@@ -126,6 +126,7 @@ builder.Services.AddAuthentication(defaultScheme: Microsoft.AspNetCore.Authentic
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwtSettings.Issuer,
             ValidAudience = jwtSettings.Audience,
@@ -206,6 +207,7 @@ app.UseRouting();
 app.UseCors("Frontend");
 
 app.UseAuthentication();
+app.UseMiddleware<SessionValidationMiddleware>();
 app.UseMiddleware<DataMaintenanceMiddleware>();
 app.UseRateLimiter();
 app.UseMiddleware<LicenseMiddleware>();
@@ -228,7 +230,8 @@ if (!app.Environment.IsEnvironment("Testing"))
     var hasher=scope.ServiceProvider.GetRequiredService<Accounting.Application.Common.Interfaces.IPasswordHasher>();
     await using var seedTransaction=await db.Database.BeginTransactionAsync();
     await StartupDataSeeder.InitializeAsync(db,invoiceBalances,accountBalances,hasher,mode,
-        builder.Configuration["Seeding:AdminPassword"] ?? builder.Configuration["Seeding:DemoPassword"] ?? "Demo1405!");
+        builder.Configuration["Seeding:AdminPassword"] ?? builder.Configuration["Seeding:DemoPassword"]
+            ?? (app.Environment.IsDevelopment() ? "Demo1405!" : string.Empty));
     await seedTransaction.CommitAsync();
 }
 

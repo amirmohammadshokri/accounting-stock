@@ -376,3 +376,15 @@ Accounting.Api/appsettings.*.local.json
 /test_errors.txt
 /docs/output/
 /build_log.txt
+
+# Database exports and deployment secrets must remain local.
+*.bak
+*.bkp
+*.bacpac
+*.sqlite
+*.sqlite3
+*.db
+**/appsettings.Production.json
+**/*.private.json
+**/*.p12
+**/database-settings.local.json

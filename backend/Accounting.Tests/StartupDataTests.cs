@@ -12,6 +12,57 @@ using Xunit;
 namespace Accounting.Tests;
 public class StartupDataTests
 {
+    [Fact]
+    public async Task RawBootstrap_HasPersianEssentialsAndWorkingAdministratorOnly()
+    {
+        await using var db = CreateDb();
+        const string password = "InitialAdmin1405!";
+        await Initialize(db, password: password);
+        var admin = await db.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
+            .ThenInclude(r => r.Permissions).SingleAsync();
+        Assert.Equal("admin@demo.local", admin.Email);
+        Assert.Equal("مدیر سامانه", admin.FullName);
+        Assert.True(new PasswordHasher().VerifyPassword(admin.PasswordHash, password));
+        Assert.Equal("مدیر سامانه", Assert.Single(admin.UserRoles).Role.Name);
+        Assert.All(Accounting.Domain.Constants.Permissions.GetAll(), permission =>
+            Assert.Contains(admin.UserRoles.SelectMany(ur => ur.Role.Permissions), p => p.Permission == permission));
+        Assert.True((await db.Branches.SingleAsync()).IsHeadquarters);
+        Assert.True((await db.Warehouses.SingleAsync()).IsDefault);
+        Assert.Equal(7, await db.Units.CountAsync());
+        Assert.All(await db.Roles.ToListAsync(), role =>
+        {
+            Assert.Matches("[\u0600-\u06FF]", role.Name);
+            Assert.Matches("[\u0600-\u06FF]", role.Description!);
+        });
+    }
+
+    [Fact]
+    public async Task RawBootstrap_RejectsMissingPasswordBeforeWritingEssentials()
+    {
+        await using var db = CreateDb();
+        await Assert.ThrowsAsync<InvalidOperationException>(() => StartupDataSeeder.SeedEssentialAsync(db, new PasswordHasher(), ""));
+        Assert.Empty(await db.Users.ToListAsync());
+        Assert.Empty(await db.CompanySettings.ToListAsync());
+        Assert.Empty(await db.Branches.ToListAsync());
+    }
+
+    [Fact]
+    public async Task Restart_AddsMissingBuiltInAdminPermissionWithoutResettingPassword()
+    {
+        await using var db = CreateDb();
+        await Initialize(db);
+        var hash = (await db.Users.SingleAsync()).PasswordHash;
+        var role = await db.Roles.Include(r => r.Permissions).SingleAsync(r => r.Name == "مدیر سامانه");
+        var removed = role.Permissions.First();
+        var permission = removed.Permission;
+        db.RolePermissions.Remove(removed);
+        await db.SaveChangesAsync();
+        await Initialize(db, password: "AnotherPassword1405!");
+        Assert.Contains(await db.RolePermissions.Where(p => p.RoleId == role.Id).ToListAsync(), p => p.Permission == permission);
+        Assert.Equal(hash, (await db.Users.SingleAsync()).PasswordHash);
+        Assert.Single(await db.Users.ToListAsync());
+    }
+
     private static AppDbContext CreateDb()
     {
         var user=new FakeCurrentUserService(1);

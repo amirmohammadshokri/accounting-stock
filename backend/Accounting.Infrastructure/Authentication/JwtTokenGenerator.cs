@@ -6,10 +6,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Accounting.Application.Authentication.Common;
 
 namespace Accounting.Infrastructure.Authentication;
 
-public class JwtTokenGenerator(IOptions<JwtSettings> jwtOptions) : IJwtTokenGenerator
+public class JwtTokenGenerator(IOptions<JwtSettings> jwtOptions, ISessionPolicy sessionPolicy, TimeProvider clock) : IJwtTokenGenerator
 {
     private readonly JwtSettings _jwtSettings = jwtOptions.Value;
 
@@ -26,6 +27,8 @@ public string GenerateAccessToken(User user, List<string> permissions)
             new(JwtRegisteredClaimNames.FamilyName, user.LastName),
             new("id", user.Id.ToString()) // Explicit ID claim
         };
+
+        if (!string.IsNullOrWhiteSpace(user.SessionId)) claims.Add(new Claim("sid", user.SessionId));
 
         // Permissions
         foreach (var permission in permissions)
@@ -53,7 +56,11 @@ public string GenerateAccessToken(User user, List<string> permissions)
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddSeconds(_jwtSettings.AccessTokenExpirationSeconds),
+            IssuedAt = clock.GetUtcNow().UtcDateTime,
+            NotBefore = clock.GetUtcNow().UtcDateTime,
+            Expires = user.SessionStartedAtUtc.HasValue
+                ? new[] { clock.GetUtcNow().UtcDateTime.AddSeconds(_jwtSettings.AccessTokenExpirationSeconds), sessionPolicy.AbsoluteExpiry(user) }.Min()
+                : clock.GetUtcNow().UtcDateTime.AddSeconds(_jwtSettings.AccessTokenExpirationSeconds),
             Issuer = _jwtSettings.Issuer,
             Audience = _jwtSettings.Audience,
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -69,7 +76,7 @@ public string GenerateAccessToken(User user, List<string> permissions)
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         var token = Convert.ToBase64String(randomNumber);
-        var expiry = DateTime.UtcNow.AddSeconds(_jwtSettings.RefreshTokenExpirationSeconds);
+        var expiry = clock.GetUtcNow().UtcDateTime.AddSeconds(_jwtSettings.RefreshTokenExpirationSeconds);
         return (token, expiry);
     }
 }

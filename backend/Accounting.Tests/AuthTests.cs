@@ -24,7 +24,8 @@ public class AuthTests
         };
 
         var options = Options.Create(_jwtSettings);
-        _jwtGenerator = new JwtTokenGenerator(options);
+        _jwtGenerator = new JwtTokenGenerator(options,
+            Moq.Mock.Of<Accounting.Application.Authentication.Common.ISessionPolicy>(), TimeProvider.System);
     }
 
     [Fact]

@@ -37,6 +37,9 @@ public static class StartupDataSeeder
 
     public static async Task SeedEssentialAsync(AppDbContext db, IPasswordHasher hasher, string adminPassword, CancellationToken ct=default)
     {
+        var needsAdmin = !await db.Users.IgnoreQueryFilters().AnyAsync(ct);
+        if (needsAdmin && (string.IsNullOrWhiteSpace(adminPassword) || adminPassword.Length < 8))
+            throw new InvalidOperationException("برای راه‌اندازی دیتابیس خام، رمز اولیه مدیر با حداقل ۸ نویسه را در Seeding:AdminPassword تعیین کنید یا ابزار راه‌اندازی دیتابیس را اجرا کنید.");
         if(!await db.CompanySettings.AnyAsync(ct))db.CompanySettings.Add(new CompanySettings{Title="کترینگ"});
         var branch=await db.Branches.Where(x=>!x.IsDeleted).OrderByDescending(x=>x.IsHeadquarters).ThenBy(x=>x.Id).FirstOrDefaultAsync(ct);
         if(branch==null)
@@ -51,7 +54,7 @@ public static class StartupDataSeeder
             if(!await db.Units.IgnoreQueryFilters().AnyAsync(x=>x.Name==name,ct))db.Units.Add(new Accounting.Domain.Entities.Unit{Name=name});
         await DataSeeder.SeedRolesAsync(db,ct);
         // Bootstrap only an empty user database; never reset a password or recreate deleted accounts.
-        if(!await db.Users.IgnoreQueryFilters().AnyAsync(ct))
+        if(needsAdmin)
         {
             var role=await db.Roles.FirstAsync(x=>x.Name=="مدیر سامانه",ct);
             var admin=new User{Email="admin@demo.local",FirstName="مدیر",LastName="سامانه",PasswordHash=hasher.HashPassword(adminPassword),IsActive=true,BranchId=branch.Id};

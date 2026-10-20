@@ -12,11 +12,13 @@ import { routes } from './app.routes';
 
 import { httpProblemInterceptor } from '../app/core/interceptors/http-problem-interceptor';
 import { authInterceptor } from '../app/core/interceptors/auth.interceptor';
+import { SessionActivityService } from './core/services/session-activity.service';
 
 registerLocaleData(localeFa);
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideAppInitializer(() => inject(SessionActivityService).start()),
     provideAppInitializer(()=>{inject(AppSvgIcons);}),
     {provide:MAT_DIALOG_DEFAULT_OPTIONS,useValue:{hasBackdrop:true,disableClose:true,closeOnNavigation:false,autoFocus:'first-tabbable',restoreFocus:true,maxWidth:'96vw',maxHeight:'94vh',direction:'rtl'}},
     provideAppInitializer(()=>inject(DialogBehaviorService).start()),

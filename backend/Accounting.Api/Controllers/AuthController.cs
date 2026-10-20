@@ -13,10 +13,10 @@ namespace Accounting.Api.Controllers;
 // (Permissions.User.Create) şube ve rol atanarak oluşturulur.
 [Route("api/auth")]
 [ApiController]
-[AllowAnonymous]
 public class AuthController(ISender mediator) : ControllerBase
 {
     [HttpPost("login")]
+    [AllowAnonymous]
     public async Task<IActionResult> Login(LoginRequest request)
     {
         var command = new LoginCommand(
@@ -26,12 +26,13 @@ public class AuthController(ISender mediator) : ControllerBase
 
         var authResult = await mediator.Send(command);
 
-        SetRefreshTokenCookie(authResult.RefreshToken);
+        SetRefreshTokenCookie(authResult.RefreshToken, authResult.RefreshTokenExpiresAtUtc);
 
         return Ok(MapToAuthResponse(authResult));
     }
 
     [HttpPost("refresh")]
+    [AllowAnonymous]
     public async Task<IActionResult> Refresh()
     {
         var refreshToken = Request.Cookies["refreshToken"];
@@ -50,24 +51,60 @@ public class AuthController(ISender mediator) : ControllerBase
         {
             var authResult = await mediator.Send(command);
             
-            SetRefreshTokenCookie(authResult.RefreshToken);
+            SetRefreshTokenCookie(authResult.RefreshToken, authResult.RefreshTokenExpiresAtUtc);
             
             return Ok(MapToAuthResponse(authResult));
         }
         catch (Accounting.Application.Common.Exceptions.BusinessRuleException ex)
         {
+            Response.Cookies.Delete("refreshToken", new CookieOptions { Path = "/", Secure = true, HttpOnly = true, SameSite = SameSiteMode.Strict });
             return Unauthorized(new { message = ex.Message });
         }
     }
 
-    private void SetRefreshTokenCookie(string refreshToken)
+    [HttpGet("session")]
+    public async Task<IActionResult> Session(CancellationToken ct)
+    {
+        if (!TryGetSession(out var id, out var sid)) return Unauthorized();
+        Response.Headers.CacheControl = "no-store";
+        var session = await mediator.Send(new SessionQuery(id, sid), ct);
+        return session is null ? Unauthorized() : Ok(session);
+    }
+
+    [HttpPost("activity")]
+    public async Task<IActionResult> Activity(CancellationToken ct)
+    {
+        if (!TryGetSession(out var id, out var sid)) return Unauthorized();
+        Response.Headers.CacheControl = "no-store";
+        var session = await mediator.Send(new SessionActivityCommand(id, sid), ct);
+        return session is null ? Unauthorized() : Ok(session);
+    }
+
+    [HttpPost("logout")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Logout(CancellationToken ct)
+    {
+        var refreshToken = Request.Cookies["refreshToken"];
+        if (!string.IsNullOrEmpty(refreshToken)) await mediator.Send(new LogoutCommand(refreshToken), ct);
+        Response.Cookies.Delete("refreshToken", new CookieOptions { Path = "/", Secure = true, HttpOnly = true, SameSite = SameSiteMode.Strict });
+        return NoContent();
+    }
+
+    private bool TryGetSession(out int id, out string sid)
+    {
+        sid = User.FindFirst("sid")?.Value ?? "";
+        return int.TryParse(User.FindFirst("id")?.Value, out id) && sid.Length > 0;
+    }
+
+    private void SetRefreshTokenCookie(string refreshToken, DateTime expiresAtUtc)
     {
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
             SameSite = SameSiteMode.Strict,
             Secure = true, // HTTPS required
-            Expires = DateTime.UtcNow.AddDays(7) 
+            Path = "/",
+            Expires = new DateTimeOffset(DateTime.SpecifyKind(expiresAtUtc, DateTimeKind.Utc))
         };
         Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
     }
@@ -79,7 +116,8 @@ public class AuthController(ISender mediator) : ControllerBase
             authResult.FirstName,
             authResult.LastName,
             authResult.Email,
-            authResult.AccessToken
+            authResult.AccessToken,
+            authResult.Session
         );
     }
 }

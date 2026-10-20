@@ -6,18 +6,21 @@ import { HANDLE_ERROR_LOCALLY } from '../interceptors/http-problem-interceptor';
  */
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient, HttpContext } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, finalize, shareReplay } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import {
   LoginBody,
   AuthResponse,
   CurrentUser,
-  JwtClaims
+  JwtClaims,
+  SessionStatus,
+  SessionState
 } from '../models/auth.models';
 
 const TOKEN_KEY = 'accessToken';
 const USER_KEY = 'currentUser';
+const SESSION_KEY = 'authSession';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -27,6 +30,10 @@ export class AuthService {
 
   // Signals for reactive state
   private currentUserSignal = signal<CurrentUser | null>(this.loadUserFromStorage());
+  private readonly sessionSignal = signal<SessionState | null>(this.loadSession());
+  readonly sessionState = this.sessionSignal.asReadonly();
+  private refreshRequest?: Observable<AuthResponse>;
+  private authEpoch = 0;
   
   // Public readonly signals
   readonly currentUser = this.currentUserSignal.asReadonly();
@@ -56,8 +63,9 @@ export class AuthService {
    * POST /api/auth/login
    */
   login(body: LoginBody): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, body, {context:new HttpContext().set(HANDLE_ERROR_LOCALLY,true)}).pipe(
-      tap(response => this.handleAuthResponse(response))
+    const epoch = ++this.authEpoch;
+    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, body, {withCredentials: true, context:new HttpContext().set(HANDLE_ERROR_LOCALLY,true)}).pipe(
+      tap(response => { if (epoch === this.authEpoch) this.handleAuthResponse(response); })
     );
   }
 
@@ -66,17 +74,48 @@ export class AuthService {
    * RefreshToken cookie'den otomatik gönderilir (HttpOnly)
    */
   refresh(): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/refresh`, {}, {context:new HttpContext().set(HANDLE_ERROR_LOCALLY,true)}).pipe(
-      tap(response => this.handleAuthResponse(response))
-    );
+    if (!this.refreshRequest) {
+      const epoch = this.authEpoch;
+      this.refreshRequest = this.http.post<AuthResponse>(`${this.baseUrl}/refresh`, {}, {
+        withCredentials: true, context: new HttpContext().set(HANDLE_ERROR_LOCALLY, true)
+      }).pipe(
+        tap(response => { if (epoch === this.authEpoch) this.handleAuthResponse(response); }),
+        finalize(() => { this.refreshRequest = undefined; }),
+        shareReplay({ bufferSize: 1, refCount: false })
+      );
+    }
+    return this.refreshRequest;
   }
 
   /**
    * Logout - Token'ları temizle ve login'e yönlendir
    */
   logout(): void {
+    const hadToken = !!this.getToken();
     this.clearAuth();
     this.router.navigate(['/login']);
+    if (hadToken) {
+      this.http.post(`${this.baseUrl}/logout`, {}, {
+        withCredentials: true, context: new HttpContext().set(HANDLE_ERROR_LOCALLY, true)
+      }).subscribe({ error: () => { /* Local logout still completes if the network is down. */ } });
+    }
+  }
+
+  updateSession(status: SessionStatus): void {
+    const state = { status, serverOffsetMs: Date.parse(status.serverTimeUtc) - Date.now() };
+    this.sessionSignal.set(state);
+    localStorage.setItem(SESSION_KEY, JSON.stringify(state));
+  }
+
+  syncFromStorage(): void {
+    this.currentUserSignal.set(this.loadUserFromStorage());
+    this.sessionSignal.set(this.loadSession());
+    if (!this.getToken()) void this.router.navigate(['/login']);
+  }
+
+  private loadSession(): SessionState | null {
+    try { return JSON.parse(localStorage.getItem(SESSION_KEY) ?? 'null') as SessionState | null; }
+    catch { return null; }
   }
 
   /**
@@ -133,6 +172,7 @@ export class AuthService {
   private handleAuthResponse(response: AuthResponse): void {
     // Store token
     localStorage.setItem(TOKEN_KEY, response.accessToken);
+    if (response.session) this.updateSession(response.session);
 
     // Parse token to get claims
     const claims = this.decodeToken(response.accessToken);
@@ -191,8 +231,11 @@ export class AuthService {
    * Clear all auth data
    */
   private clearAuth(): void {
+    this.authEpoch++;
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(SESSION_KEY);
+    this.sessionSignal.set(null);
     this.currentUserSignal.set(null);
   }
 }

@@ -956,7 +956,19 @@ public static class DataSeeder
         // Helper to Create Role if not exists
         async Task CreateRoleIfNotExists(string name, string desc, bool isStatic, string[] permissions)
         {
-            if (await db.Roles.AnyAsync(r => r.Name == name, ct)) return;
+            var existing = await db.Roles.IgnoreQueryFilters().Include(r => r.Permissions)
+                .FirstOrDefaultAsync(r => r.Name == name, ct);
+            if (existing is not null)
+            {
+                // Keep customized roles intact. The built-in administrator always gets new permissions.
+                if (isStatic && !existing.IsDeleted)
+                {
+                    foreach (var permission in permissions.Distinct())
+                        if (!existing.Permissions.Any(p => p.Permission == permission))
+                            existing.Permissions.Add(new RolePermission { Permission = permission, CreatedAtUtc = now });
+                }
+                return;
+            }
 
             var role = new Role
             {

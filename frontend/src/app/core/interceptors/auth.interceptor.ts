@@ -12,7 +12,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   // Skip token injection for auth endpoints
   if (req.url.includes('/auth/login') ||
-      req.url.includes('/auth/refresh')) {
+      req.url.includes('/auth/refresh') || req.url.includes('/auth/logout')) {
     return next(req);
   }
 
@@ -53,6 +53,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(clonedReq).pipe(
     catchError(error => {
+      if (error.status === 401 && error.error?.code === 'session_expired') {
+        authService.logout();
+        return throwError(() => error);
+      }
       // If 401 Unauthorized, try to refresh
       if (error.status === 401 && !req.url.includes('/auth/refresh')) {
         return authService.refresh().pipe(

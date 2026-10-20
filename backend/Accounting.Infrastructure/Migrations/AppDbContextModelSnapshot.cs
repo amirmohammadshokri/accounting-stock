@@ -1599,6 +1599,16 @@ namespace Accounting.Infrastructure.Migrations
                     b.Property<DateTime?>("RefreshTokenExpiryTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("SessionId")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<DateTime?>("SessionStartedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("SessionLastActivityAtUtc")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("UpdatedAtUtc")
                         .HasColumnType("datetime2");
 

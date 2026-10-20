@@ -40,6 +40,14 @@ public static class DependencyInjection
 
         // Auth
         services.Configure<Accounting.Infrastructure.Authentication.JwtSettings>(config.GetSection(Accounting.Infrastructure.Authentication.JwtSettings.SectionName));
+        services.AddOptions<Accounting.Application.Authentication.Common.SessionSettings>()
+            .Bind(config.GetSection(Accounting.Application.Authentication.Common.SessionSettings.SectionName))
+            .Validate(s => s.AbsoluteTimeoutSeconds is > 0 and <= 31536000
+                && s.IdleTimeoutSeconds is > 0 and <= 31536000,
+                "Session timeout values must be between 1 and 31536000 seconds.")
+            .ValidateOnStart();
+        services.AddSingleton<Accounting.Application.Authentication.Common.ISessionPolicy, Accounting.Infrastructure.Authentication.SessionPolicy>();
+        services.AddScoped<Accounting.Application.Authentication.Common.IUserSessionStore, Accounting.Infrastructure.Authentication.UserSessionStore>();
         services.AddSingleton<Accounting.Application.Common.Interfaces.IJwtTokenGenerator, Accounting.Infrastructure.Authentication.JwtTokenGenerator>();
         services.AddSingleton<Accounting.Application.Common.Interfaces.IPasswordHasher, Accounting.Infrastructure.Authentication.PasswordHasher>();
         services.AddSingleton<Accounting.Application.Common.Interfaces.ICurrentUserService, Accounting.Infrastructure.Services.CurrentUserService>();

@@ -5,5 +5,6 @@ public record AuthResponse(
     string FirstName,
     string LastName,
     string Email,
-    string AccessToken
+    string AccessToken,
+    Accounting.Application.Authentication.Common.SessionStatus Session
 );

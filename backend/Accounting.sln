@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accounting.Infrastructure",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accounting.Tests", "Accounting.Tests\Accounting.Tests.csproj", "{6225727C-4826-4305-A1DA-13BB618818B0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accounting.DatabaseSetup", "Accounting.DatabaseSetup\Accounting.DatabaseSetup.csproj", "{AC07694F-EF58-421C-86A2-D7139C5E8646}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,18 @@ Global
 		{6225727C-4826-4305-A1DA-13BB618818B0}.Release|x64.Build.0 = Release|Any CPU
 		{6225727C-4826-4305-A1DA-13BB618818B0}.Release|x86.ActiveCfg = Release|Any CPU
 		{6225727C-4826-4305-A1DA-13BB618818B0}.Release|x86.Build.0 = Release|Any CPU
+		{AC07694F-EF58-421C-86A2-D7139C5E8646}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC07694F-EF58-421C-86A2-D7139C5E8646}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC07694F-EF58-421C-86A2-D7139C5E8646}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AC07694F-EF58-421C-86A2-D7139C5E8646}.Debug|x64.Build.0 = Debug|Any CPU
+		{AC07694F-EF58-421C-86A2-D7139C5E8646}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AC07694F-EF58-421C-86A2-D7139C5E8646}.Debug|x86.Build.0 = Debug|Any CPU
+		{AC07694F-EF58-421C-86A2-D7139C5E8646}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC07694F-EF58-421C-86A2-D7139C5E8646}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC07694F-EF58-421C-86A2-D7139C5E8646}.Release|x64.ActiveCfg = Release|Any CPU
+		{AC07694F-EF58-421C-86A2-D7139C5E8646}.Release|x64.Build.0 = Release|Any CPU
+		{AC07694F-EF58-421C-86A2-D7139C5E8646}.Release|x86.ActiveCfg = Release|Any CPU
+		{AC07694F-EF58-421C-86A2-D7139C5E8646}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

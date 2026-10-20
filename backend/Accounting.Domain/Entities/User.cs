@@ -12,6 +12,9 @@ public class User : IHasTimestamps, ISoftDeletable
     public bool IsActive { get; set; } = true;
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiryTime { get; set; }
+    public string? SessionId { get; set; }
+    public DateTime? SessionStartedAtUtc { get; set; }
+    public DateTime? SessionLastActivityAtUtc { get; set; }
 
     // Audit
     public DateTime CreatedAtUtc { get; set; }

@@ -10,7 +10,8 @@ namespace Accounting.Application.Authentication.Commands.RefreshToken;
 
 public class RefreshTokenCommandHandler(
     IAppDbContext context,
-    IJwtTokenGenerator jwtTokenGenerator) : IRequestHandler<RefreshTokenCommand, AuthenticationResult>
+    IJwtTokenGenerator jwtTokenGenerator,
+    ISessionPolicy sessionPolicy) : IRequestHandler<RefreshTokenCommand, AuthenticationResult>
 {
     public async Task<AuthenticationResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
@@ -22,10 +23,12 @@ public class RefreshTokenCommandHandler(
             .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
                     .ThenInclude(r => r.Permissions)
+            .Include(u => u.Branch)
             .FirstOrDefaultAsync(u => u.RefreshToken == request.RefreshToken, cancellationToken);
 
         // 2. Validate Refresh Token
-        if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+        if (user == null || !user.RefreshTokenExpiryTime.HasValue
+            || user.RefreshTokenExpiryTime <= sessionPolicy.UtcNow || !sessionPolicy.IsValid(user))
         {
             throw new BusinessRuleException("توکن تمدید نشست نامعتبر است یا اعتبار آن پایان یافته است.");
         }
@@ -49,6 +52,8 @@ public class RefreshTokenCommandHandler(
 
         var newAccessToken = jwtTokenGenerator.GenerateAccessToken(user, permissions);
         var (newRefreshToken, newRefreshTokenExpiry) = jwtTokenGenerator.GenerateRefreshToken();
+        newRefreshTokenExpiry = newRefreshTokenExpiry < sessionPolicy.AbsoluteExpiry(user)
+            ? newRefreshTokenExpiry : sessionPolicy.AbsoluteExpiry(user);
 
         // 5. Update User with New Refresh Token (Revoke old one by overwriting)
         user.RefreshToken = newRefreshToken;
@@ -62,7 +67,9 @@ public class RefreshTokenCommandHandler(
             user.LastName,
             user.Email,
             newAccessToken,
-            newRefreshToken
+            newRefreshToken,
+            newRefreshTokenExpiry,
+            sessionPolicy.Status(user)
         );
     }
 }

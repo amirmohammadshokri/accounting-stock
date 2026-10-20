@@ -10,7 +10,8 @@ namespace Accounting.Application.Authentication.Commands.Login;
 public class LoginCommandHandler(
     IAppDbContext context,
     IPasswordHasher passwordHasher,
-    IJwtTokenGenerator jwtTokenGenerator) : IRequestHandler<LoginCommand, AuthenticationResult>
+    IJwtTokenGenerator jwtTokenGenerator,
+    ISessionPolicy sessionPolicy) : IRequestHandler<LoginCommand, AuthenticationResult>
 {
     public async Task<AuthenticationResult> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
@@ -49,8 +50,11 @@ public class LoginCommandHandler(
             .Distinct()
             .ToList();
 
+        sessionPolicy.Start(user);
         var accessToken = jwtTokenGenerator.GenerateAccessToken(user, permissions);
         var (refreshToken, refreshTokenExpiry) = jwtTokenGenerator.GenerateRefreshToken();
+        refreshTokenExpiry = refreshTokenExpiry < sessionPolicy.AbsoluteExpiry(user)
+            ? refreshTokenExpiry : sessionPolicy.AbsoluteExpiry(user);
 
         // 4. Update Refresh Token
         user.RefreshToken = refreshToken;
@@ -64,7 +68,9 @@ public class LoginCommandHandler(
             user.LastName,
             user.Email,
             accessToken,
-            refreshToken
+            refreshToken,
+            refreshTokenExpiry,
+            sessionPolicy.Status(user)
         );
     }
 }

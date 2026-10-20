@@ -36,6 +36,21 @@ describe('AuthService', () => {
     expect(service.currentUser()).toBeNull();
   });
 
+  it('shares simultaneous refresh requests and does not restore a session after logout', () => {
+    const service = TestBed.inject(AuthService);
+    spyOn(router, 'navigate').and.resolveTo(true);
+    localStorage.setItem('accessToken', 'old-token');
+    service.refresh().subscribe();
+    service.refresh().subscribe();
+    const request = http.expectOne(`${environment.apiBaseUrl}/auth/refresh`);
+    expect(request.request.withCredentials).toBeTrue();
+    service.logout();
+    http.expectOne(`${environment.apiBaseUrl}/auth/logout`).flush(null);
+    request.flush({ id: 1, firstName: 'Test', lastName: 'User', email: 'test@local', accessToken: fakeJwt({ id: '1', exp: Date.now() / 1000 + 900 }) });
+    expect(service.isAuthenticated()).toBeFalse();
+    expect(service.getToken()).toBeNull();
+  });
+
   it('login() stores the token/user and flips isAuthenticated/isAdmin', () => {
     const service = TestBed.inject(AuthService);
 
@@ -114,6 +129,7 @@ describe('AuthService', () => {
     expect(service.isAuthenticated()).toBeTrue();
 
     service.logout();
+    http.expectOne(`${environment.apiBaseUrl}/auth/logout`).flush(null);
 
     expect(service.isAuthenticated()).toBeFalse();
     expect(service.currentUser()).toBeNull();

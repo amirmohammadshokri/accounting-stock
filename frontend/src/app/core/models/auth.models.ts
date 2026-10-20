@@ -23,6 +23,20 @@ export interface AuthResponse {
   lastName: string;
   email: string;
   accessToken: string;
+  session?: SessionStatus;
+}
+
+export interface SessionStatus {
+  sessionId: string;
+  serverTimeUtc: string;
+  absoluteExpiresAtUtc: string;
+  idleExpiresAtUtc: string;
+  idleTimeoutSeconds: number;
+}
+
+export interface SessionState {
+  status: SessionStatus;
+  serverOffsetMs: number;
 }
 
 /**
