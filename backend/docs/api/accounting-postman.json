@@ -1,0 +1,3500 @@
+{
+  "info": {
+    "name": "Accounting API — Frontend handoff",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "90 API operations extracted from current backend. Examples are placeholders, not live records."
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://localhost:7000"
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "password",
+      "value": ""
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "rowVersion",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "AuditLogs",
+      "item": [
+        {
+          "name": "GET /api/audit-logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/audit-logs\n  Auth: Bearer accessToken\n  Permissions: —\n  query: Page (integer / int32) [optional]\n  query: PageSize (integer / int32) [optional]\n  query: UserId (integer / int32) [optional]\n  query: EntityName (string) [optional]\n  query: StartDate (string / date-time) [optional]\n  query: EndDate (string / date-time) [optional]\n  Response 200: text/plain → AuditTrailListDto; application/json → AuditTrailListDto; text/json → AuditTrailListDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/audit-logs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "audit-logs"
+              ],
+              "query": [
+                {
+                  "key": "Page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "PageSize",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "UserId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "EntityName",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "StartDate",
+                  "value": "2026-10-14T00:00:00Z",
+                  "disabled": true
+                },
+                {
+                  "key": "EndDate",
+                  "value": "2026-10-14T00:00:00Z",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST /api/auth/login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/auth/login\n  Auth: Anonymous\n  Permissions: —\n  Body: LoginRequest\n    email: string | null\n    password: string | null\n  Response 200: application/json → AuthResponse\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": null,\n  \"password\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  if (data.accessToken) pm.collectionVariables.set('accessToken', data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /api/auth/refresh",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "description": "POST /api/auth/refresh\n  Auth: Anonymous\n  Permissions: —\n  Response 200: application/json → AuthResponse\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "refresh"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Branches",
+      "item": [
+        {
+          "name": "GET /api/Branches",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Branches\n  Auth: Bearer accessToken\n  Permissions: Branch.Read\n  Response 200: text/plain → array<BranchListItemDto>; application/json → array<BranchListItemDto>; text/json → array<BranchListItemDto>\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Branches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Branches"
+              ],
+              "query": [],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/Branches",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/Branches\n  Auth: Bearer accessToken\n  Permissions: Branch.Create\n  Body: CreateBranchCommand\n    code: string | null\n    name: string | null\n  Response 200: text/plain → BranchDetailDto; application/json → BranchDetailDto; text/json → BranchDetailDto\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Branches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Branches"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": null,\n  \"name\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/Branches/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Branches/{id}\n  Auth: Bearer accessToken\n  Permissions: Branch.Read\n  path: id (integer / int32) [required]\n  Response 200: text/plain → BranchDetailDto; application/json → BranchDetailDto; text/json → BranchDetailDto\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Branches/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Branches",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/Branches/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "PUT /api/Branches/{id}\n  Auth: Bearer accessToken\n  Permissions: Branch.Update\n  path: id (integer / int32) [required]\n  Body: UpdateBranchCommand\n    id: integer / int32\n    code: string | null\n    name: string | null\n    rowVersionBase64: string | null\n  Response 200: text/plain → BranchDetailDto; application/json → BranchDetailDto; text/json → BranchDetailDto\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n  Response 409: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Branches/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Branches",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"code\": null,\n  \"name\": null,\n  \"rowVersionBase64\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/Branches/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "description": "DELETE /api/Branches/{id}\n  Auth: Bearer accessToken\n  Permissions: Branch.Delete\n  path: id (integer / int32) [required]\n  query: rowVersion (string) [optional]\n  Response 204: بدون بدنه\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Branches/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Branches",
+                ":id"
+              ],
+              "query": [
+                {
+                  "key": "rowVersion",
+                  "value": "{{rowVersion}}",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CashBankAccounts",
+      "item": [
+        {
+          "name": "GET /api/CashBankAccounts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/CashBankAccounts\n  Auth: Bearer accessToken\n  Permissions: CashBankAccount.Read\n  query: BranchId (integer / int32) [optional]\n  query: PageNumber (integer / int32) [optional]\n  query: PageSize (integer / int32) [optional]\n  query: Sort (string) [optional]\n  query: Type (CashBankAccountTypeFilter) [optional]\n  query: Search (string) [optional]\n  query: IbanStartsWith (string) [optional]\n  Response 200: text/plain → CashBankAccountListItemDtoPagedResult; application/json → CashBankAccountListItemDtoPagedResult; text/json → CashBankAccountListItemDtoPagedResult\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/CashBankAccounts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "CashBankAccounts"
+              ],
+              "query": [
+                {
+                  "key": "BranchId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "PageNumber",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "PageSize",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "Sort",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "Type",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "Search",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "IbanStartsWith",
+                  "value": "نمونه",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/CashBankAccounts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/CashBankAccounts\n  Auth: Bearer accessToken\n  Permissions: CashBankAccount.Create\n  Body: CreateCashBankAccountCommand\n    branchId: integer / int32\n    type: CashBankAccountType\n    name: string | null\n    iban: string | null\n  Response 201: text/plain → CashBankAccountDetailDto; application/json → CashBankAccountDetailDto; text/json → CashBankAccountDetailDto\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/CashBankAccounts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "CashBankAccounts"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"branchId\": 1,\n  \"type\": 1,\n  \"name\": null,\n  \"iban\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/CashBankAccounts/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/CashBankAccounts/{id}\n  Auth: Bearer accessToken\n  Permissions: CashBankAccount.Read\n  path: id (integer / int32) [required]\n  Response 200: text/plain → CashBankAccountDetailDto; application/json → CashBankAccountDetailDto; text/json → CashBankAccountDetailDto\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/CashBankAccounts/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "CashBankAccounts",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/CashBankAccounts/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "PUT /api/CashBankAccounts/{id}\n  Auth: Bearer accessToken\n  Permissions: CashBankAccount.Update\n  path: id (integer / int32) [required]\n  Body: UpdateCashBankAccountCommand\n    id: integer / int32\n    type: CashBankAccountType\n    name: string | null\n    iban: string | null\n    rowVersion: string | null\n  Response 200: text/plain → CashBankAccountDetailDto; application/json → CashBankAccountDetailDto; text/json → CashBankAccountDetailDto\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/CashBankAccounts/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "CashBankAccounts",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"type\": 1,\n  \"name\": null,\n  \"iban\": null,\n  \"rowVersion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/CashBankAccounts/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "DELETE /api/CashBankAccounts/{id}\n  Auth: Bearer accessToken\n  Permissions: CashBankAccount.Delete\n  path: id (integer / int32) [required]\n  Body: SoftDeleteCashBankAccountCommand\n    id: integer / int32\n    rowVersion: string | null\n  Response 204: بدون بدنه\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/CashBankAccounts/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "CashBankAccounts",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"rowVersion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "GET /api/categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/categories\n  Auth: Bearer accessToken\n  Permissions: Category.Read\n  query: search (string) [optional]\n  query: page (integer / int32) [optional]\n  query: pageSize (integer / int32) [optional]\n  Response 200: text/plain → CategoryListItemDtoPagedResult; application/json → CategoryListItemDtoPagedResult; text/json → CategoryListItemDtoPagedResult\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categories"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "50",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/categories",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/categories\n  Auth: Bearer accessToken\n  Permissions: Category.Create\n  Body: CreateCategoryCommand\n    name: string | null\n    description: string | null\n    color: string | null\n  Response 200: text/plain → CategoryDetailDto; application/json → CategoryDetailDto; text/json → CategoryDetailDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categories"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": null,\n  \"description\": null,\n  \"color\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/categories/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "PUT /api/categories/{id}\n  Auth: Bearer accessToken\n  Permissions: Category.Update\n  path: id (integer / int32) [required]\n  Body: UpdateCategoryCommand\n    id: integer / int32\n    name: string | null\n    description: string | null\n    color: string | null\n    rowVersion: string | null\n  Response 200: text/plain → CategoryDetailDto; application/json → CategoryDetailDto; text/json → CategoryDetailDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categories",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"name\": null,\n  \"description\": null,\n  \"color\": null,\n  \"rowVersion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/categories/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "description": "DELETE /api/categories/{id}\n  Auth: Bearer accessToken\n  Permissions: Category.Delete\n  path: id (integer / int32) [required]\n  query: rowVersion (string) [optional]\n  Response 200: text/plain → boolean; application/json → boolean; text/json → boolean\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categories",
+                ":id"
+              ],
+              "query": [
+                {
+                  "key": "rowVersion",
+                  "value": "{{rowVersion}}",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cheques",
+      "item": [
+        {
+          "name": "GET /api/cheques",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/cheques\n  Auth: Bearer accessToken\n  Permissions: Cheque.Read\n  query: Page (integer / int32) [optional]\n  query: PageSize (integer / int32) [optional]\n  query: Status (string) [optional]\n  query: Type (string) [optional]\n  query: Direction (string) [optional]\n  Response 200: text/plain → ChequeDetailDtoPagedResult; application/json → ChequeDetailDtoPagedResult; text/json → ChequeDetailDtoPagedResult\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/cheques",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cheques"
+              ],
+              "query": [
+                {
+                  "key": "Page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "PageSize",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "Status",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "Type",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "Direction",
+                  "value": "نمونه",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/cheques",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/cheques\n  Auth: Bearer accessToken\n  Permissions: Cheque.Create\n  Body: CreateChequeCommand\n    contactId: integer / int32 | null\n    type: ChequeType\n    direction: ChequeDirection\n    chequeNumber: string | null\n    issueDate: string / date-time\n    dueDate: string / date-time\n    amount: string / decimal\n    currency: string | null\n    bankName: string | null\n    bankBranch: string | null\n    accountNumber: string | null\n    drawerName: string | null\n    description: string | null\n  Response 200: text/plain → integer / int32; application/json → integer / int32; text/json → integer / int32\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/cheques",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cheques"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contactId\": null,\n  \"type\": 1,\n  \"direction\": 1,\n  \"chequeNumber\": null,\n  \"issueDate\": \"2026-10-14T00:00:00Z\",\n  \"dueDate\": \"2026-10-14T00:00:00Z\",\n  \"amount\": \"1000.00\",\n  \"currency\": null,\n  \"bankName\": null,\n  \"bankBranch\": null,\n  \"accountNumber\": null,\n  \"drawerName\": null,\n  \"description\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/cheques/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/cheques/{id}\n  Auth: Bearer accessToken\n  Permissions: Cheque.Read\n  path: id (integer / int32) [required]\n  Response 200: text/plain → ChequeDetailDto; application/json → ChequeDetailDto; text/json → ChequeDetailDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/cheques/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cheques",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/cheques/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "DELETE /api/cheques/{id}\n  Auth: Bearer accessToken\n  Permissions: Cheque.Delete\n  path: id (integer / int32) [required]\n  Body: RowVersionDto\n    rowVersion: string | null\n  Response 204: بدون بدنه\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n  Response 409: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/cheques/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cheques",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rowVersion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/cheques/{id}/status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "PUT /api/cheques/{id}/status\n  Auth: Bearer accessToken\n  Permissions: Cheque.UpdateStatus\n  path: id (integer / int32) [required]\n  Body: UpdateStatusRequest\n    newStatus: ChequeStatus\n    rowVersionBase64: string | null\n    transactionDate: string / date-time | null\n    cashBankAccountId: integer / int32 | null\n  Response 204: بدون بدنه\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/cheques/:id/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cheques",
+                ":id",
+                "status"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newStatus\": 1,\n  \"rowVersionBase64\": null,\n  \"transactionDate\": null,\n  \"cashBankAccountId\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CompanySettings",
+      "item": [
+        {
+          "name": "GET /api/company-settings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/company-settings\n  Auth: Bearer accessToken\n  Permissions: CompanySettings.Read\n  Response 200: text/plain → CompanySettingsDetailDto; application/json → CompanySettingsDetailDto; text/json → CompanySettingsDetailDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/company-settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "company-settings"
+              ],
+              "query": [],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/company-settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "PUT /api/company-settings\n  Auth: Bearer accessToken\n  Permissions: CompanySettings.Update\n  Body: UpdateCompanySettingsCommand\n    id: integer / int32\n    title: string | null\n    taxNumber: string | null\n    taxOffice: string | null\n    address: string | null\n    phone: string | null\n    email: string | null\n    website: string | null\n    tradeRegisterNo: string | null\n    mersisNo: string | null\n    logoUrl: string | null\n    rowVersionBase64: string | null\n    nationalId: string | null\n    postalCode: string | null\n  Response 200: text/plain → CompanySettingsDetailDto; application/json → CompanySettingsDetailDto; text/json → CompanySettingsDetailDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/company-settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "company-settings"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"title\": null,\n  \"taxNumber\": null,\n  \"taxOffice\": null,\n  \"address\": null,\n  \"phone\": null,\n  \"email\": null,\n  \"website\": null,\n  \"tradeRegisterNo\": null,\n  \"mersisNo\": null,\n  \"logoUrl\": null,\n  \"rowVersionBase64\": null,\n  \"nationalId\": \"12345678901\",\n  \"postalCode\": \"1234567890\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Contacts",
+      "item": [
+        {
+          "name": "POST /api/Contacts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/Contacts\n  Auth: Bearer accessToken\n  Permissions: Contact.Create\n  Body: CreateContactCommand\n    branchId: integer / int32\n    isCustomer: boolean\n    isVendor: boolean\n    isEmployee: boolean\n    isRetail: boolean\n    name: string | null\n    email: string | null\n    phone: string | null\n    iban: string | null\n    address: string | null\n    city: string | null\n    district: string | null\n    companyDetails: CompanyDetailsDto\n    personDetails: PersonDetailsDto\n    nationalId: string | null\n    postalCode: string | null\n  Response 200: text/plain → ContactDetailDto; application/json → ContactDetailDto; text/json → ContactDetailDto\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Contacts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Contacts"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"branchId\": 1,\n  \"isCustomer\": false,\n  \"isVendor\": false,\n  \"isEmployee\": false,\n  \"isRetail\": false,\n  \"name\": null,\n  \"email\": null,\n  \"phone\": null,\n  \"iban\": null,\n  \"address\": null,\n  \"city\": null,\n  \"district\": null,\n  \"companyDetails\": {\n    \"taxNumber\": null,\n    \"taxOffice\": null,\n    \"mersisNo\": null,\n    \"ticaretSicilNo\": null\n  },\n  \"personDetails\": {\n    \"tckn\": null,\n    \"firstName\": null,\n    \"lastName\": null,\n    \"title\": null,\n    \"department\": null\n  },\n  \"nationalId\": \"12345678901\",\n  \"postalCode\": \"1234567890\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/Contacts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Contacts\n  Auth: Bearer accessToken\n  Permissions: Contact.Read\n  query: branchId (integer / int32) [optional]\n  query: search (string) [optional]\n  query: sort (string) [optional]\n  query: isCustomer (boolean) [optional]\n  query: isVendor (boolean) [optional]\n  query: isEmployee (boolean) [optional]\n  query: isRetail (boolean) [optional]\n  query: pageNumber (integer / int32) [optional]\n  query: pageSize (integer / int32) [optional]\n  Response 200: text/plain → ContactListItemDtoPagedResult; application/json → ContactListItemDtoPagedResult; text/json → ContactListItemDtoPagedResult\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Contacts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Contacts"
+              ],
+              "query": [
+                {
+                  "key": "branchId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "isCustomer",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "isVendor",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "isEmployee",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "isRetail",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageNumber",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/Contacts/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Contacts/{id}\n  Auth: Bearer accessToken\n  Permissions: Contact.Read\n  path: id (integer / int32) [required]\n  Response 200: text/plain → ContactDetailDto; application/json → ContactDetailDto; text/json → ContactDetailDto\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Contacts/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Contacts",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/Contacts/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "PUT /api/Contacts/{id}\n  Auth: Bearer accessToken\n  Permissions: Contact.Update\n  path: id (integer / int32) [required]\n  Body: UpdateContactCommand\n    id: integer / int32\n    isCustomer: boolean\n    isVendor: boolean\n    isEmployee: boolean\n    isRetail: boolean\n    name: string | null\n    email: string | null\n    phone: string | null\n    iban: string | null\n    address: string | null\n    city: string | null\n    district: string | null\n    companyDetails: CompanyDetailsDto\n    personDetails: PersonDetailsDto\n    rowVersion: string | null\n    nationalId: string | null\n    postalCode: string | null\n  Response 200: text/plain → ContactDetailDto; application/json → ContactDetailDto; text/json → ContactDetailDto\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Contacts/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Contacts",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"isCustomer\": false,\n  \"isVendor\": false,\n  \"isEmployee\": false,\n  \"isRetail\": false,\n  \"name\": null,\n  \"email\": null,\n  \"phone\": null,\n  \"iban\": null,\n  \"address\": null,\n  \"city\": null,\n  \"district\": null,\n  \"companyDetails\": {\n    \"taxNumber\": null,\n    \"taxOffice\": null,\n    \"mersisNo\": null,\n    \"ticaretSicilNo\": null\n  },\n  \"personDetails\": {\n    \"tckn\": null,\n    \"firstName\": null,\n    \"lastName\": null,\n    \"title\": null,\n    \"department\": null\n  },\n  \"rowVersion\": null,\n  \"nationalId\": \"12345678901\",\n  \"postalCode\": \"1234567890\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/Contacts/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "DELETE /api/Contacts/{id}\n  Auth: Bearer accessToken\n  Permissions: Contact.Delete\n  path: id (integer / int32) [required]\n  Body: RowVersionDto\n    rowVersion: string | null\n  Response 204: بدون بدنه\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Contacts/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Contacts",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rowVersion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /health\n  Auth: Anonymous\n  Permissions: —\n  Response 200: text/plain → string\n  Response 503: بدون بدنه\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Invoices",
+      "item": [
+        {
+          "name": "POST /api/Invoices",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/Invoices\n  Auth: Bearer accessToken\n  Permissions: Invoice.Create\n  Body: CreateInvoiceCommand\n    contactId: integer / int32\n    dateUtc: string / date-time\n    currency: string | null\n    lines: array<CreateInvoiceLineDto> | null\n    type: InvoiceType\n    documentType: DocumentType\n    waybillNumber: string | null\n    waybillDateUtc: string / date-time | null\n    paymentDueDateUtc: string / date-time | null\n  Response 201: text/plain → CreateInvoiceResult; application/json → CreateInvoiceResult; text/json → CreateInvoiceResult\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Invoices"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contactId\": 1,\n  \"dateUtc\": \"2026-10-14T00:00:00Z\",\n  \"currency\": null,\n  \"lines\": null,\n  \"type\": 1,\n  \"documentType\": 1,\n  \"waybillNumber\": null,\n  \"waybillDateUtc\": null,\n  \"paymentDueDateUtc\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/Invoices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Invoices\n  Auth: Bearer accessToken\n  Permissions: Invoice.Read\n  query: pageNumber (integer / int32) [optional]\n  query: pageSize (integer / int32) [optional]\n  query: sort (string) [optional]\n  query: branchId (integer / int32) [optional]\n  query: contactId (integer / int32) [optional]\n  query: type (integer / int32) [optional]\n  query: dateFromUtc (string) [optional]\n  query: dateToUtc (string) [optional]\n  Response 200: application/json → InvoiceListItemDtoPagedResult\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Invoices"
+              ],
+              "query": [
+                {
+                  "key": "pageNumber",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "dateUtc:desc",
+                  "disabled": true
+                },
+                {
+                  "key": "branchId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "contactId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "type",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "dateFromUtc",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "dateToUtc",
+                  "value": "نمونه",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/Invoices/export",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Invoices/export\n  Auth: Bearer accessToken\n  Permissions: Invoice.Read\n  query: branchId (integer / int32) [optional]\n  query: contactId (integer / int32) [optional]\n  query: type (integer / int32) [optional]\n  query: dateFromUtc (string) [optional]\n  query: dateToUtc (string) [optional]\n  Response 200: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet → string / binary\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Invoices/export",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Invoices",
+                "export"
+              ],
+              "query": [
+                {
+                  "key": "branchId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "contactId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "type",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "dateFromUtc",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "dateToUtc",
+                  "value": "نمونه",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/Invoices/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Invoices/{id}\n  Auth: Bearer accessToken\n  Permissions: Invoice.Read\n  path: id (integer / int32) [required]\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Invoices/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Invoices",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/Invoices/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "DELETE /api/Invoices/{id}\n  Auth: Bearer accessToken\n  Permissions: Invoice.Delete\n  path: id (integer / int32) [required]\n  Body: RowVersionDto\n    rowVersion: string | null\n  Response 204: بدون بدنه\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Invoices/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Invoices",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rowVersion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/Invoices/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "PUT /api/Invoices/{id}\n  Auth: Bearer accessToken\n  Permissions: Invoice.Update\n  path: id (integer / int32) [required]\n  Body: UpdateInvoiceCommand\n    id: integer / int32\n    dateUtc: string / date-time\n    currency: string | null\n    contactId: integer / int32\n    type: InvoiceType\n    documentType: DocumentType\n    waybillNumber: string | null\n    waybillDateUtc: string / date-time | null\n    paymentDueDateUtc: string / date-time | null\n    lines: array<UpdateInvoiceLineDto> | null\n    rowVersionBase64: string | null\n  Response 200: text/plain → InvoiceDetailDto; application/json → InvoiceDetailDto; text/json → InvoiceDetailDto\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Invoices/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Invoices",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"dateUtc\": \"2026-10-14T00:00:00Z\",\n  \"currency\": null,\n  \"contactId\": 1,\n  \"type\": 1,\n  \"documentType\": 1,\n  \"waybillNumber\": null,\n  \"waybillDateUtc\": null,\n  \"paymentDueDateUtc\": null,\n  \"lines\": null,\n  \"rowVersionBase64\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/Invoices/{id}/pdf",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Invoices/{id}/pdf\n  Auth: Bearer accessToken\n  Permissions: Invoice.Read\n  path: id (integer / int32) [required]\n  Response 200: application/pdf → string / binary\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Invoices/:id/pdf",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Invoices",
+                ":id",
+                "pdf"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Items",
+      "item": [
+        {
+          "name": "GET /api/Items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Items\n  Auth: Bearer accessToken\n  Permissions: Item.Read\n  query: PageNumber (integer / int32) [optional]\n  query: PageSize (integer / int32) [optional]\n  query: Search (string) [optional]\n  query: UnitId (integer / int32) [optional]\n  query: CategoryId (integer / int32) [optional]\n  query: VatRate (integer / int32) [optional]\n  query: Sort (string) [optional]\n  Response 200: text/plain → ItemListItemDtoPagedResult; application/json → ItemListItemDtoPagedResult; text/json → ItemListItemDtoPagedResult\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Items",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Items"
+              ],
+              "query": [
+                {
+                  "key": "PageNumber",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "PageSize",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "Search",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "UnitId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "CategoryId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "VatRate",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "Sort",
+                  "value": "نمونه",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/Items",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/Items\n  Auth: Bearer accessToken\n  Permissions: Item.Create\n  Body: CreateItemCommand\n    categoryId: integer / int32 | null\n    code: string | null\n    name: string | null\n    type: ItemType\n    unitId: integer / int32\n    vatRate: integer / int32\n    defaultWithholdingRate: integer / int32 | null\n    purchasePrice: string / decimal | null\n    salesPrice: string / decimal | null\n    purchaseAccountCode: string | null\n    salesAccountCode: string | null\n    usefulLifeYears: integer / int32 | null\n  Response 201: text/plain → ItemDetailDto; application/json → ItemDetailDto; text/json → ItemDetailDto\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Items",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Items"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": null,\n  \"code\": null,\n  \"name\": null,\n  \"type\": 1,\n  \"unitId\": 1,\n  \"vatRate\": 1,\n  \"defaultWithholdingRate\": null,\n  \"purchasePrice\": null,\n  \"salesPrice\": null,\n  \"purchaseAccountCode\": null,\n  \"salesAccountCode\": null,\n  \"usefulLifeYears\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/Items/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Items/{id}\n  Auth: Bearer accessToken\n  Permissions: Item.Read\n  path: id (integer / int32) [required]\n  Response 200: text/plain → ItemDetailDto; application/json → ItemDetailDto; text/json → ItemDetailDto\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Items/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Items",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/Items/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "PUT /api/Items/{id}\n  Auth: Bearer accessToken\n  Permissions: Item.Update\n  path: id (integer / int32) [required]\n  Body: UpdateItemCommand\n    id: integer / int32\n    categoryId: integer / int32 | null\n    code: string | null\n    name: string | null\n    type: ItemType\n    unitId: integer / int32\n    vatRate: integer / int32\n    defaultWithholdingRate: integer / int32 | null\n    purchasePrice: string / decimal | null\n    salesPrice: string / decimal | null\n    purchaseAccountCode: string | null\n    salesAccountCode: string | null\n    usefulLifeYears: integer / int32 | null\n    rowVersion: string | null\n  Response 200: text/plain → ItemDetailDto; application/json → ItemDetailDto; text/json → ItemDetailDto\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Items/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Items",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"categoryId\": null,\n  \"code\": null,\n  \"name\": null,\n  \"type\": 1,\n  \"unitId\": 1,\n  \"vatRate\": 1,\n  \"defaultWithholdingRate\": null,\n  \"purchasePrice\": null,\n  \"salesPrice\": null,\n  \"purchaseAccountCode\": null,\n  \"salesAccountCode\": null,\n  \"usefulLifeYears\": null,\n  \"rowVersion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/Items/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "DELETE /api/Items/{id}\n  Auth: Bearer accessToken\n  Permissions: Item.Delete\n  path: id (integer / int32) [required]\n  Body: SoftDeleteItemCommand\n    id: integer / int32\n    rowVersion: string | null\n  Response 204: بدون بدنه\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Items/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Items",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"rowVersion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "GET /api/orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/orders\n  Auth: Bearer accessToken\n  Permissions: Order.Read\n  query: branchId (integer / int32) [optional]\n  query: contactId (integer / int32) [optional]\n  query: status (OrderStatus) [optional]\n  query: page (integer / int32) [optional]\n  query: pageSize (integer / int32) [optional]\n  Response 200: text/plain → OrderListItemDtoPagedResult; application/json → OrderListItemDtoPagedResult; text/json → OrderListItemDtoPagedResult\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "branchId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "contactId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/orders",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/orders\n  Auth: Bearer accessToken\n  Permissions: Order.Create\n  Body: CreateOrderCommand\n    contactId: integer / int32\n    dateUtc: string / date-time\n    type: InvoiceType\n    currency: string | null\n    description: string | null\n    lines: array<CreateOrderLineDto> | null\n  Response 201: text/plain → OrderDetailDto; application/json → OrderDetailDto; text/json → OrderDetailDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contactId\": 1,\n  \"dateUtc\": \"2026-10-14T00:00:00Z\",\n  \"type\": 1,\n  \"currency\": null,\n  \"description\": null,\n  \"lines\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/orders/export",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/orders/export\n  Auth: Bearer accessToken\n  Permissions: Order.Read\n  query: branchId (integer / int32) [optional]\n  query: contactId (integer / int32) [optional]\n  query: status (OrderStatus) [optional]\n  Response 200: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet → string / binary\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/export",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "export"
+              ],
+              "query": [
+                {
+                  "key": "branchId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "contactId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "1",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/orders/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/orders/{id}\n  Auth: Bearer accessToken\n  Permissions: Order.Read\n  path: id (integer / int32) [required]\n  Response 200: text/plain → OrderDetailDto; application/json → OrderDetailDto; text/json → OrderDetailDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/orders/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "PUT /api/orders/{id}\n  Auth: Bearer accessToken\n  Permissions: Order.Update\n  path: id (integer / int32) [required]\n  Body: UpdateOrderCommand\n    id: integer / int32\n    contactId: integer / int32\n    dateUtc: string / date-time\n    description: string | null\n    lines: array<UpdateOrderLineDto> | null\n    rowVersion: string | null\n  Response 200: text/plain → OrderDetailDto; application/json → OrderDetailDto; text/json → OrderDetailDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"contactId\": 1,\n  \"dateUtc\": \"2026-10-14T00:00:00Z\",\n  \"description\": null,\n  \"lines\": null,\n  \"rowVersion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/orders/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "description": "DELETE /api/orders/{id}\n  Auth: Bearer accessToken\n  Permissions: Order.Delete\n  path: id (integer / int32) [required]\n  query: rowVersion (string) [optional]\n  Response 200: text/plain → boolean; application/json → boolean; text/json → boolean\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                ":id"
+              ],
+              "query": [
+                {
+                  "key": "rowVersion",
+                  "value": "{{rowVersion}}",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/orders/{id}/approve",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "description": "PUT /api/orders/{id}/approve\n  Auth: Bearer accessToken\n  Permissions: Order.Approve\n  path: id (integer / int32) [required]\n  query: rowVersion (string) [optional]\n  Response 200: text/plain → boolean; application/json → boolean; text/json → boolean\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/:id/approve",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                ":id",
+                "approve"
+              ],
+              "query": [
+                {
+                  "key": "rowVersion",
+                  "value": "{{rowVersion}}",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/orders/{id}/cancel",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "description": "PUT /api/orders/{id}/cancel\n  Auth: Bearer accessToken\n  Permissions: Order.Cancel\n  path: id (integer / int32) [required]\n  query: rowVersion (string) [optional]\n  Response 200: text/plain → boolean; application/json → boolean; text/json → boolean\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/:id/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                ":id",
+                "cancel"
+              ],
+              "query": [
+                {
+                  "key": "rowVersion",
+                  "value": "{{rowVersion}}",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/orders/{id}/create-invoice",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "description": "POST /api/orders/{id}/create-invoice\n  Auth: Bearer accessToken\n  Permissions: Order.CreateInvoice\n  path: id (integer / int32) [required]\n  Response 200: text/plain → integer / int32; application/json → integer / int32; text/json → integer / int32\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/:id/create-invoice",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                ":id",
+                "create-invoice"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "POST /api/Payments",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/Payments\n  Auth: Bearer accessToken\n  Permissions: Payment.Create\n  Body: CreatePaymentCommand\n    accountId: integer / int32\n    contactId: integer / int32 | null\n    linkedInvoiceId: integer / int32 | null\n    dateUtc: string / date-time\n    direction: PaymentDirection\n    amount: string / decimal\n    currency: string | null\n    description: string | null\n  Response 201: text/plain → CreatePaymentResult; application/json → CreatePaymentResult; text/json → CreatePaymentResult\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Payments"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accountId\": 1,\n  \"contactId\": null,\n  \"linkedInvoiceId\": null,\n  \"dateUtc\": \"2026-10-14T00:00:00Z\",\n  \"direction\": 1,\n  \"amount\": \"1000.00\",\n  \"currency\": null,\n  \"description\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/Payments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Payments\n  Auth: Bearer accessToken\n  Permissions: Payment.Read\n  query: pageNumber (integer / int32) [optional]\n  query: pageSize (integer / int32) [optional]\n  query: sort (string) [optional]\n  query: accountId (integer / int32) [optional]\n  query: contactId (integer / int32) [optional]\n  query: direction (integer / int32) [optional]\n  query: dateFromUtc (string) [optional]\n  query: dateToUtc (string) [optional]\n  query: currency (string) [optional]\n  Response 200: application/json → PaymentListItemDtoPagedResult\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Payments"
+              ],
+              "query": [
+                {
+                  "key": "pageNumber",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "dateUtc:desc",
+                  "disabled": true
+                },
+                {
+                  "key": "accountId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "contactId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "direction",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "dateFromUtc",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "dateToUtc",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "currency",
+                  "value": "IRR",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/Payments/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Payments/{id}\n  Auth: Bearer accessToken\n  Permissions: Payment.Read\n  path: id (integer / int32) [required]\n  Response 200: text/plain → PaymentDetailDto; application/json → PaymentDetailDto; text/json → PaymentDetailDto\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Payments/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Payments",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/Payments/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "PUT /api/Payments/{id}\n  Auth: Bearer accessToken\n  Permissions: Payment.Update\n  path: id (integer / int32) [required]\n  Body: UpdatePaymentCommand\n    id: integer / int32\n    accountId: integer / int32\n    contactId: integer / int32 | null\n    linkedInvoiceId: integer / int32 | null\n    dateUtc: string / date-time\n    direction: PaymentDirection\n    amount: string / decimal\n    currency: string | null\n    description: string | null\n    rowVersion: string | null\n  Response 200: text/plain → PaymentDetailDto; application/json → PaymentDetailDto; text/json → PaymentDetailDto\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Payments/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Payments",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"accountId\": 1,\n  \"contactId\": null,\n  \"linkedInvoiceId\": null,\n  \"dateUtc\": \"2026-10-14T00:00:00Z\",\n  \"direction\": 1,\n  \"amount\": \"1000.00\",\n  \"currency\": null,\n  \"description\": null,\n  \"rowVersion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/Payments/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "DELETE /api/Payments/{id}\n  Auth: Bearer accessToken\n  Permissions: Payment.Delete\n  path: id (integer / int32) [required]\n  Body: RowVersionDto\n    rowVersion: string | null\n  Response 204: بدون بدنه\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Payments/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Payments",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rowVersion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "GET /api/reports/contact/{contactId}/statement",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/reports/contact/{contactId}/statement\n  Auth: Bearer accessToken\n  Permissions: Report.ContactStatement\n  path: contactId (integer / int32) [required]\n  query: dateFrom (string / date-time) [optional]\n  query: dateTo (string / date-time) [optional]\n  Response 200: text/plain → ContactStatementDto; application/json → ContactStatementDto; text/json → ContactStatementDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/contact/:contactId/statement",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "contact",
+                ":contactId",
+                "statement"
+              ],
+              "query": [
+                {
+                  "key": "dateFrom",
+                  "value": "2026-10-14T00:00:00Z",
+                  "disabled": true
+                },
+                {
+                  "key": "dateTo",
+                  "value": "2026-10-14T00:00:00Z",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "contactId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/reports/contact/{id}/statement/export",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/reports/contact/{id}/statement/export\n  Auth: Bearer accessToken\n  Permissions: Report.ContactStatement\n  path: id (integer / int32) [required]\n  query: dateFrom (string / date-time) [optional]\n  query: dateTo (string / date-time) [optional]\n  Response 200: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet → string / binary\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/contact/:id/statement/export",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "contact",
+                ":id",
+                "statement",
+                "export"
+              ],
+              "query": [
+                {
+                  "key": "dateFrom",
+                  "value": "2026-10-14T00:00:00Z",
+                  "disabled": true
+                },
+                {
+                  "key": "dateTo",
+                  "value": "2026-10-14T00:00:00Z",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/reports/dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/reports/dashboard\n  Auth: Bearer accessToken\n  Permissions: Report.Dashboard\n  query: branchId (integer / int32) [optional]\n  Response 200: text/plain → DashboardStatsDto; application/json → DashboardStatsDto; text/json → DashboardStatsDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/dashboard",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "dashboard"
+              ],
+              "query": [
+                {
+                  "key": "branchId",
+                  "value": "1",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/reports/income-expense",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/reports/income-expense\n  Auth: Bearer accessToken\n  Permissions: Report.ProfitLoss\n  query: branchId (integer / int32) [optional]\n  query: dateFrom (string / date-time) [optional]\n  query: dateTo (string / date-time) [optional]\n  Response 200: text/plain → IncomeExpenseDto; application/json → IncomeExpenseDto; text/json → IncomeExpenseDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/income-expense",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "income-expense"
+              ],
+              "query": [
+                {
+                  "key": "branchId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "dateFrom",
+                  "value": "2026-10-14T00:00:00Z",
+                  "disabled": true
+                },
+                {
+                  "key": "dateTo",
+                  "value": "2026-10-14T00:00:00Z",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/reports/stock-status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/reports/stock-status\n  Auth: Bearer accessToken\n  Permissions: Report.StockStatus\n  Response 200: text/plain → array<StockStatusDto>; application/json → array<StockStatusDto>; text/json → array<StockStatusDto>\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/stock-status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "stock-status"
+              ],
+              "query": [],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/reports/stock-status/export",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/reports/stock-status/export\n  Auth: Bearer accessToken\n  Permissions: Report.StockStatus\n  Response 200: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet → string / binary\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/stock-status/export",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "stock-status",
+                "export"
+              ],
+              "query": [],
+              "variable": []
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "GET /api/Roles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Roles\n  Auth: Bearer accessToken\n  Permissions: Role.Read\n  Response 200: application/json → array<RoleListItemDto>\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Roles"
+              ],
+              "query": [],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/Roles",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/Roles\n  Auth: Bearer accessToken\n  Permissions: Role.Create\n  Body: CreateRoleCommand\n    name: string | null\n    description: string | null\n    permissions: array<string> | null\n  Response 201: application/json → object\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Roles"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": null,\n  \"description\": null,\n  \"permissions\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/Roles/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Roles/{id}\n  Auth: Bearer accessToken\n  Permissions: Role.Read\n  path: id (integer / int32) [required]\n  Response 200: application/json → RoleDetailDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Roles/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Roles",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/Roles/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "PUT /api/Roles/{id}\n  Auth: Bearer accessToken\n  Permissions: Role.Update\n  path: id (integer / int32) [required]\n  Body: UpdateRoleCommand\n    id: integer / int32\n    name: string | null\n    description: string | null\n    permissions: array<string> | null\n  Response 204: بدون بدنه\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Roles/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Roles",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"name\": null,\n  \"description\": null,\n  \"permissions\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/Roles/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "description": "DELETE /api/Roles/{id}\n  Auth: Bearer accessToken\n  Permissions: Role.Delete\n  path: id (integer / int32) [required]\n  Response 204: بدون بدنه\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Roles/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Roles",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "StockMovements",
+      "item": [
+        {
+          "name": "GET /api/StockMovements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/StockMovements\n  Auth: Bearer accessToken\n  Permissions: StockMovement.Read\n  query: BranchId (integer / int32) [optional]\n  query: WarehouseId (integer / int32) [optional]\n  query: ItemId (integer / int32) [optional]\n  query: Type (StockMovementType) [optional]\n  query: FromUtc (string / date-time) [optional]\n  query: ToUtc (string / date-time) [optional]\n  query: PageNumber (integer / int32) [optional]\n  query: PageSize (integer / int32) [optional]\n  query: Sort (string) [optional]\n  Response 200: text/plain → StockMovementListItemDtoPagedResult; application/json → StockMovementListItemDtoPagedResult; text/json → StockMovementListItemDtoPagedResult\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/StockMovements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "StockMovements"
+              ],
+              "query": [
+                {
+                  "key": "BranchId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "WarehouseId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "ItemId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "Type",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "FromUtc",
+                  "value": "2026-10-14T00:00:00Z",
+                  "disabled": true
+                },
+                {
+                  "key": "ToUtc",
+                  "value": "2026-10-14T00:00:00Z",
+                  "disabled": true
+                },
+                {
+                  "key": "PageNumber",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "PageSize",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "Sort",
+                  "value": "نمونه",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/StockMovements",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/StockMovements\n  Auth: Bearer accessToken\n  Permissions: StockMovement.Create\n  Body: CreateStockMovementCommand\n    warehouseId: integer / int32\n    itemId: integer / int32\n    type: StockMovementType\n    quantity: string / decimal\n    transactionDateUtc: string / date-time | null\n    note: string | null\n    invoiceId: integer / int32 | null\n  Response 201: text/plain → StockMovementDetailDto; application/json → StockMovementDetailDto; text/json → StockMovementDetailDto\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/StockMovements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "StockMovements"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"warehouseId\": 1,\n  \"itemId\": 1,\n  \"type\": 1,\n  \"quantity\": \"1000.00\",\n  \"transactionDateUtc\": null,\n  \"note\": null,\n  \"invoiceId\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/StockMovements/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/StockMovements/{id}\n  Auth: Bearer accessToken\n  Permissions: StockMovement.Read\n  path: id (integer / int32) [required]\n  Response 200: text/plain → StockMovementDetailDto; application/json → StockMovementDetailDto; text/json → StockMovementDetailDto\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/StockMovements/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "StockMovements",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "StockTransfers",
+      "item": [
+        {
+          "name": "POST /api/stock-transfers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/stock-transfers\n  Auth: Bearer accessToken\n  Permissions: Stock.Transfer\n  Body: TransferStockCommand\n    sourceWarehouseId: integer / int32\n    targetWarehouseId: integer / int32\n    itemId: integer / int32\n    quantity: string / decimal\n    transactionDateUtc: string / date-time\n    description: string | null\n  Response 200: text/plain → StockTransferDetailDto; application/json → StockTransferDetailDto; text/json → StockTransferDetailDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/stock-transfers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "stock-transfers"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceWarehouseId\": 1,\n  \"targetWarehouseId\": 1,\n  \"itemId\": 1,\n  \"quantity\": \"1000.00\",\n  \"transactionDateUtc\": \"2026-10-14T00:00:00Z\",\n  \"description\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Stocks",
+      "item": [
+        {
+          "name": "GET /api/Stocks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Stocks\n  Auth: Bearer accessToken\n  Permissions: Stock.Read\n  query: BranchId (integer / int32) [optional]\n  query: WarehouseId (integer / int32) [optional]\n  query: Search (string) [optional]\n  query: PageNumber (integer / int32) [optional]\n  query: PageSize (integer / int32) [optional]\n  query: Sort (string) [optional]\n  Response 200: text/plain → StockListItemDtoPagedResult; application/json → StockListItemDtoPagedResult; text/json → StockListItemDtoPagedResult\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Stocks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Stocks"
+              ],
+              "query": [
+                {
+                  "key": "BranchId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "WarehouseId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "Search",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "PageNumber",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "PageSize",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "Sort",
+                  "value": "نمونه",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/Stocks/export",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Stocks/export\n  Auth: Bearer accessToken\n  Permissions: Stock.Read\n  query: BranchId (integer / int32) [optional]\n  query: WarehouseId (integer / int32) [optional]\n  query: Search (string) [optional]\n  query: PageNumber (integer / int32) [optional]\n  query: PageSize (integer / int32) [optional]\n  query: Sort (string) [optional]\n  Response 200: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet → string / binary\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Stocks/export",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Stocks",
+                "export"
+              ],
+              "query": [
+                {
+                  "key": "BranchId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "WarehouseId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "Search",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "PageNumber",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "PageSize",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "Sort",
+                  "value": "نمونه",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/Stocks/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Stocks/{id}\n  Auth: Bearer accessToken\n  Permissions: Stock.Read\n  path: id (integer / int32) [required]\n  Response 200: text/plain → StockDetailDto; application/json → StockDetailDto; text/json → StockDetailDto\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Stocks/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Stocks",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Units",
+      "item": [
+        {
+          "name": "GET /api/units",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/units\n  Auth: Bearer accessToken\n  Permissions: Unit.Read\n  query: Search (string) [optional]\n  query: Page (integer / int32) [optional]\n  query: PageSize (integer / int32) [optional]\n  Response 200: text/plain → UnitListItemDtoPagedResult; application/json → UnitListItemDtoPagedResult; text/json → UnitListItemDtoPagedResult\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/units",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "units"
+              ],
+              "query": [
+                {
+                  "key": "Search",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "Page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "PageSize",
+                  "value": "1",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/units",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/units\n  Auth: Bearer accessToken\n  Permissions: Unit.Create\n  Body: CreateUnitCommand\n    name: string | null\n    description: string | null\n  Response 201: text/plain → UnitDetailDto; application/json → UnitDetailDto; text/json → UnitDetailDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/units",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "units"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": null,\n  \"description\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/units/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/units/{id}\n  Auth: Bearer accessToken\n  Permissions: Unit.Read\n  path: id (integer / int32) [required]\n  Response 200: text/plain → UnitDetailDto; application/json → UnitDetailDto; text/json → UnitDetailDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/units/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "units",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/units/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "PUT /api/units/{id}\n  Auth: Bearer accessToken\n  Permissions: Unit.Update\n  path: id (integer / int32) [required]\n  Body: UpdateUnitCommand\n    id: integer / int32\n    name: string | null\n    description: string | null\n    rowVersion: string | null\n  Response 200: text/plain → UnitDetailDto; application/json → UnitDetailDto; text/json → UnitDetailDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/units/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "units",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"name\": null,\n  \"description\": null,\n  \"rowVersion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/units/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "description": "DELETE /api/units/{id}\n  Auth: Bearer accessToken\n  Permissions: Unit.Delete\n  path: id (integer / int32) [required]\n  query: rowVersion (string) [optional]\n  Response 204: بدون بدنه\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/units/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "units",
+                ":id"
+              ],
+              "query": [
+                {
+                  "key": "rowVersion",
+                  "value": "{{rowVersion}}",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "GET /api/Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Users\n  Auth: Bearer accessToken\n  Permissions: User.Read\n  query: Page (integer / int32) [optional]\n  query: PageSize (integer / int32) [optional]\n  query: BranchId (integer / int32) [optional]\n  query: RoleId (integer / int32) [optional]\n  query: IsActive (boolean) [optional]\n  query: Search (string) [optional]\n  Response 200: application/json → UserListItemDtoPagedResult\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Users"
+              ],
+              "query": [
+                {
+                  "key": "Page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "PageSize",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "BranchId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "RoleId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "IsActive",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "Search",
+                  "value": "نمونه",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/Users",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/Users\n  Auth: Bearer accessToken\n  Permissions: User.Create\n  Body: CreateUserCommand\n    firstName: string | null\n    lastName: string | null\n    email: string | null\n    password: string | null\n    branchId: integer / int32 | null\n    isActive: boolean\n    roleIds: array<integer / int32> | null\n  Response 201: application/json → object\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Users"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": null,\n  \"lastName\": null,\n  \"email\": null,\n  \"password\": null,\n  \"branchId\": null,\n  \"isActive\": false,\n  \"roleIds\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/Users/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Users/{id}\n  Auth: Bearer accessToken\n  Permissions: User.Read\n  path: id (integer / int32) [required]\n  Response 200: application/json → UserDetailDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Users/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Users",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/Users/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "PUT /api/Users/{id}\n  Auth: Bearer accessToken\n  Permissions: User.Update\n  path: id (integer / int32) [required]\n  Body: UpdateUserCommand\n    id: integer / int32\n    firstName: string | null\n    lastName: string | null\n    email: string | null\n    branchId: integer / int32 | null\n    isActive: boolean\n    roleIds: array<integer / int32> | null\n  Response 204: بدون بدنه\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Users/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Users",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"firstName\": null,\n  \"lastName\": null,\n  \"email\": null,\n  \"branchId\": null,\n  \"isActive\": false,\n  \"roleIds\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/Users/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "description": "DELETE /api/Users/{id}\n  Auth: Bearer accessToken\n  Permissions: User.Delete\n  path: id (integer / int32) [required]\n  Response 204: بدون بدنه\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Users/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Users",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/Users/{id}/change-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/Users/{id}/change-password\n  Auth: Bearer accessToken\n  Permissions: User.Update\n  path: id (integer / int32) [required]\n  Body: ChangeUserPasswordBody\n    newPassword: string | null\n  Response 204: بدون بدنه\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Users/:id/change-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Users",
+                ":id",
+                "change-password"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newPassword\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Warehouses",
+      "item": [
+        {
+          "name": "GET /api/Warehouses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Warehouses\n  Auth: Bearer accessToken\n  Permissions: Warehouse.Read\n  query: BranchId (integer / int32) [optional]\n  query: Search (string) [optional]\n  query: PageNumber (integer / int32) [optional]\n  query: PageSize (integer / int32) [optional]\n  query: Sort (string) [optional]\n  Response 200: text/plain → WarehouseListItemDtoPagedResult; application/json → WarehouseListItemDtoPagedResult; text/json → WarehouseListItemDtoPagedResult\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Warehouses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Warehouses"
+              ],
+              "query": [
+                {
+                  "key": "BranchId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "Search",
+                  "value": "نمونه",
+                  "disabled": true
+                },
+                {
+                  "key": "PageNumber",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "PageSize",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "Sort",
+                  "value": "نمونه",
+                  "disabled": true
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/Warehouses",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "POST /api/Warehouses\n  Auth: Bearer accessToken\n  Permissions: Warehouse.Create\n  Body: CreateWarehouseCommand\n    code: string | null\n    name: string | null\n    isDefault: boolean\n  Response 201: text/plain → WarehouseDetailDto; application/json → WarehouseDetailDto; text/json → WarehouseDetailDto\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Warehouses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Warehouses"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": null,\n  \"name\": null,\n  \"isDefault\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/Warehouses/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "GET /api/Warehouses/{id}\n  Auth: Bearer accessToken\n  Permissions: Warehouse.Read\n  path: id (integer / int32) [required]\n  Response 200: text/plain → WarehouseDetailDto; application/json → WarehouseDetailDto; text/json → WarehouseDetailDto\n  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Warehouses/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Warehouses",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/Warehouses/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "PUT /api/Warehouses/{id}\n  Auth: Bearer accessToken\n  Permissions: Warehouse.Update\n  path: id (integer / int32) [required]\n  Body: UpdateWarehouseCommand\n    id: integer / int32\n    branchId: integer / int32\n    code: string | null\n    name: string | null\n    isDefault: boolean\n    rowVersion: string | null\n  Response 200: text/plain → WarehouseDetailDto; application/json → WarehouseDetailDto; text/json → WarehouseDetailDto\n  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Warehouses/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Warehouses",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"branchId\": 1,\n  \"code\": null,\n  \"name\": null,\n  \"isDefault\": false,\n  \"rowVersion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/Warehouses/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "DELETE /api/Warehouses/{id}\n  Auth: Bearer accessToken\n  Permissions: Warehouse.Delete\n  path: id (integer / int32) [required]\n  Body: RowVersionDto\n    rowVersion: string | null\n  Response 204: بدون بدنه\n\nنمونه‌ها ساختگی‌اند؛ شناسه‌ها و rowVersion را با پاسخ واقعی جایگزین کنید.",
+            "url": {
+              "raw": "{{baseUrl}}/api/Warehouses/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Warehouses",
+                ":id"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rowVersion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+using Accounting.Application.Categories.Commands.Create;
+using Accounting.Application.Categories.Commands.Delete;
+using Accounting.Application.Categories.Commands.Update;
+using Accounting.Application.Categories.Queries;
+using Accounting.Application.Categories.Queries.List;
+using Accounting.Application.Common.Models;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+
+using Microsoft.AspNetCore.Authorization;
+using Accounting.Domain.Constants;
+
+namespace Accounting.Api.Controllers;
+
+[Route("api/categories")]
+[ApiController]
+public class CategoriesController(IMediator mediator) : ControllerBase
+{
+    [HttpGet]
+    [Authorize(Policy = Permissions.Category.Read)]
+    public async Task<ActionResult<PagedResult<CategoryListItemDto>>> GetList(
+        [FromQuery] string? search,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50,
+        CancellationToken ct = default)
+    {
+        return Ok(await mediator.Send(new ListCategoriesQuery(search, page, pageSize), ct));
+    }
+
+    [HttpPost]
+    [Authorize(Policy = Permissions.Category.Create)]
+    public async Task<ActionResult<CategoryDetailDto>> Create(CreateCategoryCommand command, CancellationToken ct)
+    {
+        return Ok(await mediator.Send(command, ct));
+    }
+
+    [HttpPut("{id}")]
+    [Authorize(Policy = Permissions.Category.Update)]
+    public async Task<ActionResult<CategoryDetailDto>> Update(int id, UpdateCategoryCommand command, CancellationToken ct)
+    {
+        if (id != command.Id) return BadRequest("شناسه مسیر با شناسه درخواست یکسان نیست.");
+        return Ok(await mediator.Send(command, ct));
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Policy = Permissions.Category.Delete)]
+    public async Task<ActionResult<bool>> Delete(int id, [FromQuery] string rowVersion, CancellationToken ct)
+    {
+        return Ok(await mediator.Send(new DeleteCategoryCommand(id, rowVersion), ct));
+    }
+}

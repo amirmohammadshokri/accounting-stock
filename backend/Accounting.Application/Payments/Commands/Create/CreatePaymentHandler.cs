@@ -1,0 +1,87 @@
+using Microsoft.EntityFrameworkCore;
+using Accounting.Application.Common.Abstractions;
+using Accounting.Application.Common.Utils;
+using Accounting.Application.Common.Validation;
+using Accounting.Application.Services;
+using Accounting.Domain.Entities;
+using MediatR;
+using System.Globalization;
+
+using Accounting.Application.Common.Interfaces;
+
+namespace Accounting.Application.Payments.Commands.Create;
+
+public class CreatePaymentHandler : IRequestHandler<CreatePaymentCommand, CreatePaymentResult>
+{
+    private readonly IAppDbContext _db;
+    private readonly IInvoiceBalanceService _balanceService;
+    private readonly IAccountBalanceService _accountBalanceService;
+    private readonly ICurrentUserService _currentUserService;
+
+    public CreatePaymentHandler(IAppDbContext db, IInvoiceBalanceService balanceService, IAccountBalanceService accountBalanceService, ICurrentUserService currentUserService)
+    {
+        _db = db;
+        _balanceService = balanceService;
+        _accountBalanceService = accountBalanceService;
+        _currentUserService = currentUserService;
+    }
+
+    public async Task<CreatePaymentResult> Handle(CreatePaymentCommand req, CancellationToken ct)
+    {
+        // Currency Normalization & Validation
+        var currency = CommonValidationRules.NormalizeAndValidateCurrency(req.Currency);
+        var accountCurrency = await _db.CashBankAccounts.Where(account => account.Id == req.AccountId && !account.IsDeleted).Select(account => account.Currency).FirstOrDefaultAsync(ct);
+        if (accountCurrency != currency)
+            throw new FluentValidation.ValidationException("برای پرداخت جدید، حساب ریالی انتخاب کنید؛ ارز حساب‌های قدیمی حفظ شده است.");
+
+        var branchId = _currentUserService.BranchId ?? throw new UnauthorizedAccessException();
+
+        var entity = new Payment
+        {
+            BranchId = branchId,
+            AccountId = req.AccountId,
+            ContactId = req.ContactId,
+            LinkedInvoiceId = req.LinkedInvoiceId,
+            DateUtc = DateTime.SpecifyKind(req.DateUtc, DateTimeKind.Utc),
+            Direction = req.Direction,
+            Amount = req.Amount,
+            Currency = currency,
+            Description = req.Description?.Trim()
+        };
+
+        // Transaction: Payment + Invoice Balance birlikte commit
+        await using var tx = await _db.BeginTransactionAsync(ct);
+        try
+        {
+            _db.Payments.Add(entity);
+            await _db.SaveChangesAsync(ct);
+
+            if (entity.LinkedInvoiceId.HasValue)
+            {
+                await _balanceService.RecalculateBalanceAsync(entity.LinkedInvoiceId.Value, ct);
+                await _db.SaveChangesAsync(ct);
+            }
+
+            // Account Balance Update
+            if (entity.AccountId > 0)
+            {
+                await _accountBalanceService.RecalculateBalanceAsync(entity.AccountId, ct);
+                await _db.SaveChangesAsync(ct);
+            }
+
+            await tx.CommitAsync(ct);
+        }
+        catch
+        {
+            await tx.RollbackAsync(ct);
+            throw;
+        }
+
+        var inv = CultureInfo.InvariantCulture;
+        return new CreatePaymentResult(
+            entity.Id,
+            entity.Amount,
+            entity.Currency
+        );
+    }
+}

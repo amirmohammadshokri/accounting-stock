@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="812pt" height="44pt" viewBox="0.00 0.00 811.75 44.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 40)">
+<polygon fill="white" stroke="none" points="-4,4 -4,-40 807.75,-40 807.75,4 -4,4"/>
+<!-- Draft -->
+<g id="node1" class="node">
+<title>Draft</title>
+<ellipse fill="none" stroke="black" cx="90.41" cy="-18" rx="90.41" ry="18"/>
+<text text-anchor="middle" x="90.41" y="-13.8" font-family="Times,serif" font-size="14.00">Expense List (Draft)</text>
+</g>
+<!-- Reviewed -->
+<g id="node2" class="node">
+<title>Reviewed</title>
+<ellipse fill="none" stroke="black" cx="368.23" cy="-18" rx="108.65" ry="18"/>
+<text text-anchor="middle" x="368.23" y="-13.8" font-family="Times,serif" font-size="14.00">Expense List (Reviewed)</text>
+</g>
+<!-- Draft&#45;&gt;Reviewed -->
+<g id="edge1" class="edge">
+<title>Draft-&gt;Reviewed</title>
+<path fill="none" stroke="black" d="M180.96,-18C202.36,-18 225.53,-18 248.03,-18"/>
+<polygon fill="black" stroke="black" points="247.85,-21.5 257.85,-18 247.85,-14.5 247.85,-21.5"/>
+<text text-anchor="middle" x="220.2" y="-22.2" font-family="Times,serif" font-size="14.00">Review</text>
+</g>
+<!-- Posted -->
+<g id="node3" class="node">
+<title>Posted</title>
+<ellipse fill="none" stroke="black" cx="688.66" cy="-18" rx="115.09" ry="18"/>
+<text text-anchor="middle" x="688.66" y="-13.8" font-family="Times,serif" font-size="14.00">Posted → Purchase Invoice</text>
+</g>
+<!-- Reviewed&#45;&gt;Posted -->
+<g id="edge2" class="edge">
+<title>Reviewed-&gt;Posted</title>
+<path fill="none" stroke="black" d="M477.04,-18C504.23,-18 533.67,-18 561.67,-18"/>
+<polygon fill="black" stroke="black" points="561.64,-21.5 571.64,-18 561.64,-14.5 561.64,-21.5"/>
+<text text-anchor="middle" x="525.22" y="-22.2" font-family="Times,serif" font-size="14.00">PostToBill</text>
+</g>
+</g>
+</svg>

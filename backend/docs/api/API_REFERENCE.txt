@@ -1,0 +1,919 @@
+Accounting API — قرارداد APIهای فعلی پروژه
+تاریخ استخراج: ۱۴۰۵/۰۷/۲۲ (2026-10-14)
+Base URL نمونه: https://localhost:7000 — پیشوند /api داخل مسیرهای زیر است.
+قرارداد کامل فیلدهای تو در تو و پاسخ‌ها در accounting-openapi.json قرار دارد.
+الزام فیلدها و قواعد تجاری تکمیلی در validation-rules.txt آمده است.
+
+GET /api/Branches
+  Auth: Bearer accessToken
+  Permissions: Branch.Read
+  Response 200: text/plain → array<BranchListItemDto>; application/json → array<BranchListItemDto>; text/json → array<BranchListItemDto>
+
+POST /api/Branches
+  Auth: Bearer accessToken
+  Permissions: Branch.Create
+  Body: CreateBranchCommand
+    code: string | null
+    name: string | null
+  Response 200: text/plain → BranchDetailDto; application/json → BranchDetailDto; text/json → BranchDetailDto
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+GET /api/Branches/{id}
+  Auth: Bearer accessToken
+  Permissions: Branch.Read
+  path: id (integer / int32) [required]
+  Response 200: text/plain → BranchDetailDto; application/json → BranchDetailDto; text/json → BranchDetailDto
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+PUT /api/Branches/{id}
+  Auth: Bearer accessToken
+  Permissions: Branch.Update
+  path: id (integer / int32) [required]
+  Body: UpdateBranchCommand
+    id: integer / int32
+    code: string | null
+    name: string | null
+    rowVersionBase64: string | null
+  Response 200: text/plain → BranchDetailDto; application/json → BranchDetailDto; text/json → BranchDetailDto
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+  Response 409: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+DELETE /api/Branches/{id}
+  Auth: Bearer accessToken
+  Permissions: Branch.Delete
+  path: id (integer / int32) [required]
+  query: rowVersion (string) [optional]
+  Response 204: بدون بدنه
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+GET /api/CashBankAccounts
+  Auth: Bearer accessToken
+  Permissions: CashBankAccount.Read
+  query: BranchId (integer / int32) [optional]
+  query: PageNumber (integer / int32) [optional]
+  query: PageSize (integer / int32) [optional]
+  query: Sort (string) [optional]
+  query: Type (CashBankAccountTypeFilter) [optional]
+  query: Search (string) [optional]
+  query: IbanStartsWith (string) [optional]
+  Response 200: text/plain → CashBankAccountListItemDtoPagedResult; application/json → CashBankAccountListItemDtoPagedResult; text/json → CashBankAccountListItemDtoPagedResult
+
+POST /api/CashBankAccounts
+  Auth: Bearer accessToken
+  Permissions: CashBankAccount.Create
+  Body: CreateCashBankAccountCommand
+    branchId: integer / int32
+    type: CashBankAccountType
+    name: string | null
+    iban: string | null
+  Response 201: text/plain → CashBankAccountDetailDto; application/json → CashBankAccountDetailDto; text/json → CashBankAccountDetailDto
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+GET /api/CashBankAccounts/{id}
+  Auth: Bearer accessToken
+  Permissions: CashBankAccount.Read
+  path: id (integer / int32) [required]
+  Response 200: text/plain → CashBankAccountDetailDto; application/json → CashBankAccountDetailDto; text/json → CashBankAccountDetailDto
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+PUT /api/CashBankAccounts/{id}
+  Auth: Bearer accessToken
+  Permissions: CashBankAccount.Update
+  path: id (integer / int32) [required]
+  Body: UpdateCashBankAccountCommand
+    id: integer / int32
+    type: CashBankAccountType
+    name: string | null
+    iban: string | null
+    rowVersion: string | null
+  Response 200: text/plain → CashBankAccountDetailDto; application/json → CashBankAccountDetailDto; text/json → CashBankAccountDetailDto
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+DELETE /api/CashBankAccounts/{id}
+  Auth: Bearer accessToken
+  Permissions: CashBankAccount.Delete
+  path: id (integer / int32) [required]
+  Body: SoftDeleteCashBankAccountCommand
+    id: integer / int32
+    rowVersion: string | null
+  Response 204: بدون بدنه
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+POST /api/Contacts
+  Auth: Bearer accessToken
+  Permissions: Contact.Create
+  Body: CreateContactCommand
+    branchId: integer / int32
+    isCustomer: boolean
+    isVendor: boolean
+    isEmployee: boolean
+    isRetail: boolean
+    name: string | null
+    email: string | null
+    phone: string | null
+    iban: string | null
+    address: string | null
+    city: string | null
+    district: string | null
+    companyDetails: CompanyDetailsDto
+    personDetails: PersonDetailsDto
+    nationalId: string | null
+    postalCode: string | null
+  Response 200: text/plain → ContactDetailDto; application/json → ContactDetailDto; text/json → ContactDetailDto
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+GET /api/Contacts
+  Auth: Bearer accessToken
+  Permissions: Contact.Read
+  query: branchId (integer / int32) [optional]
+  query: search (string) [optional]
+  query: sort (string) [optional]
+  query: isCustomer (boolean) [optional]
+  query: isVendor (boolean) [optional]
+  query: isEmployee (boolean) [optional]
+  query: isRetail (boolean) [optional]
+  query: pageNumber (integer / int32) [optional]
+  query: pageSize (integer / int32) [optional]
+  Response 200: text/plain → ContactListItemDtoPagedResult; application/json → ContactListItemDtoPagedResult; text/json → ContactListItemDtoPagedResult
+
+GET /api/Contacts/{id}
+  Auth: Bearer accessToken
+  Permissions: Contact.Read
+  path: id (integer / int32) [required]
+  Response 200: text/plain → ContactDetailDto; application/json → ContactDetailDto; text/json → ContactDetailDto
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+PUT /api/Contacts/{id}
+  Auth: Bearer accessToken
+  Permissions: Contact.Update
+  path: id (integer / int32) [required]
+  Body: UpdateContactCommand
+    id: integer / int32
+    isCustomer: boolean
+    isVendor: boolean
+    isEmployee: boolean
+    isRetail: boolean
+    name: string | null
+    email: string | null
+    phone: string | null
+    iban: string | null
+    address: string | null
+    city: string | null
+    district: string | null
+    companyDetails: CompanyDetailsDto
+    personDetails: PersonDetailsDto
+    rowVersion: string | null
+    nationalId: string | null
+    postalCode: string | null
+  Response 200: text/plain → ContactDetailDto; application/json → ContactDetailDto; text/json → ContactDetailDto
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+DELETE /api/Contacts/{id}
+  Auth: Bearer accessToken
+  Permissions: Contact.Delete
+  path: id (integer / int32) [required]
+  Body: RowVersionDto
+    rowVersion: string | null
+  Response 204: بدون بدنه
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+POST /api/Invoices
+  Auth: Bearer accessToken
+  Permissions: Invoice.Create
+  Body: CreateInvoiceCommand
+    contactId: integer / int32
+    dateUtc: string / date-time
+    currency: string | null
+    lines: array<CreateInvoiceLineDto> | null
+    type: InvoiceType
+    documentType: DocumentType
+    waybillNumber: string | null
+    waybillDateUtc: string / date-time | null
+    paymentDueDateUtc: string / date-time | null
+  Response 201: text/plain → CreateInvoiceResult; application/json → CreateInvoiceResult; text/json → CreateInvoiceResult
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+GET /api/Invoices
+  Auth: Bearer accessToken
+  Permissions: Invoice.Read
+  query: pageNumber (integer / int32) [optional]
+  query: pageSize (integer / int32) [optional]
+  query: sort (string) [optional]
+  query: branchId (integer / int32) [optional]
+  query: contactId (integer / int32) [optional]
+  query: type (integer / int32) [optional]
+  query: dateFromUtc (string) [optional]
+  query: dateToUtc (string) [optional]
+  Response 200: application/json → InvoiceListItemDtoPagedResult
+
+GET /api/Invoices/export
+  Auth: Bearer accessToken
+  Permissions: Invoice.Read
+  query: branchId (integer / int32) [optional]
+  query: contactId (integer / int32) [optional]
+  query: type (integer / int32) [optional]
+  query: dateFromUtc (string) [optional]
+  query: dateToUtc (string) [optional]
+  Response 200: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet → string / binary
+
+GET /api/Invoices/{id}
+  Auth: Bearer accessToken
+  Permissions: Invoice.Read
+  path: id (integer / int32) [required]
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+DELETE /api/Invoices/{id}
+  Auth: Bearer accessToken
+  Permissions: Invoice.Delete
+  path: id (integer / int32) [required]
+  Body: RowVersionDto
+    rowVersion: string | null
+  Response 204: بدون بدنه
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+PUT /api/Invoices/{id}
+  Auth: Bearer accessToken
+  Permissions: Invoice.Update
+  path: id (integer / int32) [required]
+  Body: UpdateInvoiceCommand
+    id: integer / int32
+    dateUtc: string / date-time
+    currency: string | null
+    contactId: integer / int32
+    type: InvoiceType
+    documentType: DocumentType
+    waybillNumber: string | null
+    waybillDateUtc: string / date-time | null
+    paymentDueDateUtc: string / date-time | null
+    lines: array<UpdateInvoiceLineDto> | null
+    rowVersionBase64: string | null
+  Response 200: text/plain → InvoiceDetailDto; application/json → InvoiceDetailDto; text/json → InvoiceDetailDto
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+GET /api/Invoices/{id}/pdf
+  Auth: Bearer accessToken
+  Permissions: Invoice.Read
+  path: id (integer / int32) [required]
+  Response 200: application/pdf → string / binary
+
+GET /api/Items
+  Auth: Bearer accessToken
+  Permissions: Item.Read
+  query: PageNumber (integer / int32) [optional]
+  query: PageSize (integer / int32) [optional]
+  query: Search (string) [optional]
+  query: UnitId (integer / int32) [optional]
+  query: CategoryId (integer / int32) [optional]
+  query: VatRate (integer / int32) [optional]
+  query: Sort (string) [optional]
+  Response 200: text/plain → ItemListItemDtoPagedResult; application/json → ItemListItemDtoPagedResult; text/json → ItemListItemDtoPagedResult
+
+POST /api/Items
+  Auth: Bearer accessToken
+  Permissions: Item.Create
+  Body: CreateItemCommand
+    categoryId: integer / int32 | null
+    code: string | null
+    name: string | null
+    type: ItemType
+    unitId: integer / int32
+    vatRate: integer / int32
+    defaultWithholdingRate: integer / int32 | null
+    purchasePrice: string / decimal | null
+    salesPrice: string / decimal | null
+    purchaseAccountCode: string | null
+    salesAccountCode: string | null
+    usefulLifeYears: integer / int32 | null
+  Response 201: text/plain → ItemDetailDto; application/json → ItemDetailDto; text/json → ItemDetailDto
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+GET /api/Items/{id}
+  Auth: Bearer accessToken
+  Permissions: Item.Read
+  path: id (integer / int32) [required]
+  Response 200: text/plain → ItemDetailDto; application/json → ItemDetailDto; text/json → ItemDetailDto
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+PUT /api/Items/{id}
+  Auth: Bearer accessToken
+  Permissions: Item.Update
+  path: id (integer / int32) [required]
+  Body: UpdateItemCommand
+    id: integer / int32
+    categoryId: integer / int32 | null
+    code: string | null
+    name: string | null
+    type: ItemType
+    unitId: integer / int32
+    vatRate: integer / int32
+    defaultWithholdingRate: integer / int32 | null
+    purchasePrice: string / decimal | null
+    salesPrice: string / decimal | null
+    purchaseAccountCode: string | null
+    salesAccountCode: string | null
+    usefulLifeYears: integer / int32 | null
+    rowVersion: string | null
+  Response 200: text/plain → ItemDetailDto; application/json → ItemDetailDto; text/json → ItemDetailDto
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+DELETE /api/Items/{id}
+  Auth: Bearer accessToken
+  Permissions: Item.Delete
+  path: id (integer / int32) [required]
+  Body: SoftDeleteItemCommand
+    id: integer / int32
+    rowVersion: string | null
+  Response 204: بدون بدنه
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+POST /api/Payments
+  Auth: Bearer accessToken
+  Permissions: Payment.Create
+  Body: CreatePaymentCommand
+    accountId: integer / int32
+    contactId: integer / int32 | null
+    linkedInvoiceId: integer / int32 | null
+    dateUtc: string / date-time
+    direction: PaymentDirection
+    amount: string / decimal
+    currency: string | null
+    description: string | null
+  Response 201: text/plain → CreatePaymentResult; application/json → CreatePaymentResult; text/json → CreatePaymentResult
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+GET /api/Payments
+  Auth: Bearer accessToken
+  Permissions: Payment.Read
+  query: pageNumber (integer / int32) [optional]
+  query: pageSize (integer / int32) [optional]
+  query: sort (string) [optional]
+  query: accountId (integer / int32) [optional]
+  query: contactId (integer / int32) [optional]
+  query: direction (integer / int32) [optional]
+  query: dateFromUtc (string) [optional]
+  query: dateToUtc (string) [optional]
+  query: currency (string) [optional]
+  Response 200: application/json → PaymentListItemDtoPagedResult
+
+GET /api/Payments/{id}
+  Auth: Bearer accessToken
+  Permissions: Payment.Read
+  path: id (integer / int32) [required]
+  Response 200: text/plain → PaymentDetailDto; application/json → PaymentDetailDto; text/json → PaymentDetailDto
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+PUT /api/Payments/{id}
+  Auth: Bearer accessToken
+  Permissions: Payment.Update
+  path: id (integer / int32) [required]
+  Body: UpdatePaymentCommand
+    id: integer / int32
+    accountId: integer / int32
+    contactId: integer / int32 | null
+    linkedInvoiceId: integer / int32 | null
+    dateUtc: string / date-time
+    direction: PaymentDirection
+    amount: string / decimal
+    currency: string | null
+    description: string | null
+    rowVersion: string | null
+  Response 200: text/plain → PaymentDetailDto; application/json → PaymentDetailDto; text/json → PaymentDetailDto
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+DELETE /api/Payments/{id}
+  Auth: Bearer accessToken
+  Permissions: Payment.Delete
+  path: id (integer / int32) [required]
+  Body: RowVersionDto
+    rowVersion: string | null
+  Response 204: بدون بدنه
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+GET /api/Roles
+  Auth: Bearer accessToken
+  Permissions: Role.Read
+  Response 200: application/json → array<RoleListItemDto>
+
+POST /api/Roles
+  Auth: Bearer accessToken
+  Permissions: Role.Create
+  Body: CreateRoleCommand
+    name: string | null
+    description: string | null
+    permissions: array<string> | null
+  Response 201: application/json → object
+
+GET /api/Roles/{id}
+  Auth: Bearer accessToken
+  Permissions: Role.Read
+  path: id (integer / int32) [required]
+  Response 200: application/json → RoleDetailDto
+
+PUT /api/Roles/{id}
+  Auth: Bearer accessToken
+  Permissions: Role.Update
+  path: id (integer / int32) [required]
+  Body: UpdateRoleCommand
+    id: integer / int32
+    name: string | null
+    description: string | null
+    permissions: array<string> | null
+  Response 204: بدون بدنه
+
+DELETE /api/Roles/{id}
+  Auth: Bearer accessToken
+  Permissions: Role.Delete
+  path: id (integer / int32) [required]
+  Response 204: بدون بدنه
+
+GET /api/StockMovements
+  Auth: Bearer accessToken
+  Permissions: StockMovement.Read
+  query: BranchId (integer / int32) [optional]
+  query: WarehouseId (integer / int32) [optional]
+  query: ItemId (integer / int32) [optional]
+  query: Type (StockMovementType) [optional]
+  query: FromUtc (string / date-time) [optional]
+  query: ToUtc (string / date-time) [optional]
+  query: PageNumber (integer / int32) [optional]
+  query: PageSize (integer / int32) [optional]
+  query: Sort (string) [optional]
+  Response 200: text/plain → StockMovementListItemDtoPagedResult; application/json → StockMovementListItemDtoPagedResult; text/json → StockMovementListItemDtoPagedResult
+
+POST /api/StockMovements
+  Auth: Bearer accessToken
+  Permissions: StockMovement.Create
+  Body: CreateStockMovementCommand
+    warehouseId: integer / int32
+    itemId: integer / int32
+    type: StockMovementType
+    quantity: string / decimal
+    transactionDateUtc: string / date-time | null
+    note: string | null
+    invoiceId: integer / int32 | null
+  Response 201: text/plain → StockMovementDetailDto; application/json → StockMovementDetailDto; text/json → StockMovementDetailDto
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+GET /api/StockMovements/{id}
+  Auth: Bearer accessToken
+  Permissions: StockMovement.Read
+  path: id (integer / int32) [required]
+  Response 200: text/plain → StockMovementDetailDto; application/json → StockMovementDetailDto; text/json → StockMovementDetailDto
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+GET /api/Stocks
+  Auth: Bearer accessToken
+  Permissions: Stock.Read
+  query: BranchId (integer / int32) [optional]
+  query: WarehouseId (integer / int32) [optional]
+  query: Search (string) [optional]
+  query: PageNumber (integer / int32) [optional]
+  query: PageSize (integer / int32) [optional]
+  query: Sort (string) [optional]
+  Response 200: text/plain → StockListItemDtoPagedResult; application/json → StockListItemDtoPagedResult; text/json → StockListItemDtoPagedResult
+
+GET /api/Stocks/export
+  Auth: Bearer accessToken
+  Permissions: Stock.Read
+  query: BranchId (integer / int32) [optional]
+  query: WarehouseId (integer / int32) [optional]
+  query: Search (string) [optional]
+  query: PageNumber (integer / int32) [optional]
+  query: PageSize (integer / int32) [optional]
+  query: Sort (string) [optional]
+  Response 200: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet → string / binary
+
+GET /api/Stocks/{id}
+  Auth: Bearer accessToken
+  Permissions: Stock.Read
+  path: id (integer / int32) [required]
+  Response 200: text/plain → StockDetailDto; application/json → StockDetailDto; text/json → StockDetailDto
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+GET /api/Users
+  Auth: Bearer accessToken
+  Permissions: User.Read
+  query: Page (integer / int32) [optional]
+  query: PageSize (integer / int32) [optional]
+  query: BranchId (integer / int32) [optional]
+  query: RoleId (integer / int32) [optional]
+  query: IsActive (boolean) [optional]
+  query: Search (string) [optional]
+  Response 200: application/json → UserListItemDtoPagedResult
+
+POST /api/Users
+  Auth: Bearer accessToken
+  Permissions: User.Create
+  Body: CreateUserCommand
+    firstName: string | null
+    lastName: string | null
+    email: string | null
+    password: string | null
+    branchId: integer / int32 | null
+    isActive: boolean
+    roleIds: array<integer / int32> | null
+  Response 201: application/json → object
+
+GET /api/Users/{id}
+  Auth: Bearer accessToken
+  Permissions: User.Read
+  path: id (integer / int32) [required]
+  Response 200: application/json → UserDetailDto
+
+PUT /api/Users/{id}
+  Auth: Bearer accessToken
+  Permissions: User.Update
+  path: id (integer / int32) [required]
+  Body: UpdateUserCommand
+    id: integer / int32
+    firstName: string | null
+    lastName: string | null
+    email: string | null
+    branchId: integer / int32 | null
+    isActive: boolean
+    roleIds: array<integer / int32> | null
+  Response 204: بدون بدنه
+
+DELETE /api/Users/{id}
+  Auth: Bearer accessToken
+  Permissions: User.Delete
+  path: id (integer / int32) [required]
+  Response 204: بدون بدنه
+
+POST /api/Users/{id}/change-password
+  Auth: Bearer accessToken
+  Permissions: User.Update
+  path: id (integer / int32) [required]
+  Body: ChangeUserPasswordBody
+    newPassword: string | null
+  Response 204: بدون بدنه
+
+GET /api/Warehouses
+  Auth: Bearer accessToken
+  Permissions: Warehouse.Read
+  query: BranchId (integer / int32) [optional]
+  query: Search (string) [optional]
+  query: PageNumber (integer / int32) [optional]
+  query: PageSize (integer / int32) [optional]
+  query: Sort (string) [optional]
+  Response 200: text/plain → WarehouseListItemDtoPagedResult; application/json → WarehouseListItemDtoPagedResult; text/json → WarehouseListItemDtoPagedResult
+
+POST /api/Warehouses
+  Auth: Bearer accessToken
+  Permissions: Warehouse.Create
+  Body: CreateWarehouseCommand
+    code: string | null
+    name: string | null
+    isDefault: boolean
+  Response 201: text/plain → WarehouseDetailDto; application/json → WarehouseDetailDto; text/json → WarehouseDetailDto
+
+GET /api/Warehouses/{id}
+  Auth: Bearer accessToken
+  Permissions: Warehouse.Read
+  path: id (integer / int32) [required]
+  Response 200: text/plain → WarehouseDetailDto; application/json → WarehouseDetailDto; text/json → WarehouseDetailDto
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+PUT /api/Warehouses/{id}
+  Auth: Bearer accessToken
+  Permissions: Warehouse.Update
+  path: id (integer / int32) [required]
+  Body: UpdateWarehouseCommand
+    id: integer / int32
+    branchId: integer / int32
+    code: string | null
+    name: string | null
+    isDefault: boolean
+    rowVersion: string | null
+  Response 200: text/plain → WarehouseDetailDto; application/json → WarehouseDetailDto; text/json → WarehouseDetailDto
+  Response 400: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+DELETE /api/Warehouses/{id}
+  Auth: Bearer accessToken
+  Permissions: Warehouse.Delete
+  path: id (integer / int32) [required]
+  Body: RowVersionDto
+    rowVersion: string | null
+  Response 204: بدون بدنه
+
+GET /api/audit-logs
+  Auth: Bearer accessToken
+  Permissions: —
+  query: Page (integer / int32) [optional]
+  query: PageSize (integer / int32) [optional]
+  query: UserId (integer / int32) [optional]
+  query: EntityName (string) [optional]
+  query: StartDate (string / date-time) [optional]
+  query: EndDate (string / date-time) [optional]
+  Response 200: text/plain → AuditTrailListDto; application/json → AuditTrailListDto; text/json → AuditTrailListDto
+
+POST /api/auth/login
+  Auth: Anonymous
+  Permissions: —
+  Body: LoginRequest
+    email: string | null
+    password: string | null
+  Response 200: application/json → AuthResponse
+
+POST /api/auth/refresh
+  Auth: Anonymous
+  Permissions: —
+  Response 200: application/json → AuthResponse
+
+GET /api/categories
+  Auth: Bearer accessToken
+  Permissions: Category.Read
+  query: search (string) [optional]
+  query: page (integer / int32) [optional]
+  query: pageSize (integer / int32) [optional]
+  Response 200: text/plain → CategoryListItemDtoPagedResult; application/json → CategoryListItemDtoPagedResult; text/json → CategoryListItemDtoPagedResult
+
+POST /api/categories
+  Auth: Bearer accessToken
+  Permissions: Category.Create
+  Body: CreateCategoryCommand
+    name: string | null
+    description: string | null
+    color: string | null
+  Response 200: text/plain → CategoryDetailDto; application/json → CategoryDetailDto; text/json → CategoryDetailDto
+
+PUT /api/categories/{id}
+  Auth: Bearer accessToken
+  Permissions: Category.Update
+  path: id (integer / int32) [required]
+  Body: UpdateCategoryCommand
+    id: integer / int32
+    name: string | null
+    description: string | null
+    color: string | null
+    rowVersion: string | null
+  Response 200: text/plain → CategoryDetailDto; application/json → CategoryDetailDto; text/json → CategoryDetailDto
+
+DELETE /api/categories/{id}
+  Auth: Bearer accessToken
+  Permissions: Category.Delete
+  path: id (integer / int32) [required]
+  query: rowVersion (string) [optional]
+  Response 200: text/plain → boolean; application/json → boolean; text/json → boolean
+
+GET /api/cheques
+  Auth: Bearer accessToken
+  Permissions: Cheque.Read
+  query: Page (integer / int32) [optional]
+  query: PageSize (integer / int32) [optional]
+  query: Status (string) [optional]
+  query: Type (string) [optional]
+  query: Direction (string) [optional]
+  Response 200: text/plain → ChequeDetailDtoPagedResult; application/json → ChequeDetailDtoPagedResult; text/json → ChequeDetailDtoPagedResult
+
+POST /api/cheques
+  Auth: Bearer accessToken
+  Permissions: Cheque.Create
+  Body: CreateChequeCommand
+    contactId: integer / int32 | null
+    type: ChequeType
+    direction: ChequeDirection
+    chequeNumber: string | null
+    issueDate: string / date-time
+    dueDate: string / date-time
+    amount: string / decimal
+    currency: string | null
+    bankName: string | null
+    bankBranch: string | null
+    accountNumber: string | null
+    drawerName: string | null
+    description: string | null
+  Response 200: text/plain → integer / int32; application/json → integer / int32; text/json → integer / int32
+
+GET /api/cheques/{id}
+  Auth: Bearer accessToken
+  Permissions: Cheque.Read
+  path: id (integer / int32) [required]
+  Response 200: text/plain → ChequeDetailDto; application/json → ChequeDetailDto; text/json → ChequeDetailDto
+
+DELETE /api/cheques/{id}
+  Auth: Bearer accessToken
+  Permissions: Cheque.Delete
+  path: id (integer / int32) [required]
+  Body: RowVersionDto
+    rowVersion: string | null
+  Response 204: بدون بدنه
+  Response 404: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+  Response 409: text/plain → ProblemDetails; application/json → ProblemDetails; text/json → ProblemDetails
+
+PUT /api/cheques/{id}/status
+  Auth: Bearer accessToken
+  Permissions: Cheque.UpdateStatus
+  path: id (integer / int32) [required]
+  Body: UpdateStatusRequest
+    newStatus: ChequeStatus
+    rowVersionBase64: string | null
+    transactionDate: string / date-time | null
+    cashBankAccountId: integer / int32 | null
+  Response 204: بدون بدنه
+
+GET /api/company-settings
+  Auth: Bearer accessToken
+  Permissions: CompanySettings.Read
+  Response 200: text/plain → CompanySettingsDetailDto; application/json → CompanySettingsDetailDto; text/json → CompanySettingsDetailDto
+
+PUT /api/company-settings
+  Auth: Bearer accessToken
+  Permissions: CompanySettings.Update
+  Body: UpdateCompanySettingsCommand
+    id: integer / int32
+    title: string | null
+    taxNumber: string | null
+    taxOffice: string | null
+    address: string | null
+    phone: string | null
+    email: string | null
+    website: string | null
+    tradeRegisterNo: string | null
+    mersisNo: string | null
+    logoUrl: string | null
+    rowVersionBase64: string | null
+    nationalId: string | null
+    postalCode: string | null
+  Response 200: text/plain → CompanySettingsDetailDto; application/json → CompanySettingsDetailDto; text/json → CompanySettingsDetailDto
+
+GET /api/orders
+  Auth: Bearer accessToken
+  Permissions: Order.Read
+  query: branchId (integer / int32) [optional]
+  query: contactId (integer / int32) [optional]
+  query: status (OrderStatus) [optional]
+  query: page (integer / int32) [optional]
+  query: pageSize (integer / int32) [optional]
+  Response 200: text/plain → OrderListItemDtoPagedResult; application/json → OrderListItemDtoPagedResult; text/json → OrderListItemDtoPagedResult
+
+POST /api/orders
+  Auth: Bearer accessToken
+  Permissions: Order.Create
+  Body: CreateOrderCommand
+    contactId: integer / int32
+    dateUtc: string / date-time
+    type: InvoiceType
+    currency: string | null
+    description: string | null
+    lines: array<CreateOrderLineDto> | null
+  Response 201: text/plain → OrderDetailDto; application/json → OrderDetailDto; text/json → OrderDetailDto
+
+GET /api/orders/export
+  Auth: Bearer accessToken
+  Permissions: Order.Read
+  query: branchId (integer / int32) [optional]
+  query: contactId (integer / int32) [optional]
+  query: status (OrderStatus) [optional]
+  Response 200: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet → string / binary
+
+GET /api/orders/{id}
+  Auth: Bearer accessToken
+  Permissions: Order.Read
+  path: id (integer / int32) [required]
+  Response 200: text/plain → OrderDetailDto; application/json → OrderDetailDto; text/json → OrderDetailDto
+
+PUT /api/orders/{id}
+  Auth: Bearer accessToken
+  Permissions: Order.Update
+  path: id (integer / int32) [required]
+  Body: UpdateOrderCommand
+    id: integer / int32
+    contactId: integer / int32
+    dateUtc: string / date-time
+    description: string | null
+    lines: array<UpdateOrderLineDto> | null
+    rowVersion: string | null
+  Response 200: text/plain → OrderDetailDto; application/json → OrderDetailDto; text/json → OrderDetailDto
+
+DELETE /api/orders/{id}
+  Auth: Bearer accessToken
+  Permissions: Order.Delete
+  path: id (integer / int32) [required]
+  query: rowVersion (string) [optional]
+  Response 200: text/plain → boolean; application/json → boolean; text/json → boolean
+
+PUT /api/orders/{id}/approve
+  Auth: Bearer accessToken
+  Permissions: Order.Approve
+  path: id (integer / int32) [required]
+  query: rowVersion (string) [optional]
+  Response 200: text/plain → boolean; application/json → boolean; text/json → boolean
+
+PUT /api/orders/{id}/cancel
+  Auth: Bearer accessToken
+  Permissions: Order.Cancel
+  path: id (integer / int32) [required]
+  query: rowVersion (string) [optional]
+  Response 200: text/plain → boolean; application/json → boolean; text/json → boolean
+
+POST /api/orders/{id}/create-invoice
+  Auth: Bearer accessToken
+  Permissions: Order.CreateInvoice
+  path: id (integer / int32) [required]
+  Response 200: text/plain → integer / int32; application/json → integer / int32; text/json → integer / int32
+
+GET /api/reports/contact/{contactId}/statement
+  Auth: Bearer accessToken
+  Permissions: Report.ContactStatement
+  path: contactId (integer / int32) [required]
+  query: dateFrom (string / date-time) [optional]
+  query: dateTo (string / date-time) [optional]
+  Response 200: text/plain → ContactStatementDto; application/json → ContactStatementDto; text/json → ContactStatementDto
+
+GET /api/reports/contact/{id}/statement/export
+  Auth: Bearer accessToken
+  Permissions: Report.ContactStatement
+  path: id (integer / int32) [required]
+  query: dateFrom (string / date-time) [optional]
+  query: dateTo (string / date-time) [optional]
+  Response 200: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet → string / binary
+
+GET /api/reports/dashboard
+  Auth: Bearer accessToken
+  Permissions: Report.Dashboard
+  query: branchId (integer / int32) [optional]
+  Response 200: text/plain → DashboardStatsDto; application/json → DashboardStatsDto; text/json → DashboardStatsDto
+
+GET /api/reports/income-expense
+  Auth: Bearer accessToken
+  Permissions: Report.ProfitLoss
+  query: branchId (integer / int32) [optional]
+  query: dateFrom (string / date-time) [optional]
+  query: dateTo (string / date-time) [optional]
+  Response 200: text/plain → IncomeExpenseDto; application/json → IncomeExpenseDto; text/json → IncomeExpenseDto
+
+GET /api/reports/stock-status
+  Auth: Bearer accessToken
+  Permissions: Report.StockStatus
+  Response 200: text/plain → array<StockStatusDto>; application/json → array<StockStatusDto>; text/json → array<StockStatusDto>
+
+GET /api/reports/stock-status/export
+  Auth: Bearer accessToken
+  Permissions: Report.StockStatus
+  Response 200: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet → string / binary
+
+POST /api/stock-transfers
+  Auth: Bearer accessToken
+  Permissions: Stock.Transfer
+  Body: TransferStockCommand
+    sourceWarehouseId: integer / int32
+    targetWarehouseId: integer / int32
+    itemId: integer / int32
+    quantity: string / decimal
+    transactionDateUtc: string / date-time
+    description: string | null
+  Response 200: text/plain → StockTransferDetailDto; application/json → StockTransferDetailDto; text/json → StockTransferDetailDto
+
+GET /api/units
+  Auth: Bearer accessToken
+  Permissions: Unit.Read
+  query: Search (string) [optional]
+  query: Page (integer / int32) [optional]
+  query: PageSize (integer / int32) [optional]
+  Response 200: text/plain → UnitListItemDtoPagedResult; application/json → UnitListItemDtoPagedResult; text/json → UnitListItemDtoPagedResult
+
+POST /api/units
+  Auth: Bearer accessToken
+  Permissions: Unit.Create
+  Body: CreateUnitCommand
+    name: string | null
+    description: string | null
+  Response 201: text/plain → UnitDetailDto; application/json → UnitDetailDto; text/json → UnitDetailDto
+
+GET /api/units/{id}
+  Auth: Bearer accessToken
+  Permissions: Unit.Read
+  path: id (integer / int32) [required]
+  Response 200: text/plain → UnitDetailDto; application/json → UnitDetailDto; text/json → UnitDetailDto
+
+PUT /api/units/{id}
+  Auth: Bearer accessToken
+  Permissions: Unit.Update
+  path: id (integer / int32) [required]
+  Body: UpdateUnitCommand
+    id: integer / int32
+    name: string | null
+    description: string | null
+    rowVersion: string | null
+  Response 200: text/plain → UnitDetailDto; application/json → UnitDetailDto; text/json → UnitDetailDto
+
+DELETE /api/units/{id}
+  Auth: Bearer accessToken
+  Permissions: Unit.Delete
+  path: id (integer / int32) [required]
+  query: rowVersion (string) [optional]
+  Response 204: بدون بدنه
+
+GET /health
+  Auth: Anonymous
+  Permissions: —
+  Response 200: text/plain → string
+  Response 503: بدون بدنه

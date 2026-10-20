@@ -1,0 +1,206 @@
+{
+  "info": {
+    "name": "ثبت اطلاعات اول دوره",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://localhost:7000"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "contactId",
+      "value": "1"
+    },
+    {
+      "key": "warehouseId",
+      "value": "1"
+    },
+    {
+      "key": "itemId",
+      "value": "1"
+    },
+    {
+      "key": "openingId",
+      "value": "1"
+    },
+    {
+      "key": "openingDateUtc",
+      "value": "2026-10-17T00:00:00Z"
+    },
+    {
+      "key": "rowVersionBase64",
+      "value": ""
+    },
+    {
+      "key": "rowVersionUrlEncoded",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "contacts",
+      "item": [
+        {
+          "name": "GET contacts",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/opening-balances/contacts",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "POST contacts",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/opening-balances/contacts",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contactId\": {{contactId}},\n  \"dateUtc\": \"{{openingDateUtc}}\",\n  \"amount\": \"50000000.00\",\n  \"isDebit\": true,\n  \"note\": \"مانده اول دوره\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "PUT contacts",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/opening-balances/contacts/{{openingId}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contactId\": {{contactId}},\n  \"dateUtc\": \"{{openingDateUtc}}\",\n  \"amount\": \"50000000.00\",\n  \"isDebit\": true,\n  \"note\": \"مانده اول دوره\",\n  \"rowVersionBase64\": \"{{rowVersionBase64}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE contacts",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/opening-balances/contacts/{{openingId}}?rowVersionBase64={{rowVersionUrlEncoded}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "inventory",
+      "item": [
+        {
+          "name": "GET inventory",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/opening-balances/inventory",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "name": "POST inventory",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/opening-balances/inventory",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"warehouseId\": {{warehouseId}},\n  \"itemId\": {{itemId}},\n  \"dateUtc\": \"{{openingDateUtc}}\",\n  \"quantity\": \"10.000\",\n  \"unitCost\": null,\n  \"note\": \"موجودی اول دوره\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "PUT inventory",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/opening-balances/inventory/{{openingId}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"warehouseId\": {{warehouseId}},\n  \"itemId\": {{itemId}},\n  \"dateUtc\": \"{{openingDateUtc}}\",\n  \"quantity\": \"10.000\",\n  \"unitCost\": null,\n  \"note\": \"موجودی اول دوره\",\n  \"rowVersionBase64\": \"{{rowVersionBase64}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE inventory",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/opening-balances/inventory/{{openingId}}?rowVersionBase64={{rowVersionUrlEncoded}}",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+<mat-sidenav-container class="shell">
+  @if (isAuthenticated()) {
+    <mat-sidenav class="sidenav" position="start" [mode]="isMobile() ? 'over' : 'side'" [opened]="opened()" (closedStart)="opened.set(false)">
+      <div class="brand"><div class="brand-mark"><mat-icon [svgIcon]="'restaurant'"></mat-icon></div><div><strong>{{brand.cateringName}}</strong><small>{{brand.tagline}}</small></div></div>
+      <mat-nav-list aria-label="منوی اصلی برنامه">
+        <a *appHasPermission="'Report.Dashboard'" mat-list-item routerLink="/dashboard" routerLinkActive="active" class="dashboard-link"><mat-icon matListItemIcon [svgIcon]="'space_dashboard'"></mat-icon><span matListItemTitle>نمای کلی کسب‌وکار</span></a>
+        @for(group of visibleNavGroups();track group.id){
+          <section class="nav-section" [class.section-open]="openGroups().has(group.id)">
+            <button mat-list-item class="group-header" type="button" (click)="toggleGroup(group.id)" [attr.aria-expanded]="openGroups().has(group.id)" [attr.aria-controls]="'nav-'+group.id">
+              <mat-icon matListItemIcon [svgIcon]="group.icon"></mat-icon><span matListItemTitle class="group-copy"><strong>{{group.title}}</strong><small class="group-hint">{{group.hint}}</small></span><mat-icon matListItemMeta class="chevron" [svgIcon]="openGroups().has(group.id)?'expand_less':'expand_more'"></mat-icon>
+            </button>
+            @if(openGroups().has(group.id)){<div class="group-items" [id]="'nav-'+group.id">@for(item of group.items;track item.path){<a mat-list-item [routerLink]="item.path" routerLinkActive="active" class="sub-item"><mat-icon matListItemIcon [svgIcon]="item.icon"></mat-icon><span matListItemTitle>{{item.label}}</span></a>}</div>}
+          </section>
+        }
+      </mat-nav-list>
+      <div class="sidebar-foot"><mat-icon [svgIcon]="'support_agent'"></mat-icon><span>از سفارش تا تسویه، همه‌چیز یکجا</span></div>
+    </mat-sidenav>
+  }
+
+  <mat-sidenav-content class="content-root">
+    @if (isAuthenticated()) {
+      <mat-toolbar color="primary" class="toolbar">
+        <button mat-icon-button (click)="opened.set(!opened())" aria-label="باز و بسته کردن منو">
+          <mat-icon [svgIcon]="'menu'"></mat-icon>
+        </button>
+        <span class="title">{{brand.cateringName}}</span>
+        <span class="spacer"></span>
+        <a mat-icon-button routerLink="/appearance" matTooltip="تنظیمات ظاهر" aria-label="تنظیمات ظاهر"><mat-icon [svgIcon]="'palette'"></mat-icon></a>
+
+        <!-- ✅ BASİT ÇÖZÜM: Direkt kullanıcı bilgisi ve logout butonu -->
+        <div class="user-info-simple">
+          <span class="user-name">{{ currentUser()?.firstName }} {{ currentUser()?.lastName }}</span>
+          <button mat-icon-button (click)="onLogout()" matTooltip="خروج" matTooltipPosition="below">
+            <mat-icon [svgIcon]="'logout'"></mat-icon>
+          </button>
+        </div>
+      </mat-toolbar>
+    }
+
+    <!-- Sağ tarafın scroll alanı -->
+    <div class="content-scroll" [class.guest-content]="!isAuthenticated()">
+      @if(isAuthenticated()){<div class="page-navigation">
+        <button mat-button (click)="navigation.back()" [disabled]="!navigation.canGoBack()"><mat-icon [svgIcon]="'arrow_forward'"></mat-icon>برگشت</button>
+      </div>}
+      @if(isAuthenticated() && license.status()?.remainingDays !== null && license.status();as validity){
+        <div class="license-notice" [class.license-warning]="validity.showWarning" role="status"><mat-icon [svgIcon]="'info'"></mat-icon><span>اعتبار نرم‌افزار: {{validity.remainingDays}} روز باقی مانده{{validity.showWarning ? '؛ برای تمدید با پشتیبانی تماس بگیرید.' : ''}}</span></div>
+      }
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

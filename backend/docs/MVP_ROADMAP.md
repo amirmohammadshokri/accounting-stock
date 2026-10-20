@@ -1,0 +1,88 @@
+# MVP Roadmap Execution
+
+- [x] Locate MVP Roadmap file <!-- id: 0 -->
+- [x] Read and analyze roadmap content <!-- id: 1 -->
+- [x] Select next high-priority task (Selected: "Multi-branch stock transfer") <!-- id: 2 -->
+- [x] Create implementation plan for the selected task <!-- id: 3 -->
+- [x] **EXECUTION**: Implement Multi-branch Stock Transfer <!-- id: 4 -->
+    - [x] Update `StockMovementType` enum <!-- id: 4.1 -->
+    - [x] Create `TransferStockCommand` and DTO <!-- id: 4.2 -->
+    - [x] Create `TransferStockHandler` <!-- id: 4.3 -->
+    - [x] Create `StockTransfersController` <!-- id: 4.4 -->
+- [x] Create Unit Tests for CreateChequeHandler <!-- id: 5 -->
+- [x] Create Unit Tests for UpdateChequeStatusHandler <!-- id: 6 -->
+- [x] Create Unit Tests for CreateItemHandler (Verify Prices) <!-- id: 7 -->
+- [x] Run Tests & Fix Bugs <!-- id: 8 -->
+
+- [x] **EXECUTION**: Implement FixedAsset CRUD <!-- id: 9 -->
+    - [x] Create Unit Tests (`FixedAssetTests.cs`) <!-- id: 9.1 -->
+    - [x] Refactor/Verify handlers <!-- id: 9.2 -->
+    - [x] Verify Soft Delete <!-- id: 9.3 -->
+- [x] **Refactor**: Rename `Common.Errors` to `Common.Exceptions` <!-- id: 10 -->
+- [x] **Refactor**: Rename `Common.Errors` to `Common.Exceptions` <!-- id: 10 -->
+
+## Backlog
+- [x] **EXECUTION**: implement Company Settings (Firma Ayarları) <!-- id: 14 -->
+    - [x] Entity `CompanySettings` (Title, LogoUrl, Address, TaxInfo)
+    - [x] CRUD Endpoints (Singleton resource)
+- [x] **EXECUTION**: implement Branch CRUD <!-- id: 14.1 -->
+    - [x] Create/Update/Delete/GetById Handlers & Validators
+    - [x] Update Controller
+    - [x] Add Unit Tests
+- [x] **EXECUTION**: Refactor - Remove Redundant `IsDeleted` Checks <!-- id: 14.2 -->
+    - [x] Update Handlers/Validators to rely on Global Filter
+- [ ] **EXECUTION**: Authentication & Authorization System (Identity) <!-- id: 15 -->
+    - [ ] **Domain**: `User`, `Role`, `UserRole`, `Permission` entities
+    - [ ] **Infrastructure**: JWT Token Generation, Password Hashing
+    - [ ] **Application**: Login, Register, Refresh Token commands
+    - [ ] **Security**: Implement `OneOf` or Policy-based Authorize attributes
+    - [ ] **Refactor**: Update **ALL** Handlers to get `BranchId` & `UserId` from `ICurrentUserService` (Remove `BranchId` from Commands)
+- [ ] **EXECUTION**: Implement Audit Log API <!-- id: 16 -->
+    - [ ] Endpoint to query `AuditTrails` table with filters (User, Date, Entity)
+
+    - [x] Domain Layer (Category entity, Item update) <!-- id: 6.1 -->
+    - [x] Infrastructure Layer (Configurations, DbContext) <!-- id: 6.2 -->
+    - [x] Application Layer: Categories (CRUD) <!-- id: 6.3 -->
+    - [x] Application Layer: Items (Update commands/queries) <!-- id: 6.4 -->
+    - [x] API Layer (CategoriesController) <!-- id: 6.5 -->
+    - [x] Verify Category Support (Unit Tests) <!-- id: 6.6 -->
+- [x] **EXECUTION**: Implement Excel Export Support <!-- id: 8 -->
+    - [x] Add `ClosedXML` library <!-- id: 8.1 -->
+    - [x] Create `IExcelService` abstraction <!-- id: 8.2 -->
+    - [x] Implement `ExcelService` with ClosedXML <!-- id: 8.3 -->
+    - [x] Add Export endpoints to Controllers (Invoices, Orders, Stocks) <!-- id: 8.4 -->
+- [x] **EXECUTION**: Implement Account Balance Tracking <!-- id: 9 -->
+    - [x] Domain: Add `Balance` to `CashBankAccount` <!-- id: 9.1 -->
+    - [x] Infrastructure: Add EF Migration <!-- id: 9.2 -->
+    - [x] Application: Implement `AccountBalanceService` <!-- id: 9.3 -->
+    - [x] Application: Update Payment Handlers (Create/Delete) <!-- id: 9.4 -->
+- [x] **EXECUTION**: Implement Reporting Module <!-- id: 10 -->
+    - [x] Create `ReportsController` and Dashboard DTOs <!-- id: 10.1 -->
+    - [x] Implement `GetDashboardStatsQuery` (Daily Sales, Cash, Receivables) <!-- id: 10.2 -->
+    - [x] Implement `GetContactStatementQuery` (Cari Ekstre) <!-- id: 10.3 -->
+    - [x] **Application**: Implement `StockService` (In/Out/Reserved) <!-- id: 10.4 -->
+    - [x] Implement `GetStockStatusQuery` (using StockService) <!-- id: 10.5 -->
+    - [x] Add Excel Export for Reports <!-- id: 10.6 -->
+    - [x] Implement `GetProfitLossQuery` (Income vs Expenses) <!-- id: 10.7 -->
+- [x] **EXECUTION**: Implement Cheque/Promissory Notes Module <!-- id: 12 -->
+    - [x] Domain Layer (Cheque entity, Enums) <!-- id: 12.1 -->
+    - [x] Infrastructure Layer (DbContext, Config) <!-- id: 12.2 -->
+    - [x] Application Layer: Commands (Receive, Issue, Cash, Endorse) <!-- id: 12.3 -->
+    - [x] API Layer (ChequesController) <!-- id: 12.4 -->
+    - [ ] Verification (Tests) <!-- id: 12.5 -->
+- [x] **DOCUMENTATION**: Create Accounting Guide <!-- id: 11 -->
+    - [x] Create `docs` folder <!-- id: 11.1 -->
+    - [x] Write `ON_MUHASEBE_REHBERI.md` <!-- id: 11.2 -->
+    - [x] Write `RAPORLAR.md` (Report Documentation) <!-- id: 11.3 -->
+    - [x] Write `CEK_SENET.md` (Cheque Module Documentation) <!-- id: 11.4 -->
+- [x] **EXECUTION**: Implement Order Management <!-- id: 7 -->
+    - [x] Domain Layer (Order, OrderLine, OrderStatus) <!-- id: 7.1 -->
+    - [x] Infrastructure Layer (Configurations, DbContext) <!-- id: 7.2 -->
+    - [x] Application Layer: Orders (CRUD + Approve) <!-- id: 7.3 -->
+    - [x] Application Layer: Invoice Conversion (Order -> Invoice) <!-- id: 7.4 -->
+    - [x] API Layer (OrdersController) <!-- id: 7.5 -->
+    - [x] Verification (Manual/Tests) <!-- id: 7.6 -->
+    - [x] Documentation (docs/ORDER_MANAGEMENT.md) <!-- id: 7.7 -->
+- [x] **REFACTOR**: Item Prices & Data Seeder Fixes <!-- id: 13 -->
+    - [x] Refactor Item (Sales/Purchase Price) <!-- id: 13.1 -->
+    - [x] Fix DataSeeder & Reset Scripts <!-- id: 13.2 -->

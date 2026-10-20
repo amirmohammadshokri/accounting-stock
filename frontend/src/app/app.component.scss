@@ -1,0 +1,20 @@
+
+.shell{height:100dvh}.content-root{display:flex;flex-direction:column;height:100%;min-height:0}.toolbar{flex:0 0 auto;height:64px;padding:0 20px;background:var(--mat-sys-primary-container);color:var(--mat-sys-on-primary-container);border-bottom:1px solid var(--mat-sys-outline-variant);gap:8px}.content-scroll{flex:1 1 auto;min-height:0;overflow:auto;padding:20px 28px 32px}.content-scroll.guest-content{padding:0}.title{margin-inline-start:8px;font-weight:600}.spacer{flex:1}.page-navigation{margin-bottom:12px}.user-info-simple{display:flex;align-items:center;gap:12px}.user-name{font-size:14px;font-weight:500;color:var(--mat-sys-on-primary-container)}.brand{color:var(--mat-sys-primary)}.sidenav{border-radius:0}.chevron{color:var(--mat-sys-on-surface-variant)}.active{border-radius:12px}.group-header .mat-mdc-list-item-title{font-weight:700}.group-header .mat-mdc-list-item-icon{color:var(--mat-sys-primary)}
+@media(max-width:760px){.content-scroll{padding:12px}.user-name{display:none}.toolbar{padding:0 10px}}
+/* Wider, clearly separated navigation for daily catering work. */
+.sidenav {width:340px;background:var(--mat-sys-surface-container-low);border-inline-end:1px solid var(--mat-sys-outline-variant);}
+.brand {display:flex;align-items:center;gap:12px;padding:26px 20px 22px;border-bottom:1px solid var(--mat-sys-outline-variant);}
+.brand-mark{width:46px;height:46px;display:grid;place-items:center;background:var(--mat-sys-primary-container);border-radius:16px;color:var(--mat-sys-primary);}.brand strong{display:block;font-size:19px}.brand small{display:block;margin-top:5px;color:var(--mat-sys-on-surface-variant);font-size:11px}
+mat-nav-list {padding:14px 12px;}.dashboard-link {margin-bottom:14px;border-radius:12px;--mdc-list-list-item-container-height:52px;}
+.nav-section {border:0;border-radius:16px;margin:0 0 20px;overflow:hidden;background:transparent;}
+.group-header {border:0;text-align:start;cursor:pointer;border-radius:14px;background:var(--mat-sys-surface-container);width:100%;height:auto;min-height:88px;padding-block:14px;--mdc-list-list-item-label-text-size:15px;--mdc-list-list-item-supporting-text-size:11px;}
+.section-open .group-header{background:var(--mat-sys-primary-container)}.group-hint{color:var(--mat-sys-on-surface-variant)}.group-items {display:flex;flex-direction:column;gap:8px;padding:4px 8px 8px;margin:18px 14px 12px 10px;border-inline-start:2px solid var(--mat-sys-outline-variant);padding-inline-start:14px}.sub-item{--mdc-list-list-item-leading-icon-start-space:12px;--mdc-list-list-item-leading-icon-end-space:16px;--mdc-list-list-item-container-height:48px;--mdc-list-list-item-label-text-size:13px;border-radius:10px;margin:0;background:var(--mat-sys-surface-container-lowest);}.sub-item mat-icon{font-size:21px;height:21px;width:21px;color:var(--mat-sys-on-surface-variant)}.sub-item.active{background:var(--mat-sys-secondary-container);border-inline-start:3px solid var(--mat-sys-primary)}.sub-item.active mat-icon{color:var(--mat-sys-primary)}.sidebar-foot{display:flex;gap:8px;align-items:center;padding:8px 22px 24px;color:var(--mat-sys-on-surface-variant);font-size:11px}.sidebar-foot mat-icon{font-size:18px;width:18px;height:18px}
+@media(max-width:900px){.sidenav{width:min(340px,88vw)}}
+
+.title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60vw}.brand strong{overflow-wrap:anywhere}
+
+.group-header .group-copy{display:flex;flex-direction:column;gap:8px;white-space:normal;line-height:1.6;overflow:visible}.group-copy strong{font-size:15px;font-weight:700}.group-copy small{font-size:11px;line-height:1.8;font-weight:400}
+
+.sidenav .group-header .group-copy::before,.sidenav .group-header .group-copy::after{display:none}
+
+.license-notice{display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:16px;border-radius:12px;background:var(--mat-sys-surface-container-high);font-size:12px;line-height:1.9}.license-warning{background:var(--mat-sys-tertiary-container);color:var(--mat-sys-on-tertiary-container)}

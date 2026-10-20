@@ -1,0 +1,1672 @@
+قواعد اعتبارسنجی واقعی بک‌اند؛ برای الزام فیلدها و بازه‌ها از این فایل استفاده کنید.
+
+================================================================================
+Accounting.Application\Authentication\Commands\Login\LoginCommandValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Authentication.Commands.Login;
+
+public class LoginCommandValidator : AbstractValidator<LoginCommand>
+{
+    public LoginCommandValidator()
+    {
+        RuleFor(x => x.Email).NotEmpty().EmailAddress();
+        RuleFor(x => x.Password).NotEmpty();
+    }
+}
+
+
+================================================================================
+Accounting.Application\Branches\Commands\Create\CreateBranchValidator.cs
+using Accounting.Application.Branches.Commands.Create;
+using Accounting.Application.Common.Abstractions;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+
+namespace Accounting.Application.Branches.Commands.Create;
+
+public class CreateBranchValidator : AbstractValidator<CreateBranchCommand>
+{
+    private readonly IAppDbContext _context;
+
+    public CreateBranchValidator(IAppDbContext context)
+    {
+        _context = context;
+
+        RuleFor(x => x.Code)
+            .NotEmpty().WithMessage("Şube kodu boş olamaz.")
+            .MaximumLength(32).WithMessage("Şube kodu en fazla 32 karakter olabilir.")
+            .MustAsync(BeUniqueCode).WithMessage("Bu şube kodu zaten kullanılıyor.");
+
+        RuleFor(x => x.Name)
+            .NotEmpty().WithMessage("Şube adı boş olamaz.")
+            .MaximumLength(128).WithMessage("Şube adı en fazla 128 karakter olabilir.");
+    }
+
+    private async Task<bool> BeUniqueCode(string code, CancellationToken cancellationToken)
+    {
+        return !await _context.Branches
+            .AnyAsync(x => x.Code == code, cancellationToken);
+    }
+}
+
+
+================================================================================
+Accounting.Application\Branches\Commands\Update\UpdateBranchValidator.cs
+using Accounting.Application.Common.Abstractions;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+
+namespace Accounting.Application.Branches.Commands.Update;
+
+public class UpdateBranchValidator : AbstractValidator<UpdateBranchCommand>
+{
+    private readonly IAppDbContext _context;
+
+    public UpdateBranchValidator(IAppDbContext context)
+    {
+        _context = context;
+
+        RuleFor(x => x.Id).GreaterThan(0);
+
+        RuleFor(x => x.Code)
+            .NotEmpty().WithMessage("Şube kodu boş olamaz.")
+            .MaximumLength(32).WithMessage("Şube kodu en fazla 32 karakter olabilir.")
+            .MustAsync(BeUniqueCode).WithMessage("Bu şube kodu zaten kullanılıyor.");
+
+        RuleFor(x => x.Name)
+            .NotEmpty().WithMessage("Şube adı boş olamaz.")
+            .MaximumLength(128).WithMessage("Şube adı en fazla 128 karakter olabilir.");
+        
+        RuleFor(x => x.RowVersionBase64).NotEmpty().WithMessage("RowVersion gereklidir.");
+    }
+
+    private async Task<bool> BeUniqueCode(UpdateBranchCommand command, string code, CancellationToken cancellationToken)
+    {
+        // Kendisi hariç diğerlerinde ara
+        return !await _context.Branches
+            .AnyAsync(x => x.Code == code && x.Id != command.Id, cancellationToken);
+    }
+}
+
+
+================================================================================
+Accounting.Application\CashBankAccounts\Commands\Create\CreateCashBankAccountValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.CashBankAccounts.Commands.Create;
+
+public class CreateCashBankAccountValidator : AbstractValidator<CreateCashBankAccountCommand>
+{
+    public CreateCashBankAccountValidator()
+    {
+        RuleFor(x => x.BranchId).GreaterThan(0);
+        RuleFor(x => x.Type).IsInEnum();
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(160);
+        RuleFor(x => x.Iban).MaximumLength(34);
+    }
+}
+
+
+================================================================================
+Accounting.Application\CashBankAccounts\Commands\Delete\SoftDeleteCashBankAccountValidator.cs
+using Accounting.Application.Common.Validation;
+using FluentValidation;
+
+namespace Accounting.Application.CashBankAccounts.Commands.Delete;
+
+public class SoftDeleteCashBankAccountValidator : AbstractValidator<SoftDeleteCashBankAccountCommand>
+{
+    public SoftDeleteCashBankAccountValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.RowVersion).MustBeValidRowVersion();
+    }
+}
+
+
+================================================================================
+Accounting.Application\CashBankAccounts\Commands\Update\UpdateCashBankAccountValidator.cs
+using Accounting.Application.Common.Validation;
+using FluentValidation;
+
+namespace Accounting.Application.CashBankAccounts.Commands.Update;
+
+public class UpdateCashBankAccountValidator : AbstractValidator<UpdateCashBankAccountCommand>
+{
+    public UpdateCashBankAccountValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.Type).IsInEnum();                // enum doğrulama
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(160);
+        RuleFor(x => x.Iban).MaximumLength(34);
+        RuleFor(x => x.RowVersion).MustBeValidRowVersion();
+    }
+}
+
+
+================================================================================
+Accounting.Application\CashBankAccounts\Queries\GetById\GetCashBankAccountByIdValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.CashBankAccounts.Queries.GetById;
+
+public class GetCashBankAccountByIdValidator : AbstractValidator<GetCashBankAccountByIdQuery>
+{
+    public GetCashBankAccountByIdValidator() => RuleFor(x => x.Id).GreaterThan(0);
+}
+
+
+================================================================================
+Accounting.Application\CashBankAccounts\Queries\List\ListCashBankAccountsValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.CashBankAccounts.Queries.List;
+
+public class ListCashBankAccountsValidator : AbstractValidator<ListCashBankAccountsQuery>
+{
+    public ListCashBankAccountsValidator()
+    {
+        RuleFor(x => x.PageNumber).GreaterThan(0);
+        RuleFor(x => x.PageSize).InclusiveBetween(1, 200);
+        RuleFor(x => x.Sort).Must(s =>
+            s is null ||
+            s.Equals("name:asc", StringComparison.OrdinalIgnoreCase) ||
+            s.Equals("name:desc", StringComparison.OrdinalIgnoreCase) ||
+            s.Equals("type:asc", StringComparison.OrdinalIgnoreCase) ||
+            s.Equals("type:desc", StringComparison.OrdinalIgnoreCase)
+        ).WithMessage("Sort desteklenmiyor.");
+    }
+}
+
+
+================================================================================
+Accounting.Application\Categories\Commands\Create\CreateCategoryValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Categories.Commands.Create;
+
+public class CreateCategoryValidator : AbstractValidator<CreateCategoryCommand>
+{
+    public CreateCategoryValidator()
+    {
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .MaximumLength(100);
+
+        RuleFor(x => x.Description)
+            .MaximumLength(500);
+
+        RuleFor(x => x.Color)
+            .MaximumLength(20);
+    }
+}
+
+
+================================================================================
+Accounting.Application\Categories\Commands\Delete\DeleteCategoryValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Categories.Commands.Delete;
+
+public class DeleteCategoryValidator : AbstractValidator<DeleteCategoryCommand>
+{
+    public DeleteCategoryValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.RowVersion).NotEmpty();
+    }
+}
+
+
+================================================================================
+Accounting.Application\Categories\Commands\Update\UpdateCategoryValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Categories.Commands.Update;
+
+public class UpdateCategoryValidator : AbstractValidator<UpdateCategoryCommand>
+{
+    public UpdateCategoryValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .MaximumLength(100);
+
+        RuleFor(x => x.Description)
+            .MaximumLength(500);
+
+        RuleFor(x => x.Color)
+            .MaximumLength(20);
+
+        RuleFor(x => x.RowVersion).NotEmpty();
+    }
+}
+
+
+================================================================================
+Accounting.Application\Cheques\Commands\Create\CreateChequeValidator.cs
+using Accounting.Application.Common.Validation;
+using Accounting.Application.Common.Abstractions;
+using Accounting.Application.Common.Interfaces;
+using Accounting.Domain.Enums;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+
+namespace Accounting.Application.Cheques.Commands.Create;
+
+public class CreateChequeValidator : AbstractValidator<CreateChequeCommand>
+{
+    private readonly IAppDbContext _db;
+    private readonly ICurrentUserService _currentUserService;
+
+    public CreateChequeValidator(IAppDbContext db, ICurrentUserService currentUserService)
+    {
+        _db = db;
+        _currentUserService = currentUserService;
+
+        // RuleFor(x => x.BranchId).GreaterThan(0); // Removed
+        RuleFor(x => x.ChequeNumber).NotEmpty().MaximumLength(50);
+        RuleFor(x => x.Amount).GreaterThan(0);
+        RuleFor(x => x.Currency).MustBeValidCurrency();
+        RuleFor(x => x.DueDate).GreaterThanOrEqualTo(x => x.IssueDate).WithMessage("Vade tarihi düzenleme tarihinden önce olamaz.");
+
+        // Müşteri çeki ise Contact zorunlu
+        RuleFor(x => x.ContactId)
+            .NotEmpty()
+            .When(x => x.Direction == ChequeDirection.Inbound)
+            .WithMessage("Müşteri evrağı girişinde cari seçimi zorunludur.");
+
+        // Contact Branch Consistency
+        RuleFor(x => x)
+            .MustAsync(ContactBelongsToSameBranchAsync)
+            .WithMessage("Seçilen cari (Contact) bu şubeye ait değil.")
+            .When(x => x.ContactId.HasValue);
+    }
+
+    private async Task<bool> ContactBelongsToSameBranchAsync(CreateChequeCommand cmd, CancellationToken ct)
+    {
+        if (!cmd.ContactId.HasValue) return true;
+
+        // Admin/HQ bypass — same rule ApplyBranchFilter applies everywhere else.
+        if (_currentUserService.IsAdmin || _currentUserService.IsHeadquarters) return true;
+
+        if (!_currentUserService.BranchId.HasValue) return false;
+        var currentBranchId = _currentUserService.BranchId.Value;
+
+        var contact = await _db.Contacts
+            .AsNoTracking()
+            .Select(c => new { c.Id, c.BranchId })
+            .FirstOrDefaultAsync(c => c.Id == cmd.ContactId.Value, ct);
+
+        if (contact == null) return false; // Cari bulunamadı
+        return contact.BranchId == currentBranchId;
+    }
+}
+
+
+================================================================================
+Accounting.Application\CompanySettings\Commands\Update\UpdateCompanySettingsValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.CompanySettings.Commands.Update;
+
+public class UpdateCompanySettingsValidator : AbstractValidator<UpdateCompanySettingsCommand>
+{
+    public UpdateCompanySettingsValidator()
+    {
+        RuleFor(x => x.NationalId).Matches(@"^[0-9]{10,11}$").When(x => !string.IsNullOrWhiteSpace(x.NationalId));
+        RuleFor(x => x.PostalCode).Matches(@"^[0-9]{10}$").When(x => !string.IsNullOrWhiteSpace(x.PostalCode));
+        RuleFor(x => x.Id).GreaterThan(0);
+
+        RuleFor(x => x.Title)
+            .NotEmpty().WithMessage("Firma ünvanı boş olamaz.")
+            .MaximumLength(200).WithMessage("Firma ünvanı en fazla 200 karakter olabilir.");
+
+        RuleFor(x => x.TaxNumber)
+            .NotEmpty().WithMessage("Vergi numarası zorunludur.")
+            .MaximumLength(20).WithMessage("Vergi numarası en fazla 20 karakter olabilir.");
+
+        RuleFor(x => x.Email)
+            .EmailAddress().When(x => !string.IsNullOrEmpty(x.Email))
+            .WithMessage("Geçersiz e-posta adresi formatı.");
+
+        RuleFor(x => x.Phone)
+            .MaximumLength(20).WithMessage("Telefon numarası çok uzun.");
+    }
+}
+
+
+================================================================================
+Accounting.Application\Contacts\Commands\Create\CreateContactValidator.cs
+using Accounting.Domain.Enums;
+using FluentValidation;
+
+namespace Accounting.Application.Contacts.Commands.Create;
+
+public class CreateContactValidator : AbstractValidator<CreateContactCommand>
+{
+    public CreateContactValidator()
+    {
+        RuleFor(x => x.NationalId).Matches(@"^[0-9]{10,11}$").When(x => !string.IsNullOrWhiteSpace(x.NationalId));
+        RuleFor(x => x.PostalCode).Matches(@"^[0-9]{10}$").When(x => !string.IsNullOrWhiteSpace(x.PostalCode));
+        RuleFor(x => x.BranchId).GreaterThan(0);
+        
+        // Common
+        RuleFor(x => x.Email).EmailAddress().When(x => !string.IsNullOrWhiteSpace(x.Email));
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(200).When(x => x.CompanyDetails != null);
+
+        // Company Validation (If params provided)
+        RuleFor(x => x.CompanyDetails!.TaxNumber).NotEmpty().MaximumLength(20).When(x => x.CompanyDetails != null);
+        RuleFor(x => x.CompanyDetails!.TaxOffice).NotEmpty().MaximumLength(100).When(x => x.CompanyDetails != null);
+        RuleFor(x => x.CompanyDetails!.MersisNo).MaximumLength(20).When(x => x.CompanyDetails != null);
+        RuleFor(x => x.CompanyDetails!.TicaretSicilNo).MaximumLength(20).When(x => x.CompanyDetails != null);
+
+        // Person Validation (If params provided)
+        RuleFor(x => x.PersonDetails!.Tckn).NotEmpty().Length(10).When(x => x.PersonDetails != null);
+        RuleFor(x => x.PersonDetails!.FirstName).NotEmpty().MaximumLength(100).When(x => x.PersonDetails != null);
+        RuleFor(x => x.PersonDetails!.LastName).NotEmpty().MaximumLength(100).When(x => x.PersonDetails != null);
+        RuleFor(x => x.PersonDetails!.Title).MaximumLength(100).When(x => x.PersonDetails != null);
+        RuleFor(x => x.PersonDetails!.Department).MaximumLength(100).When(x => x.PersonDetails != null);
+
+        // Employee MUST have PersonDetails
+        RuleFor(x => x.PersonDetails).NotNull().When(x => x.IsEmployee)
+            .WithMessage("Personel (Employee) kaydı mutlaka Şahıs bilgilerini (Person Details) içermelidir.");
+
+        // IsRetail=true can NOT be IsCustomer=true
+        RuleFor(x => x.IsCustomer).Equal(false).When(x => x.IsRetail)
+            .WithMessage("Perakende müşteri (Retail) aynı zamanda Kurumsal Müşteri (Customer) olamaz.");
+
+        // At least ONE detail must be present (Company OR Person)
+        RuleFor(x => x).Must(x => x.CompanyDetails != null || x.PersonDetails != null)
+            .WithMessage("Cari kart Şahıs veya Şirket bilgilerinden en az birini içermelidir.");
+    }
+}
+
+
+================================================================================
+Accounting.Application\Contacts\Commands\Delete\SoftDeleteContactValidator.cs
+using Accounting.Application.Common.Validation;
+using FluentValidation;
+
+namespace Accounting.Application.Contacts.Commands.Delete;
+
+public class SoftDeleteContactValidator : AbstractValidator<SoftDeleteContactCommand>
+{
+    public SoftDeleteContactValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.RowVersion).MustBeValidRowVersion();
+    }
+}
+
+
+================================================================================
+Accounting.Application\Contacts\Commands\Update\UpdateContactValidator.cs
+using Accounting.Application.Common.Validation;
+using FluentValidation;
+
+namespace Accounting.Application.Contacts.Commands.Update;
+
+public class UpdateContactValidator : AbstractValidator<UpdateContactCommand>
+{
+    public UpdateContactValidator()
+    {
+        RuleFor(x => x.NationalId).Matches(@"^[0-9]{10,11}$").When(x => !string.IsNullOrWhiteSpace(x.NationalId));
+        RuleFor(x => x.PostalCode).Matches(@"^[0-9]{10}$").When(x => !string.IsNullOrWhiteSpace(x.PostalCode));
+        RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(200);
+        RuleFor(x => x.Email).EmailAddress().MaximumLength(320).When(x => !string.IsNullOrWhiteSpace(x.Email));
+        RuleFor(x => x.Phone).MaximumLength(40);
+        RuleFor(x => x.Iban).MaximumLength(34);
+        RuleFor(x => x.Address).MaximumLength(500);
+
+        // Company Validation (Nested)
+        RuleFor(x => x.CompanyDetails!.TaxNumber).NotEmpty().MaximumLength(20).When(x => x.CompanyDetails != null);
+        RuleFor(x => x.CompanyDetails!.TaxOffice).NotEmpty().MaximumLength(100).When(x => x.CompanyDetails != null);
+        RuleFor(x => x.CompanyDetails!.MersisNo).MaximumLength(20).When(x => x.CompanyDetails != null);
+        RuleFor(x => x.CompanyDetails!.TicaretSicilNo).MaximumLength(20).When(x => x.CompanyDetails != null);
+
+        // Person Validation (Nested)
+        RuleFor(x => x.PersonDetails!.Tckn).NotEmpty().Length(10).When(x => x.PersonDetails != null);
+        RuleFor(x => x.PersonDetails!.FirstName).NotEmpty().MaximumLength(100).When(x => x.PersonDetails != null);
+        RuleFor(x => x.PersonDetails!.LastName).NotEmpty().MaximumLength(100).When(x => x.PersonDetails != null);
+        RuleFor(x => x.PersonDetails!.Title).MaximumLength(100).When(x => x.PersonDetails != null);
+        RuleFor(x => x.PersonDetails!.Department).MaximumLength(100).When(x => x.PersonDetails != null);
+
+        // Employee MUST have PersonDetails
+        RuleFor(x => x.PersonDetails).NotNull().When(x => x.IsEmployee)
+            .WithMessage("Personel (Employee) kaydı mutlaka Şahıs bilgilerini (Person Details) içermelidir.");
+        
+        // IsRetail=true can NOT be IsCustomer=true
+        RuleFor(x => x.IsCustomer).Equal(false).When(x => x.IsRetail)
+            .WithMessage("Perakende müşteri (Retail) aynı zamanda Kurumsal Müşteri (Customer) olamaz.");
+            
+        // At least ONE detail must be present (Company OR Person)
+        RuleFor(x => x).Must(x => x.CompanyDetails != null || x.PersonDetails != null)
+            .WithMessage("Cari kart Şahıs veya Şirket bilgilerinden en az birini içermelidir.");
+
+        RuleFor(x => x.RowVersion).MustBeValidRowVersion();
+    }
+}
+
+
+================================================================================
+Accounting.Application\Contacts\Queries\GetById\GetContactByIdValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Contacts.Queries.GetById;
+
+public class GetContactByIdValidator : AbstractValidator<GetContactByIdQuery>
+{
+    public GetContactByIdValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+    }
+}
+
+
+================================================================================
+Accounting.Application\Contacts\Queries\List\ListContactsValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Contacts.Queries.List;
+
+public class ListContactsValidator : AbstractValidator<ListContactsQuery>
+{
+    public ListContactsValidator()
+    {
+        RuleFor(x => x.PageNumber).GreaterThan(0);
+        RuleFor(x => x.PageSize).InclusiveBetween(1, 200);
+    }
+}
+
+
+================================================================================
+Accounting.Application\Invoices\Commands\Create\CreateInvoiceValidator.cs
+using Accounting.Application.Common.Interfaces;
+using Accounting.Application.Common.Abstractions;
+using Accounting.Application.Common.Validation;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+
+namespace Accounting.Application.Invoices.Commands.Create;
+
+public class CreateInvoiceValidator : AbstractValidator<CreateInvoiceCommand>
+{
+    private readonly IAppDbContext _db;
+    private readonly ICurrentUserService _currentUserService;
+
+    public CreateInvoiceValidator(IAppDbContext db, ICurrentUserService currentUserService)
+    {
+        _db = db;
+        _currentUserService = currentUserService;
+
+        RuleFor(x => x.ContactId)
+            .GreaterThan(0);
+
+        RuleFor(x => x.DateUtc)
+            .NotEmpty()
+            .WithMessage("DateUtc gereklidir.");
+
+        RuleFor(x => x.Currency).MustBeValidCurrency();
+
+        RuleFor(x => x.Type)
+            .IsInEnum()
+            .WithMessage("Geçersiz fatura türü.");
+
+        // 🆕 DocumentType validasyonu
+        RuleFor(x => x.DocumentType)
+            .IsInEnum()
+            .When(x => x.DocumentType.HasValue)
+            .WithMessage("Geçerli bir belge türü seçiniz.");
+
+        // Branch kontrolü
+        RuleFor(x => x)
+            .MustAsync(ContactBelongsToSameBranchAsync)
+            .WithMessage("Cari (Contact) fatura ile aynı şubeye ait olmalıdır.")
+            .When(x => x.ContactId > 0 && _currentUserService.BranchId.HasValue);
+
+        // Satırlar
+        RuleFor(x => x.Lines)
+            .NotNull()
+            .Must(l => l.Count > 0)
+            .WithMessage("En az bir satır girmelisiniz.");
+
+        RuleForEach(x => x.Lines).ChildRules(line =>
+        {
+            // 🆕 ItemId artık zorunlu (ExpenseDefinitionId yok)
+            line.RuleFor(l => l.ItemId)
+                .NotNull()
+                .GreaterThan(0)
+                .WithMessage("ItemId gereklidir.");
+
+            line.RuleFor(l => l.Qty)
+                .GreaterThan(0)
+                .WithMessage("Miktar 0'dan büyük olmalıdır.");
+
+            line.RuleFor(l => l.UnitPrice)
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("Birim fiyat 0'dan küçük olamaz.");
+
+            line.RuleFor(l => l.VatRate)
+                .InclusiveBetween(0, 100);
+
+            line.RuleFor(l => l.DiscountRate)
+                .InclusiveBetween(0, 100)
+                .When(l => l.DiscountRate.HasValue)
+                .WithMessage("İskonto oranı 0-100 arasında olmalıdır.");
+        });
+
+        // Item'lar gerçekten var mı (Item artık global/branch-agnostic bir entity,
+        // bu yüzden burada bir şube kıyaslaması değil, sadece varlık kontrolü yapılır).
+        RuleFor(x => x)
+            .MustAsync(AllItemsExistAsync)
+            .WithMessage("Fatura satırlarındaki bir veya daha fazla ürün bulunamadı.")
+            .When(x => x.Lines != null && x.Lines.Any());
+    }
+
+    private async Task<bool> ContactBelongsToSameBranchAsync(CreateInvoiceCommand cmd, CancellationToken ct)
+    {
+        // Admin/HQ users can invoice any branch's contact, same bypass ApplyBranchFilter
+        // applies everywhere else — without this, an admin could never create an invoice
+        // for a contact outside their own "home" branch.
+        if (_currentUserService.IsAdmin || _currentUserService.IsHeadquarters) return true;
+
+        if (!_currentUserService.BranchId.HasValue) return false;
+        var currentBranchId = _currentUserService.BranchId.Value;
+
+        var contact = await _db.Contacts
+            .AsNoTracking()
+            .Where(c => c.Id == cmd.ContactId && !c.IsDeleted)
+            .Select(c => new { c.BranchId })
+            .FirstOrDefaultAsync(ct);
+
+        if (contact == null)
+            return false;
+
+        return contact.BranchId == currentBranchId;
+    }
+
+    private async Task<bool> AllItemsExistAsync(CreateInvoiceCommand cmd, CancellationToken ct)
+    {
+        var itemIds = cmd.Lines
+            .Where(l => l.ItemId.HasValue)
+            .Select(l => l.ItemId!.Value)
+            .Distinct()
+            .ToList();
+
+        if (itemIds.Count == 0)
+            return true;
+
+        var existingCount = await _db.Items
+            .AsNoTracking()
+            .Where(i => itemIds.Contains(i.Id) && !i.IsDeleted)
+            .CountAsync(ct);
+
+        return existingCount == itemIds.Count;
+    }
+}
+
+
+================================================================================
+Accounting.Application\Invoices\Commands\Delete\SoftDeleteInvoiceValidator.cs
+using Accounting.Application.Common.Validation;
+using FluentValidation;
+
+namespace Accounting.Application.Invoices.Commands.Delete;
+
+public class SoftDeleteInvoiceValidator : AbstractValidator<SoftDeleteInvoiceCommand>
+{
+    public SoftDeleteInvoiceValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.RowVersion).MustBeValidRowVersion();  // Extension
+    }
+}
+
+
+================================================================================
+Accounting.Application\Invoices\Commands\Update\UpdateInvoiceValidator.cs
+using Accounting.Application.Common.Abstractions;
+using Accounting.Application.Common.Validation;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using Accounting.Application.Common.Interfaces;
+
+namespace Accounting.Application.Invoices.Commands.Update;
+
+public sealed class UpdateInvoiceValidator : AbstractValidator<UpdateInvoiceCommand>
+{
+    private readonly IAppDbContext _db;
+    private readonly ICurrentUserService _currentUserService;
+
+    public UpdateInvoiceValidator(IAppDbContext db, ICurrentUserService currentUserService)
+    {
+        _db = db;
+        _currentUserService = currentUserService;
+
+        RuleFor(x => x.Id).GreaterThan(0);
+
+        RuleFor(x => x.RowVersionBase64).MustBeValidRowVersion();
+
+        RuleFor(x => x.DateUtc)
+            .Must(d => d.Kind == DateTimeKind.Utc || d.Kind == DateTimeKind.Unspecified)
+            .WithMessage("DateUtc geçerli bir tarih olmalıdır.");
+
+        RuleFor(x => x.Currency).NotEmpty().Length(3); // The handler preserves the stored currency, including historical records.
+
+        RuleFor(x => x.ContactId).GreaterThan(0);
+
+        RuleFor(x => x.Lines)
+            .NotNull().WithMessage("Lines null olamaz.")
+            .Must(l => l != null && l.Count > 0).WithMessage("En az bir satır olmalıdır.");
+
+        RuleFor(x => x.Type)
+            .IsInEnum()
+            .WithMessage("Geçersiz fatura türü.");
+
+        // Branch Tutarlılık Kontrolü: Contact aynı şubeye ait olmalı
+        RuleFor(x => x)
+            .MustAsync(ContactBelongsToSameBranchAsync)
+            .WithMessage("Cari (Contact) fatura ile aynı şubeye ait olmalıdır.");
+
+        // Item'lar gerçekten var mı (Item artık global/branch-agnostic bir entity,
+        // bu yüzden burada bir şube kıyaslaması değil, sadece varlık kontrolü yapılır).
+        RuleFor(x => x)
+            .MustAsync(AllItemsExistAsync)
+            .WithMessage("Fatura satırlarındaki bir veya daha fazla ürün bulunamadı.");
+
+        // Id>0 olan satırlarda tekrar kontrolü
+        RuleFor(x => x.Lines)
+            .Must(lines =>
+            {
+                var ids = lines.Where(l => l.Id > 0).Select(l => l.Id);
+                return ids.Distinct().Count() == ids.Count();
+            })
+            .WithMessage("Lines içinde tekrar eden satır Id değerleri var.");
+
+        RuleForEach(x => x.Lines).SetValidator(new UpdateInvoiceLineValidator());
+    }
+
+    private async Task<bool> ContactBelongsToSameBranchAsync(UpdateInvoiceCommand cmd, CancellationToken ct)
+    {
+        // Admin/HQ users can update any branch's invoice, same bypass ApplyBranchFilter
+        // applies everywhere else — without this, an admin could never update an invoice
+        // for a contact outside their own "home" branch (found via manual UI testing:
+        // editing invoice #2, whose contact belongs to a different branch than the admin
+        // account's own branch, failed validation every time).
+        if (_currentUserService.IsAdmin || _currentUserService.IsHeadquarters) return true;
+
+        if (!_currentUserService.BranchId.HasValue) return false;
+        var currentBranchId = _currentUserService.BranchId.Value;
+
+        var contact = await _db.Contacts
+            .AsNoTracking()
+            .Where(c => c.Id == cmd.ContactId && !c.IsDeleted)
+            .Select(c => new { c.BranchId })
+            .FirstOrDefaultAsync(ct);
+
+        if (contact == null)
+            return false;
+
+        return contact.BranchId == currentBranchId;
+    }
+
+    private async Task<bool> AllItemsExistAsync(UpdateInvoiceCommand cmd, CancellationToken ct)
+    {
+        var itemIds = cmd.Lines
+            .Where(l => l.ItemId.HasValue)
+            .Select(l => l.ItemId!.Value)
+            .Distinct()
+            .ToList();
+
+        if (itemIds.Count == 0)
+            return true;
+
+        var existingCount = await _db.Items
+            .AsNoTracking()
+            .Where(i => itemIds.Contains(i.Id) && !i.IsDeleted)
+            .CountAsync(ct);
+
+        return existingCount == itemIds.Count;
+    }
+}
+
+internal sealed class UpdateInvoiceLineValidator : AbstractValidator<UpdateInvoiceLineDto>
+{
+    public UpdateInvoiceLineValidator()
+    {
+        RuleFor(l => l.Id).GreaterThanOrEqualTo(0);
+        RuleFor(l => l.ItemId).GreaterThan(0).When(l => l.ItemId.HasValue);
+
+        RuleFor(l => l.Qty)
+            .GreaterThan(0)
+            .WithMessage("Miktar 0'dan büyük olmalıdır.");
+
+        RuleFor(l => l.UnitPrice)
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("Birim fiyat 0'dan küçük olamaz.");
+
+        RuleFor(l => l.VatRate).InclusiveBetween(0, 100);
+
+        RuleFor(l => l.DiscountRate)
+            .InclusiveBetween(0, 100)
+            .When(l => l.DiscountRate.HasValue)
+            .WithMessage("İskonto oranı 0-100 arasında olmalıdır.");
+    }
+}
+
+
+================================================================================
+Accounting.Application\Invoices\Queries\List\ListInvoicesValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Invoices.Queries.List;
+
+public class ListInvoicesValidator : AbstractValidator<ListInvoicesQuery>
+{
+    public ListInvoicesValidator()
+    {
+        RuleFor(x => x.PageNumber).GreaterThanOrEqualTo(1);
+        RuleFor(x => x.PageSize).InclusiveBetween(1, 200);
+
+        RuleFor(x => x.Sort)
+            .Must(BeValidSort)
+            .WithMessage("Sort must be 'dateUtc|totalGross:asc|desc'.");
+
+        RuleFor(x => x.DateFromUtc).Must(BeIso8601OrNull)
+            .WithMessage("DateFromUtc must be ISO-8601 (e.g. 2025-08-08T10:00:00Z).");
+        RuleFor(x => x.DateToUtc).Must(BeIso8601OrNull)
+            .WithMessage("DateToUtc must be ISO-8601 (e.g. 2025-08-08T10:00:00Z).");
+    }
+
+    private static bool BeValidSort(string? sort)
+    {
+        if (string.IsNullOrWhiteSpace(sort)) return true;
+        var parts = sort.Split(':');
+        if (parts.Length != 2) return false;
+        var field = parts[0].ToLowerInvariant();
+        var dir = parts[1].ToLowerInvariant();
+        return (field is "dateutc" or "totalgross") && (dir is "asc" or "desc");
+    }
+
+    private static bool BeIso8601OrNull(string? s)
+    {
+        if (string.IsNullOrWhiteSpace(s)) return true;
+        return DateTime.TryParse(s, System.Globalization.CultureInfo.InvariantCulture,
+            System.Globalization.DateTimeStyles.AdjustToUniversal, out _);
+    }
+}
+
+
+================================================================================
+Accounting.Application\Invoices\Queries\Print\GetInvoicePdfValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Invoices.Queries.Print;
+
+public class GetInvoicePdfValidator : AbstractValidator<GetInvoicePdfQuery>
+{
+    public GetInvoicePdfValidator() => RuleFor(x => x.Id).GreaterThan(0);
+}
+
+
+================================================================================
+Accounting.Application\Items\Commands\Create\CreateItemValidator.cs
+using Accounting.Application.Common.Abstractions;
+using Microsoft.EntityFrameworkCore;
+using Accounting.Domain.Enums;
+using FluentValidation;
+
+namespace Accounting.Application.Items.Commands.Create;
+
+public class CreateItemValidator : AbstractValidator<CreateItemCommand>
+{
+    public CreateItemValidator(IAppDbContext db)
+    {
+        RuleFor(x => x.Code).NotEmpty().MaximumLength(64);
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(256);
+        RuleFor(x => x.Type).IsInEnum();
+        RuleFor(x => x.UnitId).GreaterThan(0)
+            .MustAsync((id, ct) => db.Units.AsNoTracking().AnyAsync(u => u.Id == id, ct))
+            .WithMessage("Select an existing active unit.");
+        RuleFor(x => x.VatRate).InclusiveBetween(0, 100);
+
+        RuleFor(x => x.DefaultWithholdingRate)
+            .InclusiveBetween(0, 100)
+            .When(x => x.DefaultWithholdingRate.HasValue);
+
+        RuleFor(x => x.PurchasePrice)
+            .GreaterThanOrEqualTo(0)
+            .When(x => x.PurchasePrice.HasValue);
+
+        RuleFor(x => x.SalesPrice)
+            .GreaterThanOrEqualTo(0)
+            .When(x => x.SalesPrice.HasValue);
+
+        RuleFor(x => x.PurchaseAccountCode)
+            .MaximumLength(16)
+            .When(x => !string.IsNullOrEmpty(x.PurchaseAccountCode));
+
+        RuleFor(x => x.SalesAccountCode)
+            .MaximumLength(16)
+            .When(x => !string.IsNullOrEmpty(x.SalesAccountCode));
+
+        RuleFor(x => x.UsefulLifeYears)
+            .GreaterThan(0)
+            .LessThanOrEqualTo(50)
+            .When(x => x.Type == ItemType.FixedAsset && x.UsefulLifeYears.HasValue)
+            .WithMessage("Demirbaşlar için faydalı ömür 1-50 yıl arası olmalıdır");
+    }
+}
+
+
+================================================================================
+Accounting.Application\Items\Commands\Delete\SoftDeleteItemValidator.cs
+using Accounting.Application.Common.Validation;
+using FluentValidation;
+
+namespace Accounting.Application.Items.Commands.Delete;
+
+public class SoftDeleteItemValidator : AbstractValidator<SoftDeleteItemCommand>
+{
+    public SoftDeleteItemValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.RowVersion).MustBeValidRowVersion();
+    }
+}
+
+
+================================================================================
+Accounting.Application\Items\Commands\Update\UpdateItemValidator.cs
+using Accounting.Application.Common.Abstractions;
+using Microsoft.EntityFrameworkCore;
+using Accounting.Domain.Enums;
+using FluentValidation;
+
+namespace Accounting.Application.Items.Commands.Update;
+
+public class UpdateItemValidator : AbstractValidator<UpdateItemCommand>
+{
+    public UpdateItemValidator(IAppDbContext db)
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.RowVersion).NotEmpty();
+        RuleFor(x => x.Code).NotEmpty().MaximumLength(64);
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(256);
+        RuleFor(x => x.Type).IsInEnum();
+        RuleFor(x => x.UnitId).GreaterThan(0)
+            .MustAsync((id, ct) => db.Units.AsNoTracking().AnyAsync(u => u.Id == id, ct))
+            .WithMessage("Select an existing active unit.");
+        RuleFor(x => x.VatRate).InclusiveBetween(0, 100);
+
+        RuleFor(x => x.DefaultWithholdingRate)
+            .InclusiveBetween(0, 100)
+            .When(x => x.DefaultWithholdingRate.HasValue);
+
+        RuleFor(x => x.PurchasePrice)
+            .GreaterThanOrEqualTo(0)
+            .When(x => x.PurchasePrice.HasValue);
+
+        RuleFor(x => x.SalesPrice)
+            .GreaterThanOrEqualTo(0)
+            .When(x => x.SalesPrice.HasValue);
+
+        RuleFor(x => x.PurchaseAccountCode)
+            .MaximumLength(16)
+            .When(x => !string.IsNullOrEmpty(x.PurchaseAccountCode));
+
+        RuleFor(x => x.SalesAccountCode)
+            .MaximumLength(16)
+            .When(x => !string.IsNullOrEmpty(x.SalesAccountCode));
+
+        RuleFor(x => x.UsefulLifeYears)
+            .GreaterThan(0)
+            .LessThanOrEqualTo(50)
+            .When(x => x.Type == ItemType.FixedAsset && x.UsefulLifeYears.HasValue)
+            .WithMessage("Demirbaşlar için faydalı ömür 1-50 yıl arası olmalıdır");
+    }
+}
+
+
+================================================================================
+Accounting.Application\Items\Queries\GetById\GetItemByIdValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Items.Queries.GetById;
+
+public class GetItemByIdValidator : AbstractValidator<GetItemByIdQuery>
+{
+    public GetItemByIdValidator() { RuleFor(x => x.Id).GreaterThan(0); }
+}
+
+
+================================================================================
+Accounting.Application\Orders\Commands\Approve\ApproveOrderValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Orders.Commands.Approve;
+
+public class ApproveOrderValidator : AbstractValidator<ApproveOrderCommand>
+{
+    public ApproveOrderValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.RowVersion).NotEmpty();
+    }
+}
+
+
+================================================================================
+Accounting.Application\Orders\Commands\Cancel\CancelOrderValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Orders.Commands.Cancel;
+
+public class CancelOrderValidator : AbstractValidator<CancelOrderCommand>
+{
+    public CancelOrderValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.RowVersion).NotEmpty();
+    }
+}
+
+
+================================================================================
+Accounting.Application\Orders\Commands\Create\CreateOrderValidator.cs
+using Accounting.Application.Common.Validation;
+using Accounting.Application.Common.Abstractions;
+using Accounting.Application.Common.Interfaces;
+using Accounting.Domain.Enums;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+
+namespace Accounting.Application.Orders.Commands.Create;
+
+public class CreateOrderValidator : AbstractValidator<CreateOrderCommand>
+{
+    private readonly IAppDbContext _db;
+    private readonly ICurrentUserService _currentUserService;
+
+    public CreateOrderValidator(IAppDbContext db, ICurrentUserService currentUserService)
+    {
+        _db = db;
+        _currentUserService = currentUserService;
+
+        RuleFor(x => x.ContactId)
+            .GreaterThan(0)
+            .MustAsync(ContactIsValidForBranchAsync).WithMessage("Cari bulunamadı veya bu şubeye ait değil.");
+
+        RuleFor(x => x.Type)
+            .IsInEnum();            
+
+        RuleFor(x => x.Currency)
+            .MustBeValidCurrency();
+
+        RuleFor(x => x.DateUtc)
+            .NotEmpty();
+
+        RuleFor(x => x.Description)
+            .MaximumLength(200);
+
+        RuleFor(x => x.Lines)
+            .NotEmpty().WithMessage("En az bir sipariş kalemi gereklidir.");
+
+        RuleForEach(x => x.Lines).ChildRules(line =>
+        {
+            line.RuleFor(l => l.Description)
+                .NotEmpty()
+                .MaximumLength(200);
+
+            line.RuleFor(l => l.Quantity)
+                .GreaterThan(0)
+                .WithMessage("Miktar 0'dan büyük olmalıdır.");
+
+            line.RuleFor(l => l.UnitPrice)
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("Birim fiyat 0'dan küçük olamaz.");
+
+            line.RuleFor(l => l.VatRate)
+                .Must(v => v == 0 || v == 1 || v == 10 || v == 20)
+                .WithMessage("KDV oranı 0, 1, 10 veya 20 olmalıdır.");
+        });
+    }
+
+    private async Task<bool> ContactIsValidForBranchAsync(int contactId, CancellationToken ct)
+    {
+        var contact = await _db.Contacts
+            .AsNoTracking()
+            .Where(c => c.Id == contactId && !c.IsDeleted)
+            .Select(c => new { c.BranchId })
+            .FirstOrDefaultAsync(ct);
+
+        if (contact == null) return false;
+
+        // Admin/HQ bypass — same rule ApplyBranchFilter applies everywhere else.
+        if (_currentUserService.IsAdmin || _currentUserService.IsHeadquarters) return true;
+
+        if (!_currentUserService.BranchId.HasValue) return false;
+        return contact.BranchId == _currentUserService.BranchId.Value;
+    }
+}
+
+
+================================================================================
+Accounting.Application\Orders\Commands\CreateInvoice\CreateInvoiceFromOrderValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Orders.Commands.CreateInvoice;
+
+public class CreateInvoiceFromOrderValidator : AbstractValidator<CreateInvoiceFromOrderCommand>
+{
+    public CreateInvoiceFromOrderValidator()
+    {
+        RuleFor(x => x.OrderId).GreaterThan(0);
+    }
+}
+
+
+================================================================================
+Accounting.Application\Orders\Commands\Delete\DeleteOrderValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Orders.Commands.Delete;
+
+public class DeleteOrderValidator : AbstractValidator<DeleteOrderCommand>
+{
+    public DeleteOrderValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.RowVersion).NotEmpty();
+    }
+}
+
+
+================================================================================
+Accounting.Application\Orders\Commands\Update\UpdateOrderValidator.cs
+using Accounting.Application.Common.Abstractions;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+
+namespace Accounting.Application.Orders.Commands.Update;
+
+public class UpdateOrderValidator : AbstractValidator<UpdateOrderCommand>
+{
+    private readonly IAppDbContext _db;
+
+    public UpdateOrderValidator(IAppDbContext db)
+    {
+        _db = db;
+
+        RuleFor(x => x.Id)
+            .GreaterThan(0);
+
+        RuleFor(x => x.ContactId)
+            .GreaterThan(0)
+            .MustAsync(ContactExistsAsync).WithMessage("Cari bulunamadı.");
+
+        RuleFor(x => x.DateUtc)
+            .NotEmpty();
+
+        RuleFor(x => x.Description)
+            .MaximumLength(200);
+
+        RuleFor(x => x.RowVersion)
+            .NotEmpty();
+
+        RuleFor(x => x.Lines)
+            .NotEmpty().WithMessage("En az bir sipariş kalemi gereklidir.");
+
+        RuleForEach(x => x.Lines).ChildRules(line =>
+        {
+            line.RuleFor(l => l.Description)
+                .NotEmpty()
+                .MaximumLength(200);
+
+            line.RuleFor(l => l.Quantity)
+                .GreaterThan(0)
+                .WithMessage("Miktar 0'dan büyük olmalıdır.");
+
+            line.RuleFor(l => l.UnitPrice)
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("Birim fiyat 0'dan küçük olamaz.");
+
+            line.RuleFor(l => l.VatRate)
+                .Must(v => v == 0 || v == 1 || v == 10 || v == 20)
+                .WithMessage("KDV oranı 0, 1, 10 veya 20 olmalıdır.");
+        });
+    }
+
+    private async Task<bool> ContactExistsAsync(int contactId, CancellationToken ct)
+    {
+        return await _db.Contacts.AnyAsync(c => c.Id == contactId, ct);
+    }
+}
+
+
+================================================================================
+Accounting.Application\Payments\Commands\Create\CreatePaymentValidator.cs
+using Accounting.Application.Common.Abstractions;
+using Accounting.Application.Common.Interfaces;
+using Accounting.Application.Common.Validation;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+
+namespace Accounting.Application.Payments.Commands.Create;
+
+public class CreatePaymentValidator : AbstractValidator<CreatePaymentCommand>
+{
+    private readonly IAppDbContext _db;
+    private readonly ICurrentUserService _currentUserService;
+
+    public CreatePaymentValidator(IAppDbContext db, ICurrentUserService currentUserService)
+    {
+        _db = db;
+        _currentUserService = currentUserService;
+
+        RuleFor(x => x.AccountId)
+            .GreaterThan(0)
+            .MustAsync(AccountBelongsToBranchAsync).WithMessage("Kasa/Banka hesabı bulunamadı veya bu şubeye ait değil.");
+
+        RuleFor(x => x.Direction).IsInEnum();
+
+        RuleFor(x => x.Amount)
+            .GreaterThan(0)
+            .WithMessage("Tutar 0'dan büyük olmalıdır.");
+
+        // CommonValidationRules
+        RuleFor(x => x.Currency).MustBeValidCurrency();
+        RuleFor(x => x.DateUtc).NotEmpty().WithMessage("DateUtc gereklidir.");
+
+        // LinkedInvoiceId validation
+        When(x => x.LinkedInvoiceId.HasValue, () =>
+        {
+            // 1. Invoice exist check & Branch Check
+            RuleFor(x => x.LinkedInvoiceId!.Value)
+                .MustAsync(InvoiceBelongsToBranchAsync)
+                .WithMessage("Linked invoice not found, deleted, or belongs to another branch.");
+
+            // 2. Currency match
+            RuleFor(x => x)
+                .MustAsync(async (cmd, ct) =>
+                {
+                    if (!cmd.LinkedInvoiceId.HasValue) return true;
+
+                    var invoice = await _db.Invoices
+                        .AsNoTracking()
+                        .Where(i => i.Id == cmd.LinkedInvoiceId.Value)
+                        .Select(i => new { i.Currency })
+                        .FirstOrDefaultAsync(ct);
+
+                    if (invoice == null) return true;
+
+                    var paymentCurrency = (cmd.Currency ?? "IRR").Trim().ToUpperInvariant();
+                    return invoice.Currency.ToUpperInvariant() == paymentCurrency;
+                })
+                .WithMessage("Payment currency must match invoice currency.");
+
+            // 3. Amount <= Balance
+            RuleFor(x => x)
+                .MustAsync(async (cmd, ct) =>
+                {
+                    if (!cmd.LinkedInvoiceId.HasValue) return true;
+
+                    var invoice = await _db.Invoices
+                        .AsNoTracking()
+                        .Where(i => i.Id == cmd.LinkedInvoiceId.Value)
+                        .Select(i => new { i.Balance })
+                        .FirstOrDefaultAsync(ct);
+
+                    if (invoice == null) return true;
+
+                    return cmd.Amount <= invoice.Balance;
+                })
+                .WithMessage("Payment amount exceeds invoice balance.");
+        });
+    }
+
+    private async Task<bool> AccountBelongsToBranchAsync(int accountId, CancellationToken ct)
+    {
+        var account = await _db.CashBankAccounts
+            .AsNoTracking()
+            .Where(a => a.Id == accountId && !a.IsDeleted)
+            .Select(a => new { a.BranchId })
+            .FirstOrDefaultAsync(ct);
+
+        if (account == null) return false;
+
+        // Admin/HQ bypass — same rule ApplyBranchFilter applies everywhere else.
+        if (_currentUserService.IsAdmin || _currentUserService.IsHeadquarters) return true;
+
+        if (!_currentUserService.BranchId.HasValue) return false;
+        return account.BranchId == _currentUserService.BranchId.Value;
+    }
+
+    private async Task<bool> InvoiceBelongsToBranchAsync(int invoiceId, CancellationToken ct)
+    {
+        var invoice = await _db.Invoices
+            .AsNoTracking()
+            .Where(i => i.Id == invoiceId && !i.IsDeleted)
+            .Select(i => new { i.BranchId })
+            .FirstOrDefaultAsync(ct);
+
+        if (invoice == null) return false;
+
+        // Admin/HQ bypass — same rule ApplyBranchFilter applies everywhere else.
+        if (_currentUserService.IsAdmin || _currentUserService.IsHeadquarters) return true;
+
+        if (!_currentUserService.BranchId.HasValue) return false;
+        return invoice.BranchId == _currentUserService.BranchId.Value;
+    }
+}
+
+
+================================================================================
+Accounting.Application\Payments\Commands\Delete\SoftDeletePaymentValidator.cs
+using Accounting.Application.Common.Validation;
+using FluentValidation;
+using Accounting.Application.Payments.Commands.Delete;
+
+namespace Accounting.Application.Payments.Commands.Delete;
+
+public class SoftDeletePaymentValidator : AbstractValidator<SoftDeletePaymentCommand>
+{
+    public SoftDeletePaymentValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.RowVersion).MustBeValidRowVersion();
+    }
+}
+
+
+================================================================================
+Accounting.Application\Payments\Commands\Update\UpdatePaymentValidator.cs
+using Accounting.Application.Common.Validation;
+using FluentValidation;
+using Accounting.Application.Payments.Commands.Update;
+
+namespace Accounting.Application.Payments.Commands.Update;
+
+public class UpdatePaymentValidator : AbstractValidator<UpdatePaymentCommand>
+{
+    public UpdatePaymentValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.AccountId).GreaterThan(0);
+        RuleFor(x => x.Direction).IsInEnum();
+        RuleFor(x => x.DateUtc).NotEmpty().WithMessage("DateUtc gereklidir.");
+        RuleFor(x => x.Currency).NotEmpty().Length(3); // The handler preserves the stored currency, including historical records. // Extension
+        RuleFor(x => x.RowVersion).MustBeValidRowVersion(); // Extension
+
+        When(x => x.ContactId.HasValue, () =>
+        {
+            RuleFor(x => x.ContactId!.Value).GreaterThan(0);
+        });
+        When(x => x.LinkedInvoiceId.HasValue, () =>
+        {
+            RuleFor(x => x.LinkedInvoiceId!.Value).GreaterThan(0);
+        });
+    }
+}
+
+
+================================================================================
+Accounting.Application\Payments\Queries\GetById\GetPaymentByIdValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Payments.Queries.GetById;
+
+public class GetPaymentByIdValidator : AbstractValidator<GetPaymentByIdQuery>
+{
+    public GetPaymentByIdValidator()
+    {
+        RuleFor(x => x.Id)
+            .GreaterThan(0);
+    }
+
+}
+
+
+================================================================================
+Accounting.Application\Payments\Queries\List\ListPaymentsValidator.cs
+using Accounting.Application.Common.Validation;
+using FluentValidation;
+
+namespace Accounting.Application.Payments.Queries.List;
+
+public class ListPaymentsValidator : AbstractValidator<ListPaymentsQuery>
+{
+    public ListPaymentsValidator()
+    {
+        RuleFor(x => x.PageNumber).GreaterThanOrEqualTo(1);
+        RuleFor(x => x.PageSize).InclusiveBetween(1, 200);
+
+        RuleFor(x => x.Sort)
+            .Must(BeValidSort)
+            .WithMessage("Sort must be 'dateUtc|amount:asc|desc'.");
+
+        RuleFor(x => x.Currency)
+            .Must(c => string.IsNullOrWhiteSpace(c) || CommonValidationRules.IsValidCurrency(c))
+            .WithMessage("Only Iranian rial (IRR) is supported.");
+
+        // Tarihleri opsiyonel bÄ±rakÄ±yoruz; varsa ISO-8601 olmalÄ±
+        RuleFor(x => x.DateFromUtc)
+            .Must(BeIso8601OrNull).WithMessage("DateFromUtc must be ISO-8601 (e.g. 2025-08-08T10:00:00Z).");
+        RuleFor(x => x.DateToUtc)
+            .Must(BeIso8601OrNull).WithMessage("DateToUtc must be ISO-8601 (e.g. 2025-08-08T10:00:00Z).");
+    }
+
+    private static bool BeValidSort(string? sort)
+    {
+        if (string.IsNullOrWhiteSpace(sort)) return true;
+        var parts = sort.Split(':');
+        if (parts.Length != 2) return false;
+        var field = parts[0].ToLowerInvariant();
+        var dir = parts[1].ToLowerInvariant();
+        return (field is "dateutc" or "amount") && (dir is "asc" or "desc");
+    }
+
+    private static bool BeIso8601OrNull(string? s)
+    {
+        if (string.IsNullOrWhiteSpace(s)) return true;
+        return DateTime.TryParse(s, System.Globalization.CultureInfo.InvariantCulture,
+            System.Globalization.DateTimeStyles.AdjustToUniversal, out _);
+    }
+}
+
+
+================================================================================
+Accounting.Application\StockMovements\Commands\Create\CreateStockMovementValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.StockMovements.Commands.Create;
+
+public class CreateStockMovementValidator : AbstractValidator<CreateStockMovementCommand>
+{
+    public CreateStockMovementValidator()
+    {
+        RuleFor(x => x.WarehouseId).GreaterThan(0);
+        RuleFor(x => x.ItemId).GreaterThan(0);
+
+        RuleFor(x => x.Quantity)
+            .GreaterThan(0)
+            .WithMessage("Miktar 0'dan büyük olmalıdır.");
+
+        RuleFor(x => x.Type)
+            .IsInEnum()
+            .WithMessage("Geçersiz stok hareket tipi.");
+
+        RuleFor(x => x.Note).MaximumLength(500);
+    }
+}
+
+
+================================================================================
+Accounting.Application\StockMovements\Commands\Transfer\TransferStockValidator.cs
+using Accounting.Application.Common.Abstractions;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+
+namespace Accounting.Application.StockMovements.Commands.Transfer;
+
+public class TransferStockValidator : AbstractValidator<TransferStockCommand>
+{
+    private readonly IAppDbContext _db;
+
+    public TransferStockValidator(IAppDbContext db)
+    {
+        _db = db;
+
+        RuleFor(x => x.SourceWarehouseId)
+            .GreaterThan(0)
+            .MustAsync(WarehouseExistsAsync).WithMessage("Kaynak depo bulunamadı.")
+            .NotEqual(x => x.TargetWarehouseId).WithMessage("Kaynak ve hedef depo aynı olamaz.");
+
+        RuleFor(x => x.TargetWarehouseId)
+            .GreaterThan(0)
+            .MustAsync(WarehouseExistsAsync).WithMessage("Hedef depo bulunamadı.");
+
+        RuleFor(x => x.ItemId)
+            .GreaterThan(0)
+            .MustAsync(ItemExistsAsync).WithMessage("Ürün bulunamadı.");    
+
+        RuleFor(x => x.TransactionDateUtc)
+            .NotEmpty();
+
+        RuleFor(x => x.Description)
+            .MaximumLength(500);
+    }
+
+    private async Task<bool> WarehouseExistsAsync(int warehouseId, CancellationToken ct)
+    {
+        return await _db.Warehouses.AnyAsync(w => w.Id == warehouseId, ct);
+    }
+
+    private async Task<bool> ItemExistsAsync(int itemId, CancellationToken ct)
+    {
+        return await _db.Items.AnyAsync(i => i.Id == itemId, ct);
+    }
+}
+
+
+================================================================================
+Accounting.Application\Units\Commands\Create\CreateUnitValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Units.Commands.Create;
+
+public class CreateUnitValidator : AbstractValidator<CreateUnitCommand>
+{
+    public CreateUnitValidator()
+    {
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .MaximumLength(16);
+
+        RuleFor(x => x.Description)
+            .MaximumLength(500);
+
+    }
+}
+
+
+================================================================================
+Accounting.Application\Units\Commands\Delete\DeleteUnitValidator.cs
+using Accounting.Application.Common.Validation;
+using FluentValidation;
+
+namespace Accounting.Application.Units.Commands.Delete;
+
+public class DeleteUnitValidator : AbstractValidator<DeleteUnitCommand>
+{
+    public DeleteUnitValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.RowVersion).MustBeValidRowVersion();
+    }
+}
+
+
+================================================================================
+Accounting.Application\Units\Commands\Update\UpdateUnitValidator.cs
+using Accounting.Application.Common.Validation;
+using FluentValidation;
+
+namespace Accounting.Application.Units.Commands.Update;
+
+public class UpdateUnitValidator : AbstractValidator<UpdateUnitCommand>
+{
+    public UpdateUnitValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .MaximumLength(16);
+
+        RuleFor(x => x.Description)
+            .MaximumLength(500);
+
+
+        RuleFor(x => x.RowVersion).MustBeValidRowVersion();
+    }
+}
+
+
+================================================================================
+Accounting.Application\Units\Queries\GetById\GetUnitByIdValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Units.Queries.GetById;
+
+public class GetUnitByIdValidator : AbstractValidator<GetUnitByIdQuery>
+{
+    public GetUnitByIdValidator() => RuleFor(x => x.Id).GreaterThan(0);
+}
+
+
+================================================================================
+Accounting.Application\Users\Commands\ChangePassword\ChangeUserPasswordCommandValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Users.Commands.ChangePassword;
+
+public class ChangeUserPasswordCommandValidator : AbstractValidator<ChangeUserPasswordCommand>
+{
+    public ChangeUserPasswordCommandValidator()
+    {
+        RuleFor(x => x.UserId).GreaterThan(0);
+
+        RuleFor(x => x.NewPassword)
+            .NotEmpty().WithMessage("Password is required")
+            .MinimumLength(8).WithMessage("Password must be at least 8 characters")
+            .Matches(@"[A-Z]").WithMessage("Password must contain at least one uppercase letter")
+            .Matches(@"[a-z]").WithMessage("Password must contain at least one lowercase letter")
+            .Matches(@"[0-9]").WithMessage("Password must contain at least one number");
+    }
+}
+
+
+================================================================================
+Accounting.Application\Users\Commands\Create\CreateUserCommandValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Users.Commands.Create;
+
+public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
+{
+    public CreateUserCommandValidator()
+    {
+        RuleFor(x => x.FirstName)
+            .NotEmpty().WithMessage("First name is required")
+            .MaximumLength(100);
+
+        RuleFor(x => x.LastName)
+            .NotEmpty().WithMessage("Last name is required")
+            .MaximumLength(100);
+
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage("Email is required")
+            .EmailAddress().WithMessage("Invalid email format")
+            .MaximumLength(255);
+
+        RuleFor(x => x.Password)
+            .NotEmpty().WithMessage("Password is required")
+            .MinimumLength(8).WithMessage("Password must be at least 8 characters")
+            .Matches(@"[A-Z]").WithMessage("Password must contain at least one uppercase letter")
+            .Matches(@"[a-z]").WithMessage("Password must contain at least one lowercase letter")
+            .Matches(@"[0-9]").WithMessage("Password must contain at least one number");
+
+        RuleFor(x => x.RoleIds)
+            .NotEmpty().WithMessage("At least one role must be assigned");
+    }
+}
+
+
+================================================================================
+Accounting.Application\Users\Commands\Update\UpdateUserCommandValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Users.Commands.Update;
+
+public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
+{
+    public UpdateUserCommandValidator()
+    {
+        RuleFor(x => x.Id)
+            .GreaterThan(0);
+
+        RuleFor(x => x.FirstName)
+            .NotEmpty().WithMessage("First name is required")
+            .MaximumLength(100);
+
+        RuleFor(x => x.LastName)
+            .NotEmpty().WithMessage("Last name is required")
+            .MaximumLength(100);
+
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage("Email is required")
+            .EmailAddress().WithMessage("Invalid email format")
+            .MaximumLength(255);
+
+        RuleFor(x => x.RoleIds)
+            .NotEmpty().WithMessage("At least one role must be assigned");
+    }
+}
+
+
+================================================================================
+Accounting.Application\Warehouses\Commands\Create\CreateWarehouseValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Warehouses.Commands.Create;
+
+public class CreateWarehouseValidator : AbstractValidator<CreateWarehouseCommand>
+{
+    public CreateWarehouseValidator()
+    {
+        // RuleFor(x => x.BranchId).GreaterThan(0); // Removed
+        RuleFor(x => x.Code).NotEmpty().MaximumLength(64);
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(256);
+    }
+}
+
+
+================================================================================
+Accounting.Application\Warehouses\Commands\Delete\SoftDeleteWarehouseValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Warehouses.Commands.Delete;
+
+public class SoftDeleteWarehouseValidator : AbstractValidator<SoftDeleteWarehouseCommand>
+{
+    public SoftDeleteWarehouseValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.RowVersion).NotEmpty();
+    }
+}
+
+
+================================================================================
+Accounting.Application\Warehouses\Commands\Update\UpdateWarehouseValidator.cs
+using FluentValidation;
+
+namespace Accounting.Application.Warehouses.Commands.Update;
+
+public class UpdateWarehouseValidator : AbstractValidator<UpdateWarehouseCommand>
+{
+    public UpdateWarehouseValidator()
+    {
+        RuleFor(x => x.Id).GreaterThan(0);
+        RuleFor(x => x.BranchId).GreaterThan(0);
+        RuleFor(x => x.Code).NotEmpty().MaximumLength(64);
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(256);
+        RuleFor(x => x.RowVersion).NotEmpty();
+    }
+}

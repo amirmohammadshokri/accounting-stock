@@ -1,0 +1,71 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.19" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.19" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.19">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="10.0.1" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.11" />
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.8.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Stimulsoft.Base">
+      <HintPath>libs/Stimulsoft/2024.3.2/Stimulsoft.Base.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Stimulsoft.Blockly">
+      <HintPath>libs/Stimulsoft/2024.3.2/Stimulsoft.Blockly.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Stimulsoft.Data">
+      <HintPath>libs/Stimulsoft/2024.3.2/Stimulsoft.Data.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Stimulsoft.Report.Check">
+      <HintPath>libs/Stimulsoft/2024.3.2/Stimulsoft.Report.Check.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Stimulsoft.Report">
+      <HintPath>libs/Stimulsoft/2024.3.2/Stimulsoft.Report.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Stimulsoft.Report.Helper">
+      <HintPath>libs/Stimulsoft/2024.3.2/Stimulsoft.Report.Helper.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Stimulsoft.Svg">
+      <HintPath>libs/Stimulsoft/2024.3.2/Stimulsoft.Svg.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Accounting.Application\Accounting.Application.csproj" />
+    <ProjectReference Include="..\Accounting.Domain\Accounting.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="libs/Stimulsoft/2024.3.2/*.dll" Exclude="libs/Stimulsoft/2024.3.2/Stimulsoft.Base.dll;libs/Stimulsoft/2024.3.2/Stimulsoft.Data.dll;libs/Stimulsoft/2024.3.2/Stimulsoft.Report.dll" Link="%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Update="Reporting/stimulsoft-license.private.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Update="Reporting/Invoice.mrt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Update="Reporting/Fonts/*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,37 @@
+[
+  {
+    "file": "Stimulsoft.Base.dll",
+    "version": "2024.3.2.0",
+    "sha256": "2163fa597571f77ee0e8d9d186b0d94e0ebb24a391b5900253afd23f61395294"
+  },
+  {
+    "file": "Stimulsoft.Blockly.dll",
+    "version": "2024.3.2.0",
+    "sha256": "f0e602f793800213f241819ee43f71b855b950a6614c2c774fdfc25f42a27f47"
+  },
+  {
+    "file": "Stimulsoft.Data.dll",
+    "version": "2024.3.2.0",
+    "sha256": "1de028c8b2df6862f88c926a72d085dc6e2882d69936be5314fc10c26ec062dc"
+  },
+  {
+    "file": "Stimulsoft.Report.Check.dll",
+    "version": "2024.3.2.0",
+    "sha256": "6dd7f224efd3754f46efb4e7863fd3ba8a92804901629032cb9b3f4dc496f4b2"
+  },
+  {
+    "file": "Stimulsoft.Report.dll",
+    "version": "2024.3.2.0",
+    "sha256": "44da6c44aa5d16bd9ecf1fdd132a8a499ce150eb1d183391e09dfad6b35c53b4"
+  },
+  {
+    "file": "Stimulsoft.Report.Helper.dll",
+    "version": "2024.3.2.0",
+    "sha256": "391f6d577ff212a452d7877b9268c075a03d0f4eeca57a3c6029f0e088a6cc3c"
+  },
+  {
+    "file": "Stimulsoft.Svg.dll",
+    "version": "2024.3.2.0",
+    "sha256": "6c68cccfa8f45b834f0a14bce4919400d715792c3d3d44336500ced738545bd3"
+  }
+]

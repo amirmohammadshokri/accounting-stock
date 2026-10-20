@@ -1,0 +1,111 @@
+
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+html {
+  // density: -2 = kompakt UI (bkz. FRONTEND_RULES.md "Angular Material Design 3").
+  // Not: burada tek bir tema tanımı var — önceden aynı `html` seçicisine iki ayrı
+  // @include mat.theme(...) çağrısı yapılıyordu (biri density: 0, biri density: -2
+  // ile "override" ediyordu); ikincisi zaten kazanıyordu, ilki sadece ölü koddu.
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    typography: Vazirmatn,
+    density: -2,
+  ));
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: inherit;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+}
+
+/* Son: Angular Material teması */
+
+/* AG Grid teması */
+.grid-host { height: 80vh; width: 100%; }
+ag-grid-angular { display: block; height: 100%; width: 100%; }
+/* Son: AG Grid teması */
+html { direction: rtl; }
+body, input, textarea, select, button { font-family: 'Vazirmatn', Tahoma, sans-serif; }
+body { text-align: start; }
+input[type="email"], input[type="password"], input[type="url"], input[type="tel"], input[inputmode="decimal"], .user-email { direction: ltr; text-align: start; }
+.mat-icon { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; vertical-align:middle; }
+.mat-icon svg { display:block; width:100%; height:100%; }
+.ag-root-wrapper { font-family: 'Vazirmatn', Tahoma, sans-serif; }
+
+input[persianDate], input[persianNumber] { text-align: right; }
+
+/* Shared Material surfaces and spacing for every routed screen and dialog. */
+* { box-sizing: border-box; }
+:root { --app-accent: #00796b; }
+.page-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+.page-heading h1 { font: var(--mat-sys-headline-small); margin: 0 0 6px; }
+.page-heading p { color: var(--mat-sys-on-surface-variant); margin: 0; }
+.content-scroll > :not(.page-navigation) .toolbar { flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.mat-mdc-dialog-content.fields { min-width: 0 !important; width: min(620px, 100%); gap: 16px !important; padding-top: 12px !important; }
+.mat-mdc-dialog-content .row { display: flex; flex-wrap: wrap; gap: 16px; }
+.mat-mdc-dialog-content .row > * { min-width: 140px; flex: 1 1 180px; }
+.mat-mdc-card { border-radius: 20px !important; box-shadow: none !important; border: 1px solid var(--mat-sys-outline-variant); }
+.error-state, .form-error { color: var(--mat-sys-on-error-container); background: var(--mat-sys-error-container); border-radius: 12px; padding: 12px 16px; }
+.loading { min-height: 180px; align-items: center; }
+.app-data-grid { display: block; width: 100%; height: clamp(300px, 58vh, 640px); }
+.grid-heading { display: flex; align-items: center; gap: 12px; margin-block: 16px 12px; }
+.grid-heading h2 { font: var(--mat-sys-title-large); margin: 0; flex: 1; }
+.lookup-content .app-data-grid { height: 340px; }
+@media (max-width: 600px) { .form-grid { grid-template-columns: minmax(0, 1fr) !important; } }
+
+.negative-value { color: var(--mat-sys-error); }
+
+.content-scroll .toolbar .title { font: var(--mat-sys-title-large); color: var(--mat-sys-on-surface); }
+.content-scroll .summary-label, .content-scroll .total-label { color: var(--mat-sys-on-surface-variant); }
+
+
+
+/* A calm workspace, with distinct cards instead of an all-white canvas. */
+:root { --app-workspace:#eaf0f4; --app-workspace-image:radial-gradient(ellipse at top right,#d9eee9 0,transparent 55%),linear-gradient(145deg,#edf2f7,#e5edf3); }
+body { background-color:var(--app-workspace);background-image:var(--app-workspace-image); background-attachment:fixed; }
+.mat-drawer-container,.mat-drawer-content {background:transparent;}
+.content-scroll {background-color:var(--app-workspace);background-image:var(--app-workspace-image);}
+.app-dialog-handle {position:relative;cursor:grab;touch-action:none;user-select:none;padding-inline-end:64px!important;flex-shrink:0;background:#edf5f3;border-bottom:1px solid #d7e5e1;}
+.app-dialog-handle:active {cursor:grabbing;}
+.app-dialog-close {position:absolute;inset-inline-end:14px;top:12px;width:36px;height:36px;border:1px solid #ccdcd7;border-radius:12px;background:white;color:#27473f;font:28px/28px Tahoma,sans-serif;cursor:pointer;touch-action:manipulation;}
+.app-dialog-close:hover {background:#dcebe6;}.app-dialog-close:focus-visible {outline:3px solid #00796b;outline-offset:2px;}
+.mat-mdc-dialog-surface {border:1px solid #cbdad6;border-radius:20px!important;box-shadow:0 24px 80px #173a3c33!important;overflow:hidden!important;}
+.mat-mdc-dialog-title::before {display:none!important;}
+.mat-mdc-dialog-title {padding-top:20px!important;padding-bottom:18px!important;margin-bottom:0!important;line-height:1.6!important;min-height:68px;}
+.mat-mdc-dialog-content {max-height:calc(94dvh - 210px)!important;overscroll-behavior:contain;}
+.mat-mdc-dialog-actions {background:#f7faf9;border-top:1px solid #e1e9e5;}
+@media(max-width:600px){.app-dialog-handle {cursor:default;}.mat-mdc-dialog-content .row > * {flex-basis:100%;min-width:0!important;}}
+
+:root[data-theme="dark"]{--app-workspace:#16232c;--app-workspace-image:radial-gradient(ellipse at top right,#173d38 0,transparent 55%),linear-gradient(145deg,#16232c,#1c2935);}
+[data-theme="dark"] .app-dialog-handle,[data-theme="dark"] .mat-mdc-dialog-actions{background:#233b3a;color:#e5edf4;border-color:#3d5653;}
+[data-theme="dark"] .app-dialog-close{background:#1b2d2c;color:#e5edf4;border-color:#45635d;}
+
+app-filter-panel .filter-panel .filter-fields>app-persian-date-field,.mat-mdc-dialog-content .row>app-persian-date-field{width:192px;max-width:100%;flex:0 0 auto}app-filter-panel .filter-panel .filter-fields>app-persian-date-field.with-time,.mat-mdc-dialog-content .row>app-persian-date-field.with-time{width:340px}
