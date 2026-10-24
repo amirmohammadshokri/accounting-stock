@@ -1,0 +1,391 @@
+مستند جامع نصب، تنظیم Production و پابلیش حسابداری و انبار روی IIS
+تاریخ: ۲۴ اکتبر ۲۰۲۶ — مطابق کد فعلی پروژه
+
+
+۱) نقشه نصب
+این پروژه API با net8.0-windows، رابط Angular 20.3 و SQL Server دارد.
+این راهنما برای ویندوز ۶۴ بیتی و دو Website مستقل در IIS است:
+  https://accounting.example.com       رابط کاربری
+  https://api.accounting.example.com   API
+این آدرس‌ها نمونه‌اند؛ همه‌جا نام واقعی خودتان را جایگزین کنید.
+API در ریشه سایت خودش نصب می‌شود؛ مسیر سرویس‌ها /api است.
+پوشه API را به صورت Application با نام api زیر سایت Angular نسازید؛
+در این روش مسیرهای کنترلرها از قبل api دارند و تنظیم متفاوتی لازم می‌شود.
+فرض راهنما Windows Server 2022/2025 با Desktop Experience است.
+برای آزمایش محلی Windows 11 Pro هم می‌توان IIS را از Windows Features فعال کرد؛
+برای میزبانی سازمانی از Windows Server استفاده کنید.
+
+۲) چه چیزهایی نصب کنم؟
+روی سرور مقصد به ترتیب:
+  الف) IIS و IIS Management Console
+  ب) آخرین وصله پایدار .NET 8 Hosting Bundle از سایت رسمی
+  ج) .NET Desktop Runtime 8 نسخه Windows x64
+  د) IIS URL Rewrite 2.1 x64 برای مسیرهای Angular
+  هـ) SQL Server فقط اگر دیتابیس روی همین سرور قرار می‌گیرد
+  و) گواهی HTTPS معتبر برای هر دو نام سایت
+Hosting Bundle شامل ASP.NET Core Runtime و ماژول AspNetCoreModuleV2 است.
+Desktop Runtime جدا لازم است چون Infrastructure به Microsoft.WindowsDesktop.App
+ارجاع دارد؛ نصب Hosting Bundle به‌تنهایی این وابستگی را پوشش نمی‌دهد.
+این دستورها بعد از نصب باید هر سه مورد نسخه 8.0.x را نشان بدهند:
+  dotnet --list-runtimes
+  Microsoft.NETCore.App
+  Microsoft.AspNetCore.App
+  Microsoft.WindowsDesktop.App
+Hosting Bundle را بعد از IIS نصب کنید؛ اگر قبلاً نصب شده، پس از نصب IIS آن را
+Repair کنید. سپس در زمان مناسب سرور را Restart کنید؛ این کار روی سایت‌های دیگر اثر دارد.
+
+روی سیستم ساخت/برنامه‌نویسی:
+  .NET SDK سازگار؛ SDK 10 نصب‌شده این محیط هم قابل استفاده است.
+  Node.js 24.x پایدار و npm؛ Angular 20.3 از Node ^24.0.0 پشتیبانی می‌کند.
+  سورس کامل هر دو پروژه و دسترسی به بسته‌های NuGet/npm.
+  SSMS اختیاری برای مدیریت دیتابیس؛ ابزار اجرا نیست.
+بررسی:
+  dotnet --list-sdks
+  node --version
+  npm.cmd --version
+
+چه چیزهایی برای این روش نصب نکنم؟
+  روی سرور اجرا Visual Studio، .NET SDK، Node، npm و Angular CLI لازم نیست.
+  Angular CLI سراسری لازم نیست؛ نسخه محلی package-lock.json استفاده می‌شود.
+  Docker، Nginx، IIS ARR، iisnode، PM2 و Windows Service wrapper لازم نیست.
+  نقش ASP.NET 4.x، .NET Framework 3.5، CGI، FTP و WebDAV برای این پروژه لازم نیست.
+  نصب Runtime 10 به‌تنهایی جای Runtime 8 موردنیاز این خروجی را نمی‌گیرد.
+  SQL Server Developer برای Production مجوز استفاده ندارد؛ نسخه دارای مجوز مناسب
+  انتخاب کنید. Express فقط پس از بررسی محدودیت ظرفیت و امکانات با نیاز مشتری.
+  اگر SQL موجود در شبکه دارید، نصب SQL Server دوم روی وب‌سرور لازم نیست.
+  LocalDB محیط توسعه را به عنوان دیتابیس سرویس IIS در نظر نگیرید.
+
+توجه نسخه: پشتیبانی .NET 8 در ۱۰ نوامبر ۲۰۲۶ تمام می‌شود. این راهنما اجرای نسخه
+فعلی را پوشش می‌دهد؛ برای ادامه بهره‌برداری، ارتقای آزمایش‌شده به .NET 10 برنامه‌ریزی شود.
+فقط با نصب Runtime 10 پروژه فعلی ارتقا پیدا نمی‌کند.
+
+۳) فعال‌کردن IIS
+در Server Manager > Add Roles and Features > Role-based نصب کنید:
+  Web Server (IIS)
+  Common HTTP Features: Static Content, Default Document, HTTP Errors
+  Health and Diagnostics: HTTP Logging
+  Security: Request Filtering
+  Management Tools: IIS Management Console
+گزینه‌های پیش‌فرض موردنیاز IIS را نگه دارید. Directory Browsing را فعال نکنید.
+در Windows 11 Pro از Turn Windows features on or off همین اجزا را انتخاب کنید.
+بعد Hosting Bundle، Desktop Runtime و URL Rewrite را مطابق بخش ۲ نصب کنید.
+IIS Manager باید باز شود و URL Rewrite در Features دیده شود.
+
+۴) آماده‌سازی نام‌ها، HTTPS و پوشه‌ها
+در DNS برای هر دو نام، رکورد مناسب به IP سرور بسازید؛ در شبکه داخلی DNS داخلی
+هم کافی است. نام‌ها باید از کامپیوتر کاربران هم resolve شوند.
+برای تست محدود می‌توان hosts کامپیوتر آزمایش را تنظیم کرد؛ جایگزین DNS عمومی نیست.
+گواهی با کلید خصوصی را در Local Computer > Personal وارد کنید و زنجیره اعتماد
+آن روی کلاینت‌ها معتبر باشد. dotnet dev-certs گواهی مناسب کاربران شبکه نیست.
+پوشه‌های مقصد پیشنهادی:
+  C:\Sites\Accounting\api
+  C:\Sites\Accounting\web
+  C:\Sites\Accounting\logs
+پوشه دیتابیس و بکاپ را زیر ریشه وب نگذارید.
+پورت 443 را برای کاربران مجاز باز کنید. 80 فقط اگر redirect HTTP می‌خواهید.
+برای این روش لازم نیست پورت‌های 4200، 7000 یا پورت Kestrel در شبکه باز شوند.
+پورت SQL فقط بین وب‌سرور و SQL Server و با محدودیت مبدا مجاز باشد؛ عمومی نشود.
+
+۵) دیتابیس: تازه یا موجود؟
+اگر داده‌های فعلی را می‌خواهید حفظ کنید:
+  از دیتابیس فعلی Full Backup بگیرید، روی SQL مقصد Restore کنید و سازگاری نسخه
+  SQL مقصد با بکاپ را بررسی کنید. ابزار initialize برای انتقال اطلاعات نیست.
+  لاگین SQL و user mapping را روی مقصد اصلاح کنید؛ لاگین‌های سرور با بکاپ DB منتقل نمی‌شوند.
+اگر نصب کاملاً تازه است:
+  در سیستم ساخت و از پوشه backend اجرا کنید:
+  dotnet publish .\Accounting.DatabaseSetup\Accounting.DatabaseSetup.csproj -c Release -r win-x64 --self-contained false -o .\output\iis-setup-v1
+  کل پوشه خروجی را به یک پوشه مدیریتی خارج از سایت روی سرور منتقل کنید.
+  در همان پوشه روی سرور اجرا کنید:
+  dotnet .\Accounting.DatabaseSetup.dll initialize
+  ابزار، SQL مقصد، نام دیتابیس و احراز هویت را می‌پرسد. حساب راه‌اندازی باید حق
+  ساخت دیتابیس/جدول را داشته باشد؛ یا دیتابیس خالی را از قبل مدیر SQL بسازد.
+  رمز مدیر برنامه را حداقل ۱۲ نویسه شامل حروف بزرگ، کوچک و رقم انتخاب کنید.
+  مقصد را بررسی و فقط در صورت صحت YES وارد کنید.
+  کاربر اولیه: admin@demo.local؛ رمز همان رمز انتخابی شماست.
+  این ابزار اطلاعات عملیاتی نمونه نمی‌سازد و فایل اتصال API را هم تغییر نمی‌دهد.
+  گزینه --allow-existing-schema برای دیتابیس مشتری یا دورزدن خطا استفاده نشود.
+
+نکته مهم کد فعلی: API در هر شروع MigrateAsync و SeedEssentialAsync اجرا می‌کند.
+Seeding:Enabled=false فقط حالت را Raw می‌کند؛ migration و داده‌های پایه را متوقف نمی‌کند.
+پس حساب اتصال برنامه در این نسخه باید مجوز اعمال migrationهای معوق و داده‌های پایه
+را در دیتابیس مخصوص خودش داشته باشد. صرف db_datareader/db_datawriter ممکن است کافی نباشد.
+برای شروع می‌توان db_owner فقط روی AccountingDb داد؛ sysadmin یا sa لازم نیست.
+کاهش این دسترسی و اجرای migration با حساب جدا، نیازمند تغییر چرخه شروع برنامه است.
+قبل از اولین شروع نسخه جدید از DB بکاپ بگیرید؛ هم‌زمان چند نمونه را برای ارتقا بالا نیاورید.
+
+برای SQL Login، Mixed Mode و TCP/IP در SQL Server باید فعال و سرویس در صورت تغییر
+Restart شده باشد. از وب‌سرور اتصال را تست کنید؛ برای پورت ثابت نمونه:
+  Test-NetConnection YOUR_SQL_HOST -Port 1433
+موفقیت این تست فقط بازبودن پورت را ثابت می‌کند، نه صحت رمز یا مجوز SQL.
+Integrated Security با کاربر شما ممکن است کار کند ولی با ApplicationPoolIdentity
+نمی‌گیرد. برای SQL محلی می‌توان IIS APPPOOL\AccountingApiPool را به SQL معرفی کرد؛
+برای SQL راه‌دور، هویت دامنه/service account را مدیر شبکه تنظیم کند یا SQL Login بگذارید.
+
+۶) ساخت خروجی API روی سیستم برنامه‌نویسی
+در PowerShell از پوشه backend:
+  dotnet publish .\Accounting.Api\Accounting.Api.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=false -o .\output\iis-api-v1
+خروجی باید بدون خطا کامل شود؛ کل محتویات iis-api-v1 را به پوشه api مقصد ببرید.
+نسخه‌های بعدی را در پوشه خروجی تازه بسازید تا فایل قدیمی باقی نماند.
+Accounting.Api.dll، فایل runtimeconfig، deps، web.config تولیدشده و DLLهای وابسته
+همگی لازم‌اند. web.config API را با نمونه Angular جایگزین نکنید.
+این راهنما از framework-dependent استفاده می‌کند و سه Runtime بخش ۲ را لازم دارد.
+اگر self-contained true انتخاب کردید Runtimeها همراه خروجی‌اند، ولی ماژول IIS
+هنوز لازم است؛ برای مسیر اصلی همین دستور بالا را نگه دارید.
+فایل appsettings.Development.json، گزارش‌های توسعه، سورس و تنظیمات خصوصی توسعه را
+به مقصد نبرید؛ اگر در خروجی کپی شده‌اند قبل از انتقال کنار بگذارید.
+گزارش‌گیری: DLLهای Stimulsoft 2024.3.2، Reporting\Invoice.mrt و
+Reporting\Fonts\Vazirmatn-Regular.ttf باید در خروجی موجود باشند.
+لایسنس خصوصی Stimulsoft در صورت نیاز به صورت امن با دسترسی محدود و خارج از مخزن عمومی
+منتقل شود؛ نصب نرم‌افزار Designer روی سرور برای اجرای سایت لازم نیست.
+
+۷) تنظیم Production روی سرور
+در C:\Sites\Accounting\api فایلی با نام دقیق appsettings.Production.json بسازید.
+نمونه کامل تنظیمات Production در پیوست همین سند آمده است.
+آن را کپی و مقادیر placeholder را روی سرور جایگزین کنید؛ فایل نمونه قابل اجرای مستقیم نیست.
+  ConnectionStrings:Default = اتصال دیتابیس واقعی
+  JwtSettings:Secret = کلید تصادفی خصوصی، حداقل ۳۲ نویسه
+  Cors:AllowedOrigins = https://accounting.example.com
+Origin فاقد / در انتها و فاقد مسیر است. برای localhost یا ستاره تنظیم نکنید.
+کلید تصادفی نمونه تولید در PowerShell؛ خروجی را فقط در تنظیمات خصوصی ذخیره کنید:
+  $jwtBytes = New-Object byte[] 48
+  $jwtRng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+  $jwtRng.GetBytes($jwtBytes)
+  [Convert]::ToBase64String($jwtBytes)
+  $jwtRng.Dispose()
+رمز SQL و JWT را در Git یا مستند تحویلی ننویسید. فایل تنظیمات فقط برای مدیران
+و هویت Pool خواندنی باشد. متغیرهای محیطی قدیمی با نام‌های ConnectionStrings__Default
+یا JwtSettings__Secret بر JSON اولویت دارند؛ تنظیمات باقی‌مانده سرویس قبلی را بررسی کنید.
+Encrypt=True;TrustServerCertificate=False به گواهی معتبر SQL و نام درست سرور نیاز دارد.
+TrustServerCertificate=True فقط برای تست کنترل‌شده/گواهی خودامضا پس از تصمیم مدیر است.
+اگر DB از قبل با ابزار راه‌اندازی آماده شده، AdminPassword خالی بماند.
+اگر API مستقیم روی DB کاملاً خالی شروع شود، رمز اولیه Seeding:AdminPassword لازم دارد؛
+بعد از ایجاد کاربر آن را از تنظیمات حذف کنید. تغییر این مقدار رمز کاربر موجود را عوض نمی‌کند.
+
+۸) تغییر تنظیمات و ساخت Angular برای Production
+فایل frontend\src\environments\environment.iis.ts برای انتشار IIS اضافه شده است.
+دامنه نمونه را با دامنه واقعی API عوض کنید؛ environment.ts توسعه را تغییر ندهید:
+
+export const environment = {
+    production: true,
+    apiBaseUrl: 'https://api.accounting.example.com/api'
+};
+
+آدرس باید به /api ختم شود؛ localhost برای کاربران شبکه مناسب نیست.
+در frontend\angular.json، زیر projects.accounting-web.architect.build.configurations
+این تنظیم کنار production و development اضافه شده است:
+
+"iis": {
+  "fileReplacements": [
+    {
+      "replace": "src/environments/environment.ts",
+      "with": "src/environments/environment.iis.ts"
+    }
+  ]
+}
+
+این قطعه بخشی از JSON است؛ هنگام واردکردن دستی، ویرگول بین سکشن‌ها رعایت شود.
+فرمان production,iis به ترتیب تنظیمات production و جایگزینی محیط IIS را ترکیب می‌کند.
+production به‌تنهایی هنوز محیط توسعه قبلی را می‌خواند؛ برای این روش فرمان زیر را بزنید.
+روی سیستم ساخت، PowerShell:
+
+  Set-Location 'C:\Users\s.asadi\Downloads\accounting-stock\frontend'
+  npm.cmd ci
+  npm.cmd run build -- --configuration production,iis --output-path output/iis-web-v2
+
+npm ci وابستگی‌ها را دقیق مطابق lock نصب مجدد می‌کند؛ اگر قبلاً نصب و lock عوض
+نشده است، اجرای مجدد آن برای هر Build لازم نیست.
+خروجی: frontend\output\iis-web-v2\browser
+محتویات browser را به C:\Sites\Accounting\web منتقل کنید؛ index.html مستقیم زیر web باشد.
+JS/CSSهای هش‌دار، fonts، vendor و assets گزارش‌ساز که prebuild آماده کرده هم منتقل شوند.
+src و node_modules را منتقل نکنید؛ Node روی سرور اجرا لازم نیست.
+فایل web.config فرانت در پیوست همین سند آمده؛ آن را کنار index.html ذخیره کنید.
+این web.config مخصوص Angular است و هرگز جای فایل API قرار نمی‌گیرد.
+تغییر apiBaseUrl بعد از ساخت نیازمند Build مجدد است؛ ویرایش TS روی سرور اثری ندارد.
+این راهنما برای نصب در ریشه دامنه است؛ نصب در زیرمسیر به base-href و rewrite جدا نیاز دارد.
+از configuration docker استفاده نکنید؛ /api نسبی آن نیازمند proxy است.
+اگر Build شکست خورد خروجی ناقص را منتشر نکنید. در خطای EPERM، دسترسی نوشتن مسیر
+خروجی و قفل فایل/محدودیت محیط را بررسی و سپس Build را دوباره اجرا کنید.
+برای نسخه‌های بعدی نام خروجی تازه مانند iis-web-v3 انتخاب کنید.
+
+۹) ساخت Pool و Website در IIS Manager
+Application Pools > Add Application Pool:
+  AccountingApiPool: .NET CLR Version = No Managed Code، Pipeline = Integrated
+  AccountingWebPool: No Managed Code، Integrated
+Advanced Settings هر دو: Identity = ApplicationPoolIdentity
+برای API: Enable 32-Bit Applications = False (خروجی ما win-x64 است).
+Sites > Add Website:
+  AccountingApi، Pool = AccountingApiPool، Physical path = C:\Sites\Accounting\api
+  Binding: https، پورت 443، Host name = api.accounting.example.com
+  SNI را برای میزبانی چند نام روی یک IP فعال و گواهی درست را انتخاب کنید.
+سایت دوم:
+  AccountingWeb، Pool = AccountingWebPool، Physical path = C:\Sites\Accounting\web
+  https:443، Host name = accounting.example.com، SNI، گواهی همان نام
+در هر دو Anonymous Authentication فعال باشد؛ احراز هویت برنامه JWT است.
+برای سایت وب Default Document باید index.html را بشناسد.
+Binding تکراری با Default Web Site یا سایت دیگر نسازید.
+در Configuration Editor سایت API بخش system.webServer/aspNetCore را باز کنید،
+environmentVariables را ویرایش و ASPNETCORE_ENVIRONMENT=Production اضافه کنید.
+اگر DOTNET_ENVIRONMENT تنظیم شده است، آن هم Production باشد تا تعارض پیش نیاید.
+همین مقدار را می‌توان داخل environmentVariables در web.config تولیدشده افزود؛
+processPath، arguments و handlers تولیدشده را نگه دارید. Pool را Recycle کنید.
+
+مجوزهای NTFS، PowerShell مدیر روی مقصد:
+  icacls 'C:\Sites\Accounting\api' /grant 'IIS AppPool\AccountingApiPool:(OI)(CI)(RX)'
+  icacls 'C:\Sites\Accounting\web' /grant 'IIS AppPool\AccountingWebPool:(OI)(CI)(RX)'
+  icacls 'C:\Sites\Accounting\logs' /grant 'IIS AppPool\AccountingApiPool:(OI)(CI)(M)'
+به ریشه سایت Everyone:FullControl ندهید. در صورت خطای Access Denied مسیر واقعی
+فایل/Temp را از لاگ پیدا و فقط همان مسیر لازم را برای Pool مجاز کنید.
+سرویس‌های Windows قدیمی AccountingStockBackend/Frontend اگر وجود دارند، بعد از
+تایید انتقال و در بازه نگهداری Stop شوند تا دو نسخه مستقل به DB درخواست ندهند.
+IIS خودش فرایند API را مدیریت می‌کند؛ نیازی به dotnet run یا پنجره PowerShell باز نیست.
+
+۱۰) تست پذیرش از یک کامپیوتر دیگر
+  https://api.accounting.example.com/health باید 200 و Healthy بدهد؛ DB هم بررسی می‌شود.
+  https://api.accounting.example.com/api/license باید وضعیت اعتبار را برگرداند.
+  سایت رابط را باز و با حساب موجود یا مدیر تازه ساخته‌شده وارد شوید.
+  صفحه داخلی را باز و Refresh کنید؛ نباید 404 بگیرید.
+  در DevTools > Network درخواست API باید به دامنه واقعی برود، نه localhost.
+  فهرست‌ها، ثبت آزمایشی مجاز، خروج/ورود و PDF فارسی فاکتور را بررسی کنید.
+  تاریخ، حروف فارسی، فونت، قالب چاپ و دانلود گزارش را بررسی کنید.
+  سرور/Pool را در بازه تست Restart و اتصال دوباره را بررسی کنید.
+Swagger در Production به عمد فعال نیست؛ /swagger ممکن است 404 بدهد.
+Healthy بودن به تنهایی صحت ورود، CORS، اعتبار نرم‌افزار و چاپ را ثابت نمی‌کند.
+محدودیت اعتبار برنامه از DB می‌آید؛ در صورت license_expired مستند LICENSE.fa.md
+را برای تمدید مجاز ببینید. ساعت ویندوز و همگام‌سازی زمان سرور درست باشد.
+
+۱۱) عیب‌یابی سریع
+500.19: XML نامعتبر، بخش قفل‌شده یا نبود URL Rewrite؛ کد دقیق خطا را بخوانید.
+500.21 / AspNetCoreModuleV2 ناشناخته: Hosting Bundle بعد از IIS نصب/Repair شود.
+500.30: شروع API شکست خورده؛ JWT، اتصال SQL، migration و رمز مدیر DB خالی بررسی شود.
+500.31: Runtime لازم نیست؛ هر سه Runtime نسخه 8 و WindowsDesktop را بررسی کنید.
+500.32: معماری Pool/خروجی/Runtime یکی نیست؛ x64 و Enable 32-Bit=False بررسی شود.
+503: Pool متوقف یا rapid-fail شده؛ Event Viewer > Windows Logs > Application را بخوانید.
+SQL login failed: نام DB، SQL Login، user mapping و هویت واقعی Pool بررسی شود.
+CORS: origin شامل scheme و port واقعی و بدون / انتهایی باشد؛ HTTPS و DNS API هم تست شود.
+status=0 در مرورگر ممکن است خطای گواهی/DNS باشد؛ الزاماً CORS نیست.
+Refresh=404: URL Rewrite و web.config فرانت و مسیر index.html بررسی شود.
+PDF خراب: DLLهای نسخه درست، فونت همراه و فایل MRT و لایسنس گزارش‌ساز بررسی شود.
+403 license_expired: به مستند LICENSE.fa.md مراجعه کنید، IIS را بی‌دلیل تغییر ندهید.
+برای خطای شروع، در web.config API موقتاً stdoutLogEnabled=true و
+stdoutLogFile=C:\Sites\Accounting\logs\stdout قرار دهید؛ پوشه logs باید قابل نوشتن باشد.
+یک درخواست بفرستید، لاگ و Event Viewer را بخوانید، سپس stdout را خاموش کنید.
+این لاگ موقتی است و چرخش خودکار فایل ندارد؛ تنظیمات و رمزها را در گزارش عمومی کپی نکنید.
+
+۱۲) انتشار بعدی و برگشت
+قبل از تعویض فایل‌ها، نسخه قبلی خروجی، تنظیمات خصوصی مقصد و بکاپ DB را نگه دارید.
+سایت را در بازه نگهداری متوقف کنید (یا برای API از app_offline.htm استفاده کنید)،
+خروجی کامل جدید را جایگزین و appsettings.Production.json مقصد را حفظ کنید.
+web.config API تولید جدید و متغیر محیطی Production را بررسی کنید.
+API را یک بار شروع کنید تا migrationها تمام شوند؛ سپس health و تست‌های بخش ۱۰.
+برای Angular کل مجموعه فایل‌های یک Build را هم‌زمان منتشر کنید؛ فایل‌های هش‌دار
+نسخه‌های مختلف را مخلوط نکنید. بعد از انتشار Reload و درخواست‌های Network بررسی شوند.
+برگشت فایل API فقط وقتی کافی است که DB با نسخه قبلی سازگار باشد؛ migration ممکن است
+نیازمند Restore بکاپ DB باشد. Restore تغییرات بعد از بکاپ را از دست می‌دهد و باید هماهنگ شود.
+بکاپ زمان‌بندی‌شده، آزمون Restore و پایش فضای دیسک و انقضای گواهی را برقرار کنید.
+
+۱۳) منابع رسمی و محدوده تحویل
+نصب IIS و Hosting Bundle:
+https://learn.microsoft.com/en-us/aspnet/core/tutorials/publish-to-iis
+دانلود Hosting Bundle و Desktop Runtime 8:
+https://dotnet.microsoft.com/en-us/download/dotnet/8.0
+URL Rewrite:
+https://www.iis.net/downloads/microsoft/url-rewrite
+سازگاری نسخه Node و Angular:
+https://angular.dev/reference/versions
+پایان پشتیبانی .NET 8:
+https://devblogs.microsoft.com/dotnet/dotnet-8-9-end-of-support/
+این سند از روی کد پروژه تهیه شده؛ IIS یا SQL روی سرور مقصد در این کار نصب نشده
+و آزمون پذیرش محیط مقصد هنوز باید انجام شود. آدرس‌ها و رمزها نمونه‌اند.
+راهنمای قدیمی «راهنمای-پابلیش-و-استقرار.txt» مربوط به روش Windows Service است؛
+فرمان‌های سرویس آن را با این روش IIS ترکیب نکنید.
+
+۱۴) نمونه کامل appsettings.Production.json
+========================================
+این محتوا را فقط روی سرور در C:\Sites\Accounting\api\appsettings.Production.json
+ذخیره و مقادیر نمونه را با مقادیر واقعی جایگزین کنید. رمزهای نمونه قابل استفاده نیستند.
+بک‌اسلش instance در JSON باید دوبل باشد، مثلاً localhost\\SQLEXPRESS.
+{
+  "AllowedHosts": "api.accounting.example.com",
+  "ConnectionStrings": {
+    "Default": "Server=YOUR_SQL_HOST,1433;Database=AccountingDb;User ID=YOUR_APP_LOGIN;Password=REPLACE_ON_SERVER;Encrypt=True;TrustServerCertificate=False;MultipleActiveResultSets=True"
+  },
+  "JwtSettings": {
+    "Secret": "REPLACE_WITH_PRIVATE_RANDOM_SECRET_AT_LEAST_32_CHARACTERS"
+  },
+  "Cors": {
+    "AllowedOrigins": ["https://accounting.example.com"]
+  },
+  "Seeding": {
+    "Mode": "Raw",
+    "Enabled": false,
+    "AdminPassword": ""
+  },
+  "SessionSettings": {
+    "AbsoluteTimeoutSeconds": 86400,
+    "IdleTimeoutSeconds": 3600
+  }
+}
+
+۱۵) محتوای کامل web.config سایت Angular
+=======================================
+در C:\Sites\Accounting\web\web.config ذخیره شود. فقط برای سایت Angular:
+
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <system.webServer>
+    <rewrite>
+      <rules>
+        <rule name="Angular routes" stopProcessing="true">
+          <match url=".*" />
+          <conditions logicalGrouping="MatchAll">
+            <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+            <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
+            <add input="{REQUEST_URI}" pattern="^/api(/|$)" negate="true" />
+          </conditions>
+          <action type="Rewrite" url="/index.html" />
+        </rule>
+      </rules>
+    </rewrite>
+  </system.webServer>
+</configuration>
+
+۱۶) تنظیم Production در web.config API
+====================================
+web.config تولیدشده dotnet publish را نگه دارید. داخل عنصر موجود aspNetCore
+عنصر زیر را اضافه کنید؛ اگر environmentVariables موجود است فقط متغیر را به آن بیفزایید:
+
+<environmentVariables>
+  <environmentVariable name="ASPNETCORE_ENVIRONMENT" value="Production" />
+</environmentVariables>
+
+اگر aspNetCore به شکل <aspNetCore ... /> است، آن را به عنصر باز و بسته تبدیل کنید
+و environmentVariables را درون آن بگذارید؛ صفت‌های اصلی تولیدشده را حفظ کنید.
+اگر از Configuration Editor استفاده می‌کنید لازم نیست همان متغیر را دوباره تکرار کنید.
+Release تنظیم ساخت است؛ Production محیط زمان اجراست. launchSettings.json و
+user-secrets توسعه، تنظیمات Production مقصد نیستند.
+بعد از تغییر متغیرها Pool را Recycle کنید. Program.cs، کنترلرها و TargetFramework
+برای این روش نیاز به تغییر ندارند.
+
+۱۷) چک‌لیست نهایی تحویل
+======================
+[ ] IIS، Hosting Bundle 8، Desktop Runtime 8 x64 و URL Rewrite نصب‌اند.
+[ ] نام‌های DNS و گواهی HTTPS هر دو سایت از کامپیوتر کاربران معتبرند.
+[ ] دامنه واقعی در environment.iis.ts تنظیم و Build production,iis موفق شده است.
+[ ] dotnet publish API موفق و تمام فایل‌های خروجی منتقل شده‌اند.
+[ ] فایل خصوصی Production شامل SQL، JWT و CORS واقعی روی سرور قرار دارد.
+[ ] محیط API در IIS روی Production تنظیم شده است.
+[ ] دو سایت و دو Pool جدا با مسیر و مجوز مناسب ساخته شده‌اند.
+[ ] دیتابیس تازه initialize شده یا دیتابیس فعلی Backup/Restore شده است.
+[ ] قبل از migration و شروع نسخه جدید، بکاپ قابل بازیابی وجود دارد.
+[ ] /health، /api/license، ورود، Refresh مسیر داخلی و چاپ PDF فارسی تست شده‌اند.
+[ ] پورت‌های توسعه در شبکه باز نشده و سرویس قدیمی پس از انتقال متوقف شده است.
+[ ] نسخه خروجی، تاریخ انتشار و مسیر بکاپ برای برگشت ثبت شده‌اند.
+
+۱۸) وضعیت بررسی این تحویل
+========================
+تنظیم iis و environment.iis.ts به سورس فرانت‌اند اضافه شده‌اند.
+ساخت Angular با production,iis مرحله تولید bundle را گذراند، ولی ذخیره خروجی
+در محیط فعلی با EPERM متوقف شد؛ خروجی کامل قابل انتشار تایید نشده است.
+فایل نمونه JSON و XML از نظر ساختار بررسی شده‌اند.
+پابلیش API و نصب و تست واقعی IIS/SQL مقصد در این کار انجام نشده‌اند.
+برای نصب جدید فقط همین سند را دنبال کنید؛ راهنماهای قبلی مسیرهای جدا/قدیمی دارند.
