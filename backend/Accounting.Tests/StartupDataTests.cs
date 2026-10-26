@@ -47,7 +47,7 @@ public class StartupDataTests
     }
 
     [Fact]
-    public async Task Restart_AddsMissingBuiltInAdminPermissionWithoutResettingPassword()
+    public async Task Restart_PreservesRemovedBuiltInAdminPermissionWithoutResettingPassword()
     {
         await using var db = CreateDb();
         await Initialize(db);
@@ -58,7 +58,7 @@ public class StartupDataTests
         db.RolePermissions.Remove(removed);
         await db.SaveChangesAsync();
         await Initialize(db, password: "AnotherPassword1405!");
-        Assert.Contains(await db.RolePermissions.Where(p => p.RoleId == role.Id).ToListAsync(), p => p.Permission == permission);
+        Assert.DoesNotContain(await db.RolePermissions.Where(p => p.RoleId == role.Id).ToListAsync(), p => p.Permission == permission);
         Assert.Equal(hash, (await db.Users.SingleAsync()).PasswordHash);
         Assert.Single(await db.Users.ToListAsync());
     }

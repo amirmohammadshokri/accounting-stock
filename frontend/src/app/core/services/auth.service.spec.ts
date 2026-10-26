@@ -51,6 +51,25 @@ describe('AuthService', () => {
     expect(service.getToken()).toBeNull();
   });
 
+  it('normalizes a single JWT permission and never uses substring matching', () => {
+    const service = TestBed.inject(AuthService);
+    service.login({email: 'test@local', password: 'test'}).subscribe();
+    http.expectOne(`${environment.apiBaseUrl}/auth/login`).flush({
+      id: 1, firstName: 'Test', lastName: 'User', email: 'test@local',
+      accessToken: fakeJwt({id: '1', permission: 'Order.CreateInvoice', role: ['Staff'], exp: Date.now()/1000+900})
+    });
+    expect(service.currentUser()?.permissions).toEqual(['Order.CreateInvoice']);
+    expect(service.currentUser()?.permissions.includes('Order.Create')).toBeFalse();
+  });
+
+  it('ignores cached permissions that are absent from the stored token', () => {
+    localStorage.setItem('currentUser', JSON.stringify({id: 1, permissions: ['Invoice.Delete'], role: 'Admin'}));
+    localStorage.setItem('accessToken', fakeJwt({id:'1', permission:'Invoice.Read',role:'Staff',exp:Date.now()/1000+900}));
+    const service = TestBed.inject(AuthService);
+    expect(service.currentUser()?.permissions).toEqual(['Invoice.Read']);
+    expect(service.isAdmin()).toBeFalse();
+  });
+
   it('login() stores the token/user and flips isAuthenticated/isAdmin', () => {
     const service = TestBed.inject(AuthService);
 

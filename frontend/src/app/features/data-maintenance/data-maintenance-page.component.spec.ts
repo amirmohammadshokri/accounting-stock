@@ -1,3 +1,4 @@
+import { PermissionService } from '../../core/services/permission.service';
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
@@ -8,7 +9,7 @@ import { environment } from '../../../environments/environment';
 describe('Admin data maintenance',()=>{
   let http:HttpTestingController;
   const url=`${environment.apiBaseUrl}/data-maintenance`;
-  beforeEach(()=>{TestBed.configureTestingModule({imports:[DataMaintenancePageComponent],providers:[provideHttpClient(),provideHttpClientTesting(),provideNoopAnimations()]});http=TestBed.inject(HttpTestingController);});
+  beforeEach(()=>{TestBed.configureTestingModule({imports:[DataMaintenancePageComponent],providers:[{provide:PermissionService,useValue:{has:()=>true}},provideHttpClient(),provideHttpClientTesting(),provideNoopAnimations()]});http=TestBed.inject(HttpTestingController);});
   afterEach(()=>http.verify());
   function create(){const fixture=TestBed.createComponent(DataMaintenancePageComponent);fixture.detectChanges();return fixture;}
   it('shows the affected counts and blocks reset until the password, phrase and acknowledgement are entered',()=>{

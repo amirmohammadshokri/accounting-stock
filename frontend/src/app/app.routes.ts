@@ -4,7 +4,7 @@ import { permissionGuard,openingBalancesGuard } from './core/guards/permission.g
 
 export const routes: Routes = [
   {path:'invoice-mrt-designer',canActivate:[authGuard,permissionGuard('CompanySettings.Read'),permissionGuard('CompanySettings.Update')],canDeactivate:[(component:import('./features/invoice-print-layouts/mrt-designer-page.component').MrtDesignerPageComponent)=>component.canLeave()],loadComponent:()=>import('./features/invoice-print-layouts/mrt-designer-page.component').then(m=>m.MrtDesignerPageComponent)},
-  {path:'data-maintenance',canActivate:[adminGuard],loadComponent:()=>import('./features/data-maintenance/data-maintenance-page.component').then(m=>m.DataMaintenancePageComponent)},
+  {path:'data-maintenance',canActivate:[adminGuard,permissionGuard('DataMaintenance.Read')],loadComponent:()=>import('./features/data-maintenance/data-maintenance-page.component').then(m=>m.DataMaintenancePageComponent)},
   {path:'license-expired',loadComponent:()=>import('./features/auth/license-expired-page.component').then(m=>m.LicenseExpiredPageComponent)},
   // Public routes (guest only)
   {
@@ -100,12 +100,12 @@ export const routes: Routes = [
   },
   {
     path: 'users',
-    canActivate: [authGuard, adminGuard],
+    canActivate: [authGuard, permissionGuard('User.Read')],
     loadComponent: () => import('./features/users/users-page.component').then(m => m.UsersPageComponent)
   },
   {
     path: 'roles',
-    canActivate: [authGuard, adminGuard],
+    canActivate: [authGuard, permissionGuard('Role.Read')],
     loadComponent: () => import('./features/roles/roles-page.component').then(m => m.RolesPageComponent)
   },
 

@@ -42,11 +42,11 @@ describe('permissionGuard', () => {
     expect((result as UrlTree).toString()).toBe('/stocks');
   });
 
-  it('redirects to /login when the user has no matching permission at all', () => {
+  it('redirects to /appearance when the user has no matching permission at all', () => {
     permStub.grant();
     const guard = permissionGuard('Invoice.Read');
     const result = TestBed.runInInjectionContext(() => guard({} as any, {} as any));
-    expect((result as UrlTree).toString()).toBe('/login');
+    expect((result as UrlTree).toString()).toBe('/appearance');
   });
 });
 
@@ -62,9 +62,9 @@ describe('firstAccessibleRoute', () => {
     expect(firstAccessibleRoute(permStub as unknown as PermissionService)).toBe('/orders');
   });
 
-  it('returns /login when the user has none of the nav permissions', () => {
+  it('returns /appearance when the user has none of the nav permissions', () => {
     permStub.grant('SomeUnrelated.Permission');
-    expect(firstAccessibleRoute(permStub as unknown as PermissionService)).toBe('/login');
+    expect(firstAccessibleRoute(permStub as unknown as PermissionService)).toBe('/appearance');
   });
 
   it('respects Dashboard being first when the user has it', () => {

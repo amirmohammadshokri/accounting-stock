@@ -8,7 +8,7 @@
  * Element, kullanıcı verilen izne (veya dizi verilirse en az birine) sahip değilse
  * DOM'a hiç eklenmez (ngIf gibi, sadece gizlemez — kaldırır).
  */
-import { Directive, Input, TemplateRef, ViewContainerRef, inject } from '@angular/core';
+import { Directive, Input, TemplateRef, ViewContainerRef, inject, effect, signal } from '@angular/core';
 import { PermissionService } from '../../core/services/permission.service';
 
 @Directive({
@@ -20,8 +20,17 @@ export class HasPermissionDirective {
   private templateRef = inject(TemplateRef<unknown>);
   private viewContainer = inject(ViewContainerRef);
   private hasView = false;
+  private required = signal<string | string[]>('');
+
+  constructor() {
+    effect(() => this.updateView(this.required()));
+  }
 
   @Input() set appHasPermission(value: string | string[]) {
+    this.required.set(value);
+  }
+
+  private updateView(value: string | string[]): void {
     const allowed = Array.isArray(value)
       ? this.permissionService.hasAny(value)
       : this.permissionService.has(value);

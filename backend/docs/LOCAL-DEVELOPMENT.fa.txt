@@ -1,0 +1,29 @@
+اجرای توسعه در کنار سرویس نصب‌شده
+
+سرویس AccountingStockBackend روی پورت 7000 اجرا می‌شود. نسخه سورس از پروفایل
+https روی 7001 استفاده می‌کند تا به توقف سرویس یا دسترسی Administrator نیاز نباشد.
+
+۱. اجرای قبلی و دیباگ متوقف‌شده را در IDE با Stop ببندید.
+۲. در پوشه backend اجرا کنید:
+dotnet run --project .\Accounting.Api\Accounting.Api.csproj --launch-profile https
+در Rider/Visual Studio هم پروفایل https از launchSettings.json انتخاب شود؛
+آدرس 7000 را در تنظیم اجرای دستی نگه ندارید.
+۳. آدرس‌ها:
+https://localhost:7001/health
+https://localhost:7001/swagger
+۴. در پوشه frontend:
+npm.cmd start
+فرانت‌اند: http://localhost:4200
+آدرس توسعه API در frontend/src/environments/environment.ts برابر
+https://localhost:7001/api است. اگر سرور Angular باز است، تغییر محیط باید در Build
+بعدی دیده شود؛ در صورت باقی‌ماندن آدرس قبلی، آن را Stop و دوباره Start کنید.
+در پروفایل https، CORS برای http://localhost:4200 و https://localhost:4200 تنظیم است.
+۵. در خطای گواهی HTTPS، در حساب کاربری خودتان اجرا کنید:
+dotnet dev-certs https --trust
+سپس صفحه health را در همان مرورگر باز کنید و اتصال معتبر را بررسی کنید.
+
+فایل exe را بدون پروفایل یا تنظیم محیط اجرا نکنید؛ launchSettings فقط توسط ابزار
+توسعه خوانده می‌شود. برای اجرای فرمانی از dotnet run بالا استفاده کنید.
+این تغییر مخصوص توسعه است؛ محیط IIS و environment.iis.ts جدا باقی می‌مانند.
+سرویس و نسخه توسعه ممکن است به یک دیتابیس وصل باشند؛ برای آزمون با داده‌های
+آزمایشی، ConnectionStrings:Default توسعه را به دیتابیس مخصوص توسعه تنظیم کنید.

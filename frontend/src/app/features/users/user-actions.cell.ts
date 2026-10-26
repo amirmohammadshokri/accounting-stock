@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { APP_ICON_IMPORTS } from '../../core/icons/app-svg-icon.directive';
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { ICellRendererParams } from 'ag-grid-community';
+import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 
 export interface UserActionsContext<T = unknown> {
   onEdit?: (row: T) => void;
@@ -15,15 +16,15 @@ export interface UserActionsContext<T = unknown> {
 @Component({
   standalone: true,
   selector: 'app-user-actions-cell',
-  imports: [MatTooltipModule, MatButtonModule, CommonModule, ...APP_ICON_IMPORTS],
+  imports: [HasPermissionDirective, MatTooltipModule, MatButtonModule, CommonModule, ...APP_ICON_IMPORTS],
   template: `
-    <button mat-icon-button class="icon-btn" type="button" (click)="edit()" matTooltip="ویرایش" aria-label="ویرایش">
+    <button *appHasPermission="'User.Update'" mat-icon-button class="icon-btn" type="button" (click)="edit()" matTooltip="ویرایش" aria-label="ویرایش">
       <mat-icon [svgIcon]="'edit'"></mat-icon>
     </button>
-    <button mat-icon-button class="icon-btn" type="button" (click)="changePassword()" matTooltip="تغییر رمز عبور" aria-label="تغییر رمز عبور">
+    <button *appHasPermission="'User.Update'" mat-icon-button class="icon-btn" type="button" (click)="changePassword()" matTooltip="تغییر رمز عبور" aria-label="تغییر رمز عبور">
       <mat-icon [svgIcon]="'key'"></mat-icon>
     </button>
-    <button mat-icon-button class="icon-btn" type="button" (click)="remove()" matTooltip="حذف" aria-label="حذف">
+    <button *appHasPermission="'User.Delete'" mat-icon-button class="icon-btn" type="button" (click)="remove()" matTooltip="حذف" aria-label="حذف">
       <mat-icon [svgIcon]="'delete'"></mat-icon>
     </button>
   `,

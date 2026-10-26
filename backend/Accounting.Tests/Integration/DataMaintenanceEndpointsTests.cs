@@ -47,7 +47,7 @@ public class DataMaintenanceEndpointsTests
     {
         using var factory=new DiagnosticFactory();using var scope=await factory.CreateSeedScopeAsync();
         var db=scope.ServiceProvider.GetRequiredService<AppDbContext>();var hasher=scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
-        var (_,email,password)=await IntegrationTestSeeder.SeedBranchUserAsync(db,hasher,true);
+        var (_,email,password)=await IntegrationTestSeeder.SeedBranchUserAsync(db,hasher,true,"DataMaintenance.Read","DataMaintenance.Reset");
         var user=await db.Users.Include(x=>x.UserRoles).ThenInclude(x=>x.Role).SingleAsync(x=>x.Email==email);
         var role=user.UserRoles.Single().Role!;role.Name="مدیر سامانه";await db.SaveChangesAsync();
         using var client=factory.CreateClient();

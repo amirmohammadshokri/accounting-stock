@@ -6,6 +6,17 @@ namespace Accounting.Domain.Constants;
 /// </summary>
 public static class Permissions
 {
+    public static class Audit
+    {
+        public const string Read = "Audit.Read";
+    }
+
+    public static class DataMaintenance
+    {
+        public const string Read = "DataMaintenance.Read";
+        public const string Reset = "DataMaintenance.Reset";
+    }
+
     public static class Unit
     {
         public const string Create = "Unit.Create";
@@ -179,7 +190,8 @@ public static class Permissions
             // Report
             Report.Dashboard, Report.ProfitLoss, Report.ContactStatement, Report.StockStatus,
             // CompanySettings
-            CompanySettings.Read, CompanySettings.Update
+            CompanySettings.Read, CompanySettings.Update,
+            Audit.Read, DataMaintenance.Read, DataMaintenance.Reset
         };
     }
 }

@@ -37,11 +37,15 @@ export const NAV_PERMISSIONS: { path: string; permission: string }[] = [
   { path: '/categories', permission: 'Category.Read' },
   { path: '/opening-balances', permission: 'Contact.Read' },
   { path: '/opening-balances', permission: 'Stock.Read' },
-  { path: '/company-settings', permission: 'CompanySettings.Read' }
+  { path: '/company-settings', permission: 'CompanySettings.Read' },
+  { path: '/users', permission: 'User.Read' },
+  { path: '/roles', permission: 'Role.Read' },
+  { path: '/orders/new', permission: 'Order.Create' },
+  { path: '/invoices/new', permission: 'Invoice.Create' }
 ];
 
 export function firstAccessibleRoute(permissionService: PermissionService): string {
-  return NAV_PERMISSIONS.find(r => permissionService.has(r.permission))?.path ?? '/login';
+  return NAV_PERMISSIONS.find(r => permissionService.has(r.permission))?.path ?? '/appearance';
 }
 
 export function permissionGuard(permission: string): CanActivateFn {

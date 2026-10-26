@@ -45,8 +45,8 @@ export interface SessionState {
 export interface JwtClaims {
   id: string;
   email: string;
-  role: string;
-  permission: string[];
+  role: string | string[];
+  permission: string | string[];
   branchId?: string;
   isHeadquarters?: string;
   exp: number;

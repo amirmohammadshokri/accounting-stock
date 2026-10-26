@@ -26,8 +26,8 @@ export const NAV_GROUPS: NavGroup[] = [
       {path:'/invoice-print-layouts',label:'طراحی چاپ فاکتور',icon:'print',allOf:['CompanySettings.Read','CompanySettings.Update']},
       {path:'/invoice-mrt-designer',label:'طراح کامل قالب MRT',icon:'edit',allOf:['CompanySettings.Read','CompanySettings.Update']},
       {path:'/opening-balances',label:'مانده‌های اول دوره',icon:'start',anyOf:['Contact.Read','Stock.Read']},
-      {path:'/users',label:'کاربران سامانه',icon:'manage_accounts',admin:true},
-      {path:'/roles',label:'نقش‌ها و دسترسی‌ها',icon:'admin_panel_settings',admin:true},
-      {path:'/data-maintenance',label:'مدیریت داده‌ها و پاک‌سازی',icon:'delete',admin:true},
+      {path:'/users',label:'کاربران سامانه',icon:'manage_accounts',permission:'User.Read'},
+      {path:'/roles',label:'نقش‌ها و دسترسی‌ها',icon:'admin_panel_settings',permission:'Role.Read'},
+      {path:'/data-maintenance',label:'مدیریت داده‌ها و پاک‌سازی',icon:'delete',admin:true,permission:'DataMaintenance.Read'},
       {path:'/appearance',label:'رنگ و ظاهر برنامه',icon:'palette'}]}
   ];

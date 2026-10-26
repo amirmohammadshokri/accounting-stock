@@ -1,3 +1,5 @@
+import { inject } from '@angular/core';
+import { PermissionService } from '../../core/services/permission.service';
 import { FilterPanelComponent } from '../../shared/filter-panel/filter-panel.component';
 import { DashboardShortcutsComponent } from './dashboard-shortcuts.component';
 import { AgGridAngular } from 'ag-grid-angular';
@@ -159,6 +161,7 @@ import { BranchListItemDto } from '../../core/models/branch.models';
   `]
 })
 export class DashboardPageComponent implements OnInit {
+  private permissions = inject(PermissionService);
   cashColumns: ColDef[] = [
 { field: 'name', headerName: 'حساب', flex: 1, minWidth: 180 },
  { field: 'type', headerName: 'نوع', valueFormatter: p => new PersianPipe().transform(p.value, 'type'), minWidth: 120 },
@@ -180,8 +183,14 @@ export class DashboardPageComponent implements OnInit {
 
   ngOnInit(): void {
     const user = this.authService.currentUser();
-    this.showBranchSelector = !!user && (user.role === 'Admin' || user.isHeadquarters);
+    const canReadBranches = this.permissions.has('Branch.Read');
+    this.showBranchSelector = canReadBranches && !!user && (user.role === 'Admin' || user.isHeadquarters);
 
+    if (!canReadBranches) {
+      this.branchId = user?.branchId ?? null;
+      this.load();
+      return;
+    }
     this.branchesService.list().subscribe(branches => {
       this.branches = branches;
       this.branchId = user?.branchId ?? branches[0]?.id ?? null;

@@ -1,0 +1,8 @@
+﻿Backend permissions: 69
+Frontend permissions: 69
+Missing in frontend: []
+Unknown in frontend: []
+No static controller policy usage: ['Cheque.Update']
+Endpoints inventoried: 115
+Business endpoints without static policy: []
+Auth endpoints use session/login rules; License is intentionally public. Runtime conditional checks are not included in this static inventory.

@@ -1,0 +1,116 @@
+﻿Controller,Action,RequiredPolicies,RequiredRoles,AllowAnonymous
+AuditLogsController.cs,public async Task<ActionResult<AuditTrailListDto>> GetAuditTrails([FromQuery] GetAuditTrailsQuery query),Audit.Read,,False
+AuthController.cs,public async Task<IActionResult> Login(LoginRequest request),,,True
+AuthController.cs,public async Task<IActionResult> Refresh(),,,True
+AuthController.cs,public async Task<IActionResult> Session(CancellationToken ct),,,False
+AuthController.cs,public async Task<IActionResult> Activity(CancellationToken ct),,,False
+AuthController.cs,public async Task<IActionResult> Logout(CancellationToken ct),,,True
+BranchesController.cs,public async Task<ActionResult<IReadOnlyList<BranchListItemDto>>> List(CancellationToken ct),Branch.Read,,False
+BranchesController.cs,public async Task<ActionResult<BranchDetailDto>> GetById(int id),Branch.Read,,False
+BranchesController.cs,public async Task<ActionResult<BranchDetailDto>> Create(CreateBranchCommand command),Branch.Create,,False
+BranchesController.cs,"public async Task<ActionResult<BranchDetailDto>> Update(int id, UpdateBranchCommand command)",Branch.Update,,False
+BranchesController.cs,"public async Task<IActionResult> Delete(int id, [FromQuery] string rowVersion)",Branch.Delete,,False
+CashBankAccountsController.cs,"public async Task<ActionResult> List([FromQuery] ListCashBankAccountsQuery q, CancellationToken ct)",CashBankAccount.Read,,False
+CashBankAccountsController.cs,"public async Task<ActionResult> GetById([FromRoute] int id, CancellationToken ct)",CashBankAccount.Read,,False
+CashBankAccountsController.cs,"public async Task<ActionResult> Create([FromBody] CreateCashBankAccountCommand cmd, CancellationToken ct)",CashBankAccount.Create,,False
+CashBankAccountsController.cs,"public async Task<ActionResult> Update([FromRoute] int id, [FromBody] UpdateCashBankAccountCommand cmd, CancellationToken ct)",CashBankAccount.Update,,False
+CashBankAccountsController.cs,"public async Task<ActionResult> SoftDelete([FromRoute] int id, [FromBody] SoftDeleteCashBankAccountCommand cmd, CancellationToken ct)",CashBankAccount.Delete,,False
+CategoriesController.cs,public async Task<ActionResult<PagedResult<CategoryListItemDto>>> GetList(,Category.Read,,False
+CategoriesController.cs,"public async Task<ActionResult<CategoryDetailDto>> Create(CreateCategoryCommand command, CancellationToken ct)",Category.Create,,False
+CategoriesController.cs,"public async Task<ActionResult<CategoryDetailDto>> Update(int id, UpdateCategoryCommand command, CancellationToken ct)",Category.Update,,False
+CategoriesController.cs,"public async Task<ActionResult<bool>> Delete(int id, [FromQuery] string rowVersion, CancellationToken ct)",Category.Delete,,False
+ChequesController.cs,"public async Task<ActionResult<PagedResult<ChequeDetailDto>>> GetList([FromQuery] ListChequesQuery query, CancellationToken ct)",Cheque.Read,,False
+ChequesController.cs,"public async Task<ActionResult<ChequeDetailDto>> GetById(int id, CancellationToken ct)",Cheque.Read,,False
+ChequesController.cs,"public async Task<ActionResult<int>> Create(CreateChequeCommand command, CancellationToken ct)",Cheque.Create,,False
+ChequesController.cs,"public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusRequest request, CancellationToken ct)",Cheque.UpdateStatus,,False
+ChequesController.cs,"public async Task<IActionResult> Delete(int id, [FromBody] RowVersionDto body, CancellationToken ct)",Cheque.Delete,,False
+CompanySettingsController.cs,public async Task<ActionResult<CompanySettingsDetailDto>> Get(),CompanySettings.Read,,False
+CompanySettingsController.cs,public async Task<ActionResult<CompanySettingsDetailDto>> Update(UpdateCompanySettingsCommand command),CompanySettings.Update,,False
+ContactsController.cs,"public async Task<ActionResult> Create([FromBody] CreateContactCommand body, CancellationToken ct)",Contact.Create,,False
+ContactsController.cs,"public async Task<ActionResult> GetById([FromRoute] int id, CancellationToken ct)",Contact.Read,,False
+ContactsController.cs,public async Task<ActionResult> List(,Contact.Read,,False
+ContactsController.cs,"public async Task<ActionResult> Update([FromRoute] int id, [FromBody] UpdateContactCommand body, CancellationToken ct)",Contact.Update,,False
+ContactsController.cs,"public async Task<ActionResult> SoftDelete([FromRoute] int id, [FromBody] RowVersionDto body, CancellationToken ct)",Contact.Delete,,False
+DataMaintenanceController.cs,public Task<IReadOnlyList<DataCount>> Preview(CancellationToken ct),DataMaintenance.Read,"مدیر سامانه,Admin",False
+DataMaintenanceController.cs,"public Task<DataResetResult> Reset(ResetOperationalDataRequest request,CancellationToken ct)",DataMaintenance.Reset,"مدیر سامانه,Admin",False
+InvoiceMrtController.cs,"public async Task<IActionResult> Get(string format,[FromQuery]int? invoiceId,CancellationToken ct)",CompanySettings.Read; CompanySettings.Update,,False
+InvoiceMrtController.cs,"public IActionResult Save(string format,SaveInvoiceMrt request)",CompanySettings.Read; CompanySettings.Update,,False
+InvoiceMrtController.cs,"public IActionResult Validate(string format,PreviewInvoiceMrt request)",CompanySettings.Read; CompanySettings.Update,,False
+InvoiceMrtController.cs,"public IActionResult Restore(string format,RestoreInvoiceMrt request)",CompanySettings.Read; CompanySettings.Update,,False
+InvoiceMrtController.cs,public IActionResult Download(string format),CompanySettings.Read; CompanySettings.Update,,False
+InvoiceMrtController.cs,"public IActionResult PreviewSample(string format,PreviewInvoiceMrt request)",CompanySettings.Read; CompanySettings.Update,,False
+InvoiceMrtController.cs,"public async Task<IActionResult> Preview(string format,int id,PreviewInvoiceMrt request,CancellationToken ct)",CompanySettings.Read; CompanySettings.Update; Invoice.Read,,False
+InvoicePrintLayoutsController.cs,public ActionResult<InvoicePrintLayoutVersion> Get(string format),CompanySettings.Read,,False
+InvoicePrintLayoutsController.cs,"public ActionResult<InvoicePrintLayoutVersion> Save(string format, SaveInvoicePrintLayout request)",CompanySettings.Update,,False
+InvoicePrintLayoutsController.cs,"public async Task<IActionResult> Preview(int id, InvoicePrintLayout layout, CancellationToken ct)",CompanySettings.Update; Invoice.Read,,False
+InvoicesController.cs,"public async Task<IActionResult> Pdf(int id, CancellationToken ct, [FromQuery] string format",Invoice.Read,,False
+InvoicesController.cs,"public async Task<ActionResult<CreateInvoiceResult>> Create([FromBody] CreateInvoiceCommand command, CancellationToken ct)",Invoice.Create,,False
+InvoicesController.cs,"public async Task<ActionResult> GetById([FromRoute] int id, CancellationToken ct)",Invoice.Read,,False
+InvoicesController.cs,public async Task<ActionResult> List(,Invoice.Read,,False
+InvoicesController.cs,"public async Task<ActionResult> SoftDelete([FromRoute] int id, [FromBody] RowVersionDto body, CancellationToken ct)",Invoice.Delete,,False
+InvoicesController.cs,"public async Task<ActionResult> Update([FromRoute] int id, [FromBody] UpdateInvoiceCommand body, CancellationToken ct)",Invoice.Update,,False
+ItemsController.cs,"public async Task<ActionResult> List([FromQuery] ListItemsQuery q, CancellationToken ct)",Item.Read,,False
+ItemsController.cs,"public async Task<ActionResult> GetById([FromRoute] int id, CancellationToken ct)",Item.Read,,False
+ItemsController.cs,"public async Task<ActionResult> Create([FromBody] CreateItemCommand cmd, CancellationToken ct)",Item.Create,,False
+ItemsController.cs,"public async Task<ActionResult> Update([FromRoute] int id, [FromBody] UpdateItemCommand cmd, CancellationToken ct)",Item.Update,,False
+ItemsController.cs,"public async Task<ActionResult> SoftDelete([FromRoute] int id, [FromBody] SoftDeleteItemCommand body, CancellationToken ct)",Item.Delete,,False
+LicenseController.cs,public Task<LicenseStatus> Get(CancellationToken cancellationToken),,,True
+MealPackagesController.cs,public async Task<IActionResult> List(CancellationToken ct),Item.Read,,False
+MealPackagesController.cs,"public async Task<IActionResult> Create(SaveMealPackage request, CancellationToken ct)",Item.Create,,False
+MealPackagesController.cs,"public async Task<IActionResult> Update(int id, SaveMealPackage request, CancellationToken ct)",Item.Update,,False
+MealPackagesController.cs,"public async Task<IActionResult> Delete(int id, [FromQuery] string rowVersion, CancellationToken ct)",Item.Delete,,False
+OpeningBalancesController.cs,"public Task<List<OpeningBalanceDto>> Contacts([FromQuery] int? contactId, CancellationToken ct)",Contact.Read,,False
+OpeningBalancesController.cs,"public async Task<ActionResult<OpeningBalanceDto>> CreateContact(ContactOpeningRequest body, CancellationToken ct)",CompanySettings.Update; Contact.Update,,False
+OpeningBalancesController.cs,"public async Task<ActionResult<OpeningBalanceDto>> UpdateContact(int id, ContactOpeningRequest body, CancellationToken ct)",CompanySettings.Update; Contact.Update,,False
+OpeningBalancesController.cs,"public async Task<IActionResult> DeleteContact(int id, [FromQuery] string rowVersionBase64, CancellationToken ct)",CompanySettings.Update; Contact.Update,,False
+OpeningBalancesController.cs,"public Task<List<OpeningBalanceDto>> Inventory([FromQuery] int? warehouseId, [FromQuery] int? itemId, CancellationToken ct)",Stock.Read,,False
+OpeningBalancesController.cs,"public async Task<ActionResult<OpeningBalanceDto>> CreateInventory(InventoryOpeningRequest body, CancellationToken ct)",CompanySettings.Update; StockMovement.Create,,False
+OpeningBalancesController.cs,"public async Task<ActionResult<OpeningBalanceDto>> UpdateInventory(int id, InventoryOpeningRequest body, CancellationToken ct)",CompanySettings.Update; StockMovement.Create,,False
+OpeningBalancesController.cs,"public async Task<IActionResult> DeleteInventory(int id, [FromQuery] string rowVersionBase64, CancellationToken ct)",CompanySettings.Update; StockMovement.Create,,False
+OrdersController.cs,public async Task<ActionResult<PagedResult<OrderListItemDto>>> GetList(,Order.Read,,False
+OrdersController.cs,"public async Task<ActionResult<OrderDetailDto>> GetById(int id, CancellationToken ct)",Order.Read,,False
+OrdersController.cs,"public async Task<ActionResult<OrderDetailDto>> Create(CreateOrderCommand command, CancellationToken ct)",Order.Create,,False
+OrdersController.cs,"public async Task<ActionResult<OrderDetailDto>> Update(int id, UpdateOrderCommand command, CancellationToken ct)",Order.Update,,False
+OrdersController.cs,"public async Task<ActionResult<bool>> Delete(int id, [FromQuery] string rowVersion, CancellationToken ct)",Order.Delete,,False
+OrdersController.cs,"public async Task<ActionResult<bool>> Approve(int id, [FromQuery] string rowVersion, CancellationToken ct)",Order.Approve,,False
+OrdersController.cs,"public async Task<ActionResult<bool>> Cancel(int id, [FromQuery] string rowVersion, CancellationToken ct)",Order.Cancel,,False
+OrdersController.cs,"public async Task<ActionResult<int>> CreateInvoice(int id, CancellationToken ct)",Order.CreateInvoice,,False
+OrdersController.cs,public async Task<IActionResult> Export(,Order.Read,,False
+PaymentsController.cs,"public async Task<ActionResult<CreatePaymentResult>> Create([FromBody] CreatePaymentCommand cmd, CancellationToken ct)",Payment.Create,,False
+PaymentsController.cs,"public async Task<ActionResult> GetById([FromRoute] int id, CancellationToken ct)",Payment.Read,,False
+PaymentsController.cs,public async Task<ActionResult> List(,Payment.Read,,False
+PaymentsController.cs,"public async Task<ActionResult> Update([FromRoute] int id, [FromBody] UpdatePaymentCommand body, CancellationToken ct)",Payment.Update,,False
+PaymentsController.cs,"public async Task<ActionResult> SoftDelete([FromRoute] int id, [FromBody] RowVersionDto body, CancellationToken ct)",Payment.Delete,,False
+ReportsController.cs,public async Task<ActionResult<DashboardStatsDto>> GetDashboard([FromQuery] int branchId,Report.Dashboard,,False
+ReportsController.cs,public async Task<ActionResult<ContactStatementDto>> GetContactStatement(,Report.ContactStatement,,False
+ReportsController.cs,public async Task<ActionResult<List<StockStatusDto>>> GetStockStatus(CancellationToken ct),Report.StockStatus,,False
+ReportsController.cs,public async Task<IActionResult> ExportStockStatus(CancellationToken ct),Report.StockStatus,,False
+ReportsController.cs,public async Task<IActionResult> ExportContactStatement(,Report.ContactStatement,,False
+ReportsController.cs,public async Task<ActionResult<IncomeExpenseDto>> GetProfitLoss(,Report.ProfitLoss,,False
+RolesController.cs,public async Task<IActionResult> ListRoles(),Role.Read,,False
+RolesController.cs,public async Task<IActionResult> GetById(int id),Role.Read,,False
+RolesController.cs,public async Task<IActionResult> Create([FromBody] CreateRoleCommand command),Role.Create,,False
+RolesController.cs,"public async Task<IActionResult> Update(int id, [FromBody] UpdateRoleCommand command)",Role.Update,,False
+RolesController.cs,public async Task<IActionResult> Delete(int id),Role.Delete,,False
+StockMovementsController.cs,"public async Task<ActionResult> List([FromQuery] ListStockMovementsQuery q, CancellationToken ct)",StockMovement.Read,,False
+StockMovementsController.cs,"public async Task<ActionResult> GetById([FromRoute] int id, CancellationToken ct)",StockMovement.Read,,False
+StockMovementsController.cs,"public async Task<ActionResult> Create([FromBody] CreateStockMovementCommand cmd, CancellationToken ct)",StockMovement.Create,,False
+StocksController.cs,"public async Task<ActionResult> List([FromQuery] ListStocksQuery q, CancellationToken ct)",Stock.Read,,False
+StocksController.cs,"public async Task<ActionResult> GetById([FromRoute] int id, CancellationToken ct)",Stock.Read,,False
+StockTransfersController.cs,"public async Task<ActionResult<StockTransferDetailDto>> Transfer(TransferStockCommand command, CancellationToken ct)",Stock.Transfer,,False
+UnitsController.cs,public async Task<ActionResult<PagedResult<UnitListItemDto>>> List(,Unit.Read,,False
+UnitsController.cs,"public async Task<ActionResult<UnitDetailDto>> GetById(int id, CancellationToken ct)",Unit.Read,,False
+UnitsController.cs,"public async Task<ActionResult<UnitDetailDto>> Create(CreateUnitCommand command, CancellationToken ct)",Unit.Create,,False
+UnitsController.cs,"public async Task<ActionResult<UnitDetailDto>> Update(int id, UpdateUnitCommand command, CancellationToken ct)",Unit.Update,,False
+UnitsController.cs,"public async Task<IActionResult> Delete(int id, [FromQuery] string rowVersion, CancellationToken ct)",Unit.Delete,,False
+UsersController.cs,public async Task<IActionResult> ListUsers([FromQuery] ListUsersQuery query),User.Read,,False
+UsersController.cs,public async Task<IActionResult> GetById(int id),User.Read,,False
+UsersController.cs,public async Task<IActionResult> Create([FromBody] CreateUserCommand command),User.Create,,False
+UsersController.cs,"public async Task<IActionResult> Update(int id, [FromBody] UpdateUserCommand command)",User.Update,,False
+UsersController.cs,public async Task<IActionResult> Delete(int id),User.Delete,,False
+UsersController.cs,"public async Task<IActionResult> ChangePassword(int id, [FromBody] ChangeUserPasswordBody body)",User.Update,,False
+WarehousesController.cs,"public async Task<ActionResult<PagedResult<WarehouseListItemDto>>> List([FromQuery] ListWarehousesQuery q, CancellationToken ct)",Warehouse.Read,,False
+WarehousesController.cs,"public async Task<ActionResult<WarehouseDetailDto>> GetById([FromRoute] int id, CancellationToken ct)",Warehouse.Read,,False
+WarehousesController.cs,"public async Task<ActionResult<WarehouseDetailDto>> Create([FromBody] CreateWarehouseCommand cmd, CancellationToken ct)",Warehouse.Create,,False
+WarehousesController.cs,"public async Task<ActionResult<WarehouseDetailDto>> Update([FromRoute] int id, [FromBody] UpdateWarehouseCommand cmd, CancellationToken ct)",Warehouse.Update,,False
+WarehousesController.cs,"public async Task<IActionResult> SoftDelete([FromRoute] int id, [FromBody] RowVersionDto body, CancellationToken ct)",Warehouse.Delete,,False

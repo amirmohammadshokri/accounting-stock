@@ -1,7 +1,9 @@
+import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
+import { PermissionService } from '../../core/services/permission.service';
 import { FilterPanelComponent } from '../../shared/filter-panel/filter-panel.component';
 import { AgGridAngular } from 'ag-grid-angular';
 import { GridPaginatorComponent } from '../../shared/ag-grid/grid-paginator.component';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ColDef } from 'ag-grid-community';
 import { FormsModule } from '@angular/forms';
@@ -27,7 +29,7 @@ import { ChangePasswordDialogComponent, ChangePasswordDialogData } from './chang
 @Component({
   standalone: true,
   selector: 'app-users-page',
-  imports: [FilterPanelComponent, AgGridAngular, GridPaginatorComponent,
+  imports: [HasPermissionDirective, FilterPanelComponent, AgGridAngular, GridPaginatorComponent,
     CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule,
     MatButtonModule, ...APP_ICON_IMPORTS, MatDialogModule, PagedGridDirective
   ],
@@ -35,14 +37,14 @@ import { ChangePasswordDialogComponent, ChangePasswordDialogData } from './chang
     <div class="toolbar">
       <span class="title">کاربران</span>
       <span class="spacer"></span>
-      <button mat-stroked-button color="primary" (click)="openCreate()">
+      <button *appHasPermission="'User.Create'" mat-stroked-button color="primary" (click)="openCreate()">
         <mat-icon [svgIcon]="'add'"></mat-icon>
         کاربر جدید
       </button>
     </div>
 
     <app-filter-panel (apply)="apply()" (reset)="reset()">
-<mat-form-field appearance="outline" class="branch-field">
+<mat-form-field *appHasPermission="'Branch.Read'" appearance="outline" class="branch-field">
         <mat-label>شعبه</mat-label>
         <mat-select [(ngModel)]="branchId">
           <mat-option [value]="null">همه شعبه‌ها</mat-option>
@@ -51,7 +53,7 @@ import { ChangePasswordDialogComponent, ChangePasswordDialogData } from './chang
           }
         </mat-select>
       </mat-form-field>
-      <mat-form-field appearance="outline" class="role-field">
+      <mat-form-field *appHasPermission="'Role.Read'" appearance="outline" class="role-field">
         <mat-label>نقش</mat-label>
         <mat-select [(ngModel)]="roleId">
           <mat-option [value]="null">همه نقش‌ها</mat-option>
@@ -93,6 +95,7 @@ import { ChangePasswordDialogComponent, ChangePasswordDialogData } from './chang
   `]
 })
 export class UsersPageComponent {
+  private permissions = inject(PermissionService);
   sortWhitelist: string[] = [];
 
   branchId: number | null = null;
@@ -129,8 +132,8 @@ export class UsersPageComponent {
     private dialog: MatDialog,
     private snack: MatSnackBar
   ) {
-    this.branchesService.list().subscribe(res => (this.branches = res));
-    this.rolesService.list().subscribe(res => (this.roles = res));
+    if (this.permissions.has('Branch.Read')) this.branchesService.list().subscribe(res => (this.branches = res));
+    if (this.permissions.has('Role.Read')) this.rolesService.list().subscribe(res => (this.roles = res));
   }
 
   fetcher = (q: { filters?:string; pageNumber?: number; pageSize?: number; sort?: string }) => {

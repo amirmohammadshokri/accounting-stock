@@ -1,3 +1,5 @@
+import { inject } from '@angular/core';
+import { PermissionService } from '../../core/services/permission.service';
 import { FilterPanelComponent } from '../../shared/filter-panel/filter-panel.component';
 import { AgGridAngular } from 'ag-grid-angular';
 import { GridPaginatorComponent } from '../../shared/ag-grid/grid-paginator.component';
@@ -81,7 +83,7 @@ export class StocksPageComponent {
     private service: StocksService,
     private warehousesService: WarehousesService
   ) {
-    this.warehousesService.list().subscribe(res => (this.warehouses = res.items));
+    if (inject(PermissionService).has('Warehouse.Read')) this.warehousesService.list().subscribe(res => (this.warehouses = res.items));
   }
 
   fetcher = (q: { filters?:string; pageNumber?: number; pageSize?: number; sort?: string }) => {

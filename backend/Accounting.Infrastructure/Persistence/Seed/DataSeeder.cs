@@ -960,13 +960,7 @@ public static class DataSeeder
                 .FirstOrDefaultAsync(r => r.Name == name, ct);
             if (existing is not null)
             {
-                // Keep customized roles intact. The built-in administrator always gets new permissions.
-                if (isStatic && !existing.IsDeleted)
-                {
-                    foreach (var permission in permissions.Distinct())
-                        if (!existing.Permissions.Any(p => p.Permission == permission))
-                            existing.Permissions.Add(new RolePermission { Permission = permission, CreatedAtUtc = now });
-                }
+                // Preserve explicitly assigned permissions, including customized static roles.
                 return;
             }
 

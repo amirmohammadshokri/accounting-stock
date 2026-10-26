@@ -68,6 +68,8 @@ export interface PermissionGroup {
 }
 
 export const PERMISSION_GROUPS: PermissionGroup[] = [
+  { label: 'سوابق فعالیت', permissions: ['Audit.Read'] },
+  { label: 'مدیریت داده‌ها', permissions: ['DataMaintenance.Read', 'DataMaintenance.Reset'] },
   { label: 'فاکتورها', permissions: ['Invoice.Create', 'Invoice.Read', 'Invoice.Update', 'Invoice.Delete'] },
   { label: 'پرداخت‌ها', permissions: ['Payment.Create', 'Payment.Read', 'Payment.Update', 'Payment.Delete'] },
   { label: 'طرف‌های حساب', permissions: ['Contact.Create', 'Contact.Read', 'Contact.Update', 'Contact.Delete'] },

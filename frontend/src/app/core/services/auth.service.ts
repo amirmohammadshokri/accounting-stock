@@ -43,7 +43,7 @@ export class AuthService {
   constructor() {
     // Token varsa ama user yoksa, token'ı parse et
     const token = this.getToken();
-    if (token && !this.currentUser()) {
+    if (token) {
       try {
         const claims = this.decodeToken(token);
         // Token geçerliyse user'ı oluştur
@@ -183,8 +183,8 @@ export class AuthService {
       email: response.email,
       firstName: response.firstName,
       lastName: response.lastName,
-      role: claims?.role ?? '',
-      permissions: claims?.permission ?? [],
+      role: this.roleFromClaims(claims?.role),
+      permissions: this.permissionClaims(claims?.permission),
       branchId: claims?.branchId ? Number(claims.branchId) : undefined,
       isHeadquarters: claims?.isHeadquarters === 'true'
     };
@@ -202,7 +202,11 @@ export class AuthService {
     if (!userJson) return null;
 
     try {
-      return JSON.parse(userJson) as CurrentUser;
+      const user = JSON.parse(userJson) as CurrentUser;
+      const token = this.getToken();
+      const claims = token ? this.decodeToken(token) : null;
+      if (!claims || claims.exp * 1000 <= Date.now()) return null;
+      return { ...user, role: this.roleFromClaims(claims.role), permissions: this.permissionClaims(claims.permission) };
     } catch {
       return null;
     }
@@ -215,10 +219,10 @@ export class AuthService {
     const user: CurrentUser = {
       id: Number(claims.id),
       email: claims.email,
-      firstName: '', // Token'da yok, login response'dan gelir
-      lastName: '',  // Token'da yok, login response'dan gelir
-      role: claims.role,
-      permissions: claims.permission ?? [],
+      firstName: this.currentUser()?.firstName ?? '',
+      lastName: this.currentUser()?.lastName ?? '',
+      role: this.roleFromClaims(claims.role),
+      permissions: this.permissionClaims(claims.permission),
       branchId: claims.branchId ? Number(claims.branchId) : undefined,
       isHeadquarters: claims.isHeadquarters === 'true'
     };
@@ -230,6 +234,16 @@ export class AuthService {
   /**
    * Clear all auth data
    */
+  private permissionClaims(value: unknown): string[] {
+    const values = Array.isArray(value) ? value : typeof value === 'string' ? [value] : [];
+    return [...new Set(values.filter((p): p is string => typeof p === 'string' && p.length > 0))];
+  }
+
+  private roleFromClaims(value: unknown): string {
+    const roles = this.permissionClaims(value);
+    return roles.find(role => ['مدیر سامانه', 'Admin'].includes(role)) ?? roles[0] ?? '';
+  }
+
   private clearAuth(): void {
     this.authEpoch++;
     localStorage.removeItem(TOKEN_KEY);
