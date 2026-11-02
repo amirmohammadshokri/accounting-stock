@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,8 +8,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
 import { ColDef } from 'ag-grid-community';
-import { Observable, of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Observable, of, defer, EMPTY } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { debounceTime, switchMap, catchError } from 'rxjs/operators';
 import { PagedResult } from '../ag-grid/paged-grid.directive';
 import { LookupDialogComponent, LookupDialogData, LookupQuery } from '../lookup-dialog/lookup-dialog.component';
 
@@ -92,6 +93,7 @@ export class EntityPickerComponent implements OnInit, OnChanges {
   @Output() valueChange = new EventEmitter<number | null>();
 
   private dialog = inject(MatDialog);
+  private destroyRef = inject(DestroyRef);
 
   control = new FormControl<string | PickerOption>('');
   options: PickerOption[] = [];
@@ -105,11 +107,16 @@ export class EntityPickerComponent implements OnInit, OnChanges {
     this.control.valueChanges
       .pipe(
         debounceTime(250),
-        distinctUntilChanged((a, b) => this.toSearchTerm(a) === this.toSearchTerm(b)),
         switchMap(v => {
           if (v != null && typeof v !== 'string') return of([]); // seçim yapıldı, arama tetikleme
-          return this.fetcher(this.toSearchTerm(v));
-        })
+          this.options = [];
+          this.loaded = false;
+          return defer(() => this.fetcher(this.toSearchTerm(v))).pipe(
+            // Keep valueChanges alive after a failed request; focus or typing can retry.
+            catchError(() => EMPTY)
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(opts => {
         this.options = opts;
@@ -132,10 +139,8 @@ export class EntityPickerComponent implements OnInit, OnChanges {
 
   ensureLoaded() {
     if (!this.loaded) {
-      this.fetcher('').subscribe(opts => {
-        this.options = opts;
-        this.loaded = true;
-      });
+      // Use the same switchMap as typing so an older focus request cannot replace new results.
+      this.control.setValue(this.control.value);
     }
   }
 
@@ -147,7 +152,7 @@ export class EntityPickerComponent implements OnInit, OnChanges {
   onSelected(e: MatAutocompleteSelectedEvent) {
     const opt = e.option.value as PickerOption;
     this.valueChange.emit(opt.id);
-    if(this.clearOnSelect){this.control.setValue('',{emitEvent:false});this.options=[];this.loaded=false;}
+    if(this.clearOnSelect){this.control.setValue('');this.options=[];this.loaded=false;}
   }
 
   openLookup() {
@@ -170,7 +175,7 @@ export class EntityPickerComponent implements OnInit, OnChanges {
       this.control.setValue(opt, { emitEvent: false });
       this.loaded = true;
       this.valueChange.emit(opt.id);
-    if(this.clearOnSelect){this.control.setValue('',{emitEvent:false});this.options=[];this.loaded=false;}
+    if(this.clearOnSelect){this.control.setValue('');this.options=[];this.loaded=false;}
     });
   }
 
