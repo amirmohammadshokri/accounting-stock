@@ -50,6 +50,22 @@
               "outputHashing": "all"
             },
             "iis": {
+              "optimization": true,
+              "extractLicenses": true,
+              "sourceMap": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2MB",
+                  "maximumError": "3MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -128,5 +144,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }
