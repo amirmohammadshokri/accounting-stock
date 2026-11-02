@@ -1,3 +1,4 @@
+import { BranchContextService } from '../../core/services/branch-context.service';
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -26,14 +27,7 @@ export interface WarehouseFormDialogData {
     <h2 mat-dialog-title>{{ data.warehouse ? 'ویرایش انبار' : 'انبار جدید' }}</h2>
     <form [formGroup]="form" (ngSubmit)="save()">
       <mat-dialog-content class="fields">
-        <mat-form-field appearance="outline">
-          <mat-label>شعبه</mat-label>
-          <mat-select formControlName="branchId">
-            @for (b of branches; track b.id) {
-              <mat-option [value]="b.id">{{ b.code }} - {{ b.name }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
+        <p>شعبه فعال: {{branchContext.active()?.name}}</p>
         <mat-form-field appearance="outline">
           <mat-label>کد</mat-label>
           <input matInput formControlName="code" maxlength="20" />
@@ -58,19 +52,20 @@ export class WarehouseFormDialogComponent {
   dialogRef = inject(MatDialogRef<WarehouseFormDialogComponent>);
   data = inject<WarehouseFormDialogData>(MAT_DIALOG_DATA);
   private fb = inject(FormBuilder);
+  readonly branchContext = inject(BranchContextService);
   private branchesService = inject(BranchesService);
 
   branches: BranchListItemDto[] = [];
 
   form = this.fb.group({
-    branchId: [this.data.warehouse?.branchId ?? null, Validators.required],
+    branchId: [this.data.warehouse?.branchId ?? this.branchContext.active()?.id ?? null, Validators.required],
     code: [this.data.warehouse?.code ?? '', [Validators.required, Validators.maxLength(20)]],
     name: [this.data.warehouse?.name ?? '', [Validators.required, Validators.maxLength(100)]],
     isDefault: [this.data.warehouse?.isDefault ?? false]
   });
 
   constructor() {
-    this.branchesService.list().subscribe(res => (this.branches = res));
+
   }
 
   save() {

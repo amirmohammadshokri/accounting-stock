@@ -18,7 +18,7 @@ public class BranchContextController(IAppDbContext db) : ControllerBase
         var ids = user.AllowedBranches.Select(b => b.BranchId).ToList();
         if (user.BranchId.HasValue) ids.Add(user.BranchId.Value);
         var canViewAll = User.HasClaim("permission", Permissions.Branch.ViewAll);
-        var branches = await db.Branches.AsNoTracking().Where(b => canViewAll || ids.Contains(b.Id))
+        var branches = await db.Branches.AsNoTracking().Where(b => ids.Contains(b.Id))
             .OrderBy(b => b.Name).Select(b => new { b.Id, b.Code, b.Name, b.IsHeadquarters }).ToListAsync(ct);
         return Ok(new { defaultBranchId = user.BranchId, canViewAll, branches });
     }

@@ -1,3 +1,4 @@
+import { BranchContextService } from '../services/branch-context.service';
 /**
  * Auth Guard
  * Protects routes - redirects to login if not authenticated
@@ -10,7 +11,10 @@ export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
+  const branches = inject(BranchContextService);
   if (authService.isAuthenticated()) {
+    if (!(state.url ?? '').startsWith('/select-branch') && branches.active()?.userId !== authService.currentUser()?.id)
+      return router.parseUrl('/select-branch');
     return true;
   }
 
@@ -18,7 +22,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   router.navigate(['/login'], {
     queryParams: { returnUrl: state.url }
   });
-  
+
   return false;
 };
 

@@ -13,7 +13,7 @@
           </section>
         }
       </mat-nav-list>
-      <div class="sidebar-foot"><mat-icon [svgIcon]="'support_agent'"></mat-icon><span>از سفارش تا تسویه، همه‌چیز یکجا</span></div>
+      <div class="sidebar-foot"><mat-icon [svgIcon]="'support_agent'"></mat-icon><a [href]="'tel:'+brand.supportPhone" aria-label="تماس با پشتیبانی">پشتیبانی: <bdi dir="ltr">{{brand.supportPhone}}</bdi></a></div>
     </mat-sidenav>
   }
 
@@ -24,6 +24,12 @@
           <mat-icon [svgIcon]="'menu'"></mat-icon>
         </button>
         <span class="title">{{brand.cateringName}}</span>
+        @if(branchContext.active();as branch){
+          <a mat-button routerLink="/select-branch">شعبه فعال: {{branch.name}} — تغییر شعبه</a>
+          @if(branchContext.canViewAll()){
+            <button mat-button (click)="setAllBranches(!branchContext.allBranches())">{{branchContext.allBranches()?'فهرست‌ها: همه شعب — فقط شعبه فعال':'فهرست‌ها: شعبه فعال — نمایش همه شعب'}}</button>
+          }
+        }
         <span class="spacer"></span>
         <a mat-icon-button routerLink="/appearance" matTooltip="تنظیمات ظاهر" aria-label="تنظیمات ظاهر"><mat-icon [svgIcon]="'palette'"></mat-icon></a>
 

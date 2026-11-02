@@ -53,15 +53,21 @@ export interface UserFormDialogData {
         }
 
         <mat-form-field appearance="outline">
-          <mat-label>شعبه (اختیاری)</mat-label>
+          <mat-label>شعبه پیش‌فرض کاربر</mat-label>
           <mat-select formControlName="branchId">
-            <mat-option [value]="null">بدون شعبه (مرکزی)</mat-option>
+            <mat-option [value]="null">انتخاب نشده</mat-option>
             @for (b of data.branches; track b.id) {
               <mat-option [value]="b.id">{{ b.code }} - {{ b.name }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
 
+        <mat-form-field appearance="outline"><mat-label>شعب مجاز کاربر</mat-label>
+          <mat-select formControlName="allowedBranchIds" multiple>
+            @for(b of data.branches;track b.id){<mat-option [value]="b.id">{{b.name}}</mat-option>}
+          </mat-select>
+          <mat-hint>شعبه پیش‌فرض هم مجاز محسوب می‌شود.</mat-hint>
+        </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>نقش‌ها</mat-label>
           <mat-select formControlName="roleIds" multiple>
@@ -95,7 +101,8 @@ export class UserFormDialogComponent {
     lastName: [this.data.user?.lastName ?? '', [Validators.required, Validators.maxLength(100)]],
     email: [this.data.user?.email ?? '', [Validators.required, Validators.email]],
     password: ['', this.data.user ? [] : [Validators.required, Validators.minLength(8)]],
-    branchId: [this.data.user?.branchId ?? null],
+    branchId: [this.data.user?.branchId ?? null, Validators.required],
+    allowedBranchIds: [this.data.user?.allowedBranchIds ?? [] as number[]],
     roleIds: [this.initialRoleIds(), Validators.required],
     isActive: [this.data.user?.isActive ?? true]
   });
@@ -115,6 +122,7 @@ export class UserFormDialogComponent {
         lastName: v.lastName!,
         email: v.email!,
         branchId: v.branchId ?? null,
+        allowedBranchIds: v.allowedBranchIds ?? [],
         roleIds: v.roleIds!,
         isActive: v.isActive!
       });
@@ -125,6 +133,7 @@ export class UserFormDialogComponent {
         email: v.email!,
         password: v.password!,
         branchId: v.branchId ?? null,
+        allowedBranchIds: v.allowedBranchIds ?? [],
         roleIds: v.roleIds!,
         isActive: v.isActive!
       });

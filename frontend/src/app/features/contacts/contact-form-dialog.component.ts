@@ -34,15 +34,14 @@ type ContactKind = 'company' | 'person' | 'both';
   template: `
     <h2 mat-dialog-title>{{data.contact ? 'ویرایش طرف حساب' : 'طرف حساب جدید'}}</h2>
     <form [formGroup]="form" (ngSubmit)="save()">
+      <mat-dialog-content class="fields">
       <div class="identity-selector"><mat-form-field appearance="outline"><mat-label>این طرف حساب شخص است یا شرکت؟</mat-label><mat-select [value]="kind" (selectionChange)="kind=$event.value;onKindChange()" aria-label="نوع طرف حساب"><mat-option value="person">شخص حقیقی</mat-option><mat-option value="company">شرکت / مجموعه</mat-option><mat-option *ngIf="hasBothDetails" value="both">شخص صاحب کسب‌وکار (اطلاعات شخص و شرکت)</mat-option></mat-select></mat-form-field>
         <div class="customer-number">شناسه داخلی: <strong dir="ltr">{{data.contact?.customerNumber || (data.contact ? data.contact.id.toString().padStart(6,'0') : 'پس از ذخیره صادر می‌شود')}}</strong></div>
       </div>
-      <mat-dialog-content class="fields">
         <mat-form-field appearance="outline"><mat-label>شماره اشتراک (اختیاری)</mat-label><input matInput formControlName="subscriptionNumber" [placeholder]="data.contact?.subscriptionNumber || 'مثلاً VIP-1001'" maxlength="32" dir="ltr" (input)="normalizeSubscription($event)"><mat-hint>خالی بگذارید تا شماره خودکار صادر شود؛ مثلاً 1001 یا VIP-12</mat-hint><mat-error>حداکثر ۳۲ حرف انگلیسی، عدد یا خط تیره؛ پیشوند AUTO- رزرو است.</mat-error></mat-form-field>
         @if(kind!=='person'){<mat-form-field appearance="outline"><mat-label>نام شرکت / مجموعه</mat-label><input matInput formControlName="name" maxlength="200"><mat-error>نام شرکت را وارد کنید.</mat-error></mat-form-field>}
         @if(kind!=='company'){<div class="row"><mat-form-field appearance="outline"><mat-label>نام</mat-label><input matInput formControlName="firstName" maxlength="100"><mat-error>نام را وارد کنید.</mat-error></mat-form-field><mat-form-field appearance="outline"><mat-label>نام خانوادگی</mat-label><input matInput formControlName="lastName" maxlength="100"><mat-error>نام خانوادگی را وارد کنید.</mat-error></mat-form-field></div>}
-        <div class="row"><mat-form-field appearance="outline"><mat-label>شماره تماس</mat-label><input matInput formControlName="phone" type="tel" maxlength="40"></mat-form-field><mat-form-field appearance="outline"><mat-label>شعبه</mat-label><mat-select formControlName="branchId">@for(b of branches;track b.id){<mat-option [value]="b.id">{{b.name}}</mat-option>}</mat-select><mat-error>شعبه را انتخاب کنید.</mat-error></mat-form-field></div>
-        <p *ngIf="branchError" class="form-error">دریافت شعبه‌ها ناموفق بود. <button mat-button type="button" (click)="loadBranches()">تلاش دوباره</button></p>
+        <div class="row"><mat-form-field appearance="outline"><mat-label>شماره تماس</mat-label><input matInput formControlName="phone" type="tel" maxlength="40"></mat-form-field><span>طرف حساب بین همه شعب مشترک است.</span></div>
         <mat-form-field appearance="outline"><mat-label>نشانی (اختیاری)</mat-label><textarea matInput formControlName="address" rows="2" maxlength="500"></textarea></mat-form-field>
         <div class="flags"><span>نقش طرف حساب:</span><mat-checkbox formControlName="isCustomer">مشتری</mat-checkbox><mat-checkbox formControlName="isVendor">تأمین‌کننده</mat-checkbox><mat-checkbox formControlName="isEmployee" (change)="onEmployeeChange($event.checked)">کارمند</mat-checkbox></div>
         <details class="extra"><summary>اطلاعات تکمیلی و بانکی (اختیاری)</summary>
@@ -59,7 +58,8 @@ type ContactKind = 'company' | 'person' | 'both';
       <mat-dialog-actions align="end">@if(data.contact){<a *appHasPermission="'Contact.Read'" mat-button routerLink="/opening-balances" [queryParams]="{tab:'contacts',contactId:data.contact.id}" (click)="dialogRef.close(null)">مانده اول دوره</a>}<button type="button" mat-button (click)="dialogRef.close(null)">بستن</button><button type="submit" mat-flat-button>ذخیره طرف حساب</button></mat-dialog-actions>
     </form>
   `,
-  styles:[`.identity-selector{padding:18px 24px 12px;border-bottom:1px solid #e1e9e5;background:#f7faf9}.identity-selector mat-form-field{width:100%;margin-bottom:0}.customer-number{font-size:12px;color:#526d64}.fields{display:flex;flex-direction:column;gap:12px;min-width:0}.row{display:flex;gap:12px}.row mat-form-field{flex:1;min-width:0}.flags{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap}.flags>span{font-size:12px}.extra{border:1px solid #dbe5e0;border-radius:12px;padding:12px}.extra summary{cursor:pointer;color:#29634f;margin-bottom:12px}.extra mat-form-field{width:100%}.form-error{font-size:12px}@media(max-width:600px){.row{flex-wrap:wrap}.row mat-form-field{flex-basis:100%}}`]
+  styles:[`:host{display:flex;flex-direction:column;flex:1;min-height:0;max-height:inherit;overflow:hidden}h2[mat-dialog-title]{flex-shrink:0}form{display:flex;flex-direction:column;min-height:0;max-height:calc(94dvh - 68px);overflow:hidden}.fields.mat-mdc-dialog-content{flex:1 1 auto;min-height:0;max-height:none!important;overflow-y:auto}.fields>*{flex-shrink:0}mat-dialog-actions{flex:0 0 auto;position:relative;z-index:1;padding-bottom:max(12px,env(safe-area-inset-bottom))}
+.identity-selector{padding:18px 24px 12px;border-bottom:1px solid #e1e9e5;background:#f7faf9}.identity-selector mat-form-field{width:100%;margin-bottom:0}.customer-number{font-size:12px;color:#526d64}.fields{display:flex;flex-direction:column;gap:12px;min-width:0}.row{display:flex;gap:12px}.row mat-form-field{flex:1;min-width:0}.flags{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap}.flags>span{font-size:12px}.extra{border:1px solid #dbe5e0;border-radius:12px;padding:12px}.extra summary{cursor:pointer;color:#29634f;margin-bottom:12px}.extra mat-form-field{width:100%}.form-error{font-size:12px}@media(max-width:600px){.row{flex-wrap:wrap}.row mat-form-field{flex-basis:100%}}`]
 })
 export class ContactFormDialogComponent {
   dialogRef = inject(MatDialogRef<ContactFormDialogComponent>);
@@ -103,7 +103,7 @@ export class ContactFormDialogComponent {
   });
 
   constructor() {
-    this.loadBranches();
+
     this.applyKindValidators();
   }
 

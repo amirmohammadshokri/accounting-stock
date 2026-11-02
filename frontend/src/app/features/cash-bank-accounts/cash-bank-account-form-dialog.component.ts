@@ -1,3 +1,4 @@
+import { BranchContextService } from '../../core/services/branch-context.service';
 import { PersianPipe } from '../../shared/persian.pipe';
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -30,14 +31,7 @@ export interface CashBankAccountFormDialogData {
           کد: {{ data.account.code }} · واحد پول: {{ data.account.currency | persian:'currency' }} · مانده: {{ data.account.balance }}
         </div>
 
-        <mat-form-field appearance="outline" *ngIf="!data.account">
-          <mat-label>شعبه</mat-label>
-          <mat-select formControlName="branchId">
-            @for (b of branches; track b.id) {
-              <mat-option [value]="b.id">{{ b.code }} - {{ b.name }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
+        <p>شعبه فعال: {{branchContext.active()?.name}}</p>
 
         <mat-form-field appearance="outline">
           <mat-label>نوع</mat-label>
@@ -72,13 +66,14 @@ export class CashBankAccountFormDialogComponent {
   dialogRef = inject(MatDialogRef<CashBankAccountFormDialogComponent>);
   data = inject<CashBankAccountFormDialogData>(MAT_DIALOG_DATA);
   private fb = inject(FormBuilder);
+  readonly branchContext = inject(BranchContextService);
   private branchesService = inject(BranchesService);
 
   CashBankAccountType = CashBankAccountType;
   branches: BranchListItemDto[] = [];
 
   form = this.fb.group({
-    branchId: [this.data.account?.branchId ?? null, this.data.account ? [] : [Validators.required]],
+    branchId: [this.data.account?.branchId ?? this.branchContext.active()?.id ?? null, this.data.account ? [] : [Validators.required]],
     type: [this.data.account?.type === 'Bank' ? CashBankAccountType.Bank : CashBankAccountType.Cash, Validators.required],
     name: [this.data.account?.name ?? '', [Validators.required, Validators.maxLength(160)]],
     iban: [this.data.account?.iban ?? '', [Validators.maxLength(34)]]
@@ -86,7 +81,7 @@ export class CashBankAccountFormDialogComponent {
 
   constructor() {
     if (!this.data.account) {
-      this.branchesService.list().subscribe(res => (this.branches = res));
+
     }
   }
 

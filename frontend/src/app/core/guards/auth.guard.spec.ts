@@ -1,3 +1,4 @@
+import { BranchContextService } from '../services/branch-context.service';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter, UrlTree } from '@angular/router';
 import { authGuard, guestGuard, adminGuard } from './auth.guard';
@@ -11,6 +12,8 @@ class AuthServiceStub {
     this.authed = authed;
     this.admin = admin;
   }
+
+  currentUser() { return {id: 1}; }
 
   isAuthenticated(): boolean {
     return this.authed;
@@ -31,7 +34,7 @@ describe('auth guards', () => {
   beforeEach(() => {
     authStub = new AuthServiceStub();
     TestBed.configureTestingModule({
-      providers: [provideRouter([]), { provide: AuthService, useValue: authStub }]
+      providers: [{provide:BranchContextService,useValue:{active:()=>({userId:1,id:1})}},provideRouter([]), { provide: AuthService, useValue: authStub }]
     });
     router = TestBed.inject(Router);
   });
@@ -41,6 +44,13 @@ describe('auth guards', () => {
       authStub.setState(true);
       const result = TestBed.runInInjectionContext(() => authGuard(fakeRoute, fakeState));
       expect(result).toBeTrue();
+    });
+
+    it('requires branch selection before opening operational pages', () => {
+      authStub.setState(true);
+      spyOn(TestBed.inject(BranchContextService), 'active').and.returnValue(null);
+      const result = TestBed.runInInjectionContext(() => authGuard(fakeRoute, fakeState));
+      expect((result as UrlTree).toString()).toBe('/select-branch');
     });
 
     it('redirects to /login with returnUrl when not authenticated', () => {

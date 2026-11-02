@@ -20,6 +20,7 @@ export interface UserListItemDto {
   email: string;
   branchId?: number | null;
   branchName?: string | null;
+  allowedBranchIds?: number[];
   isActive: boolean;
   createdAtUtc: string;             // ISO-8601 UTC
 }
@@ -35,6 +36,7 @@ export interface UserDetailDto {
   email: string;
   branchId?: number | null;
   branchName?: string | null;
+  allowedBranchIds?: number[];
   isActive: boolean;
   roles: string[];                  // Role names
   createdAtUtc: string;             // ISO-8601 UTC
@@ -74,6 +76,7 @@ export interface CreateUserBody {
   password: string;                 // Plain text (will be hashed by backend)
   branchId?: number | null;
   isActive: boolean;
+  allowedBranchIds?: number[];
   roleIds: number[];                // Role IDs to assign
 }
 
@@ -88,6 +91,7 @@ export interface UpdateUserBody {
   email: string;
   branchId?: number | null;
   isActive: boolean;
+  allowedBranchIds?: number[];
   roleIds: number[];                // Role IDs to assign
 }
 

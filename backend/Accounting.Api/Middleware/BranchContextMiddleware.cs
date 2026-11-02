@@ -34,7 +34,7 @@ public sealed class BranchContextMiddleware(RequestDelegate next)
             if (!int.TryParse(raw, out var parsed) || parsed <= 0) throw new ForbiddenAccessException();
             branchId = parsed;
         }
-        if (branchId.HasValue && ((!crossBranch && !allowed.Contains(branchId.Value))
+        if (branchId.HasValue && ((!allowed.Contains(branchId.Value) && (!crossBranch || !HttpMethods.IsGet(context.Request.Method)))
             || !await db.Branches.AnyAsync(b => b.Id == branchId.Value, context.RequestAborted)))
             throw new ForbiddenAccessException();
 

@@ -82,7 +82,7 @@ export const PERMISSION_GROUPS: PermissionGroup[] = [
   { label: 'چک / سفته', permissions: ['Cheque.Create', 'Cheque.Read', 'Cheque.Update', 'Cheque.Delete', 'Cheque.UpdateStatus'] },
   { label: 'واحدهای کالا', permissions: ['Unit.Create', 'Unit.Read', 'Unit.Update', 'Unit.Delete'] },
   { label: 'دسته‌بندی‌ها', permissions: ['Category.Create', 'Category.Read', 'Category.Update', 'Category.Delete'] },
-  { label: 'شعبه‌ها', permissions: ['Branch.Create', 'Branch.Read', 'Branch.Update', 'Branch.Delete'] },
+  { label: 'شعبه‌ها', permissions: ['Branch.Create', 'Branch.Read', 'Branch.Update', 'Branch.Delete', 'Branch.ViewAll'] },
   { label: 'کاربران', permissions: ['User.Create', 'User.Read', 'User.Update', 'User.Delete'] },
   { label: 'نقش‌ها', permissions: ['Role.Create', 'Role.Read', 'Role.Update', 'Role.Delete'] },
   { label: 'گزارش‌ها', permissions: ['Report.Dashboard', 'Report.ProfitLoss', 'Report.ContactStatement', 'Report.StockStatus'] },

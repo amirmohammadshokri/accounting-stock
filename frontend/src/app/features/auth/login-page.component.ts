@@ -50,6 +50,7 @@ import { AuthService } from '../../core/services/auth.service';
             <button mat-flat-button type="submit" class="submit-btn" [disabled]="loading()">@if(loading()){<mat-spinner diameter="20"></mat-spinner><span>در حال ورود…</span>}@else{<span>ورود به سامانه</span>}<mat-icon *ngIf="!loading()" iconPositionEnd [svgIcon]="'arrow_back'"></mat-icon></button>
           </form><p class="help">اگر رمز را فراموش کرده‌اید، از مدیر سامانه کمک بگیرید.</p>
         </div><p class="login-footer">ساده، منظم و مناسب کارهای روزمره</p>
+        <p class="support-contact">پشتیبانی: <a [href]="'tel:'+brand.supportPhone"><bdi dir="ltr">{{brand.supportPhone}}</bdi></a></p>
       </section>
     </main>
   `,

@@ -1,3 +1,4 @@
+import { BranchContextService } from './core/services/branch-context.service';
 import { LicenseService } from './core/services/license.service';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -37,6 +38,8 @@ import { NavigationMenuService } from './core/services/navigation-menu.service';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
+  readonly branchContext = inject(BranchContextService);
+  setAllBranches(value:boolean):void { sessionStorage.setItem('branchListScope', value?'all':'active'); window.location.reload(); }
   readonly license = inject(LicenseService);
   readonly brand = APP_BRAND;
   appearance = inject(AppearanceService);

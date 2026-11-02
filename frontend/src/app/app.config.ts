@@ -1,3 +1,4 @@
+import { branchContextInterceptor } from './core/interceptors/branch-context.interceptor';
 import { AppSvgIcons } from './core/icons/app-svg-icon.directive';
 import { ApplicationConfig, LOCALE_ID, inject, provideAppInitializer, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
 import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
@@ -28,6 +29,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withFetch(),
       withInterceptors([
+        branchContextInterceptor,
         authInterceptor,          // Auth interceptor ÖNCE (token ekler)
         httpProblemInterceptor    // Problem interceptor SONRA (hata yakalar)
       ])),

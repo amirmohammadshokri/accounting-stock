@@ -3,8 +3,9 @@ import { authGuard, guestGuard, adminGuard } from './core/guards/auth.guard';
 import { permissionGuard,openingBalancesGuard } from './core/guards/permission.guard';
 
 export const routes: Routes = [
+  {path:'select-branch',canActivate:[authGuard],loadComponent:()=>import('./features/auth/select-branch-page.component').then(m=>m.SelectBranchPageComponent)},
   {path:'invoice-mrt-designer',canActivate:[authGuard,permissionGuard('CompanySettings.Read'),permissionGuard('CompanySettings.Update')],canDeactivate:[(component:import('./features/invoice-print-layouts/mrt-designer-page.component').MrtDesignerPageComponent)=>component.canLeave()],loadComponent:()=>import('./features/invoice-print-layouts/mrt-designer-page.component').then(m=>m.MrtDesignerPageComponent)},
-  {path:'data-maintenance',canActivate:[adminGuard,permissionGuard('DataMaintenance.Read')],loadComponent:()=>import('./features/data-maintenance/data-maintenance-page.component').then(m=>m.DataMaintenancePageComponent)},
+  {path:'data-maintenance',canActivate:[authGuard,adminGuard,permissionGuard('DataMaintenance.Read')],loadComponent:()=>import('./features/data-maintenance/data-maintenance-page.component').then(m=>m.DataMaintenancePageComponent)},
   {path:'license-expired',loadComponent:()=>import('./features/auth/license-expired-page.component').then(m=>m.LicenseExpiredPageComponent)},
   // Public routes (guest only)
   {

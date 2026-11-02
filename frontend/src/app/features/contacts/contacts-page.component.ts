@@ -34,7 +34,7 @@ import { ContactFormDialogComponent, ContactFormDialogData } from './contact-for
     <div class="toolbar">
       <span class="title">مشتری‌ها و طرف‌حساب‌ها</span>
       <span class="spacer"></span>
-    
+
 <button *appHasPermission="'Contact.Create'" mat-stroked-button color="primary" (click)="openCreate()">
         <mat-icon [svgIcon]="'add'"></mat-icon>
         طرف حساب جدید
@@ -46,15 +46,7 @@ import { ContactFormDialogComponent, ContactFormDialogData } from './contact-for
         <mat-label>جستجو (شماره اشتراک، نام یا تلفن)</mat-label>
         <input matInput [(ngModel)]="filters.search" />
       </mat-form-field>
-      <mat-form-field *appHasPermission="'Branch.Read'" appearance="outline" class="branch-field">
-        <mat-label>شعبه</mat-label>
-        <mat-select [(ngModel)]="filters.branchId">
-          <mat-option [value]="null">همه شعبه‌ها</mat-option>
-          @for (b of branches; track b.id) {
-            <mat-option [value]="b.id">{{ b.code }} - {{ b.name }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
+
       <mat-form-field appearance="outline">
         <mat-label>نوع</mat-label>
         <mat-select [(ngModel)]="typeFilter">
@@ -81,8 +73,8 @@ import { ContactFormDialogComponent, ContactFormDialogData } from './contact-for
     .toolbar { display:flex; align-items:center; padding:8px 0; }
     .title { font-weight:600; }
     .spacer { flex:1; }
-    
-    
+
+
   `]
 })
 export class ContactsPageComponent {
@@ -96,7 +88,6 @@ export class ContactsPageComponent {
     { field: 'subscriptionNumber', headerName: 'شماره اشتراک', sortable: false, minWidth:130, pinned:'right',valueGetter:p=>p.data?.subscriptionNumber ?? ('AUTO-' + String(p.data?.id ?? '').padStart(6,'0')) },
     { field: 'code', headerName: 'کد', sortable: true, minWidth: 130 },
     { field: 'name', headerName: 'نام / عنوان', sortable: true, minWidth: 220 },
-    { field: 'branchId', headerName: 'شناسه شعبه', sortable: false, maxWidth: 100 },
     { headerName: 'نوع', colId:'contactRole', sortable: false, minWidth: 180, valueGetter: p => p.data ? getContactType(p.data) : '' },
     { field: 'email', headerName: 'ایمیل', sortable: false, minWidth: 180 },
     { field: 'createdAtUtc', headerName: 'زمان ایجاد', sortable: false, valueFormatter: p => p.value ? new Date(p.value).toLocaleDateString('fa-IR') : '' },
@@ -132,7 +123,7 @@ export class ContactsPageComponent {
     const query: ListContactsQuery = {
       ...q,
       search: (this.filters.search ?? '').trim() || null,
-      branchId: this.filters.branchId,
+
       isCustomer: this.typeFilter === 'isCustomer' ? true : null,
       isVendor: this.typeFilter === 'isVendor' ? true : null,
       isEmployee: this.typeFilter === 'isEmployee' ? true : null,
