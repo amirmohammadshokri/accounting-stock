@@ -80,7 +80,7 @@ public class BranchFilterExtensionsTests : IDisposable
     }
 
     [Fact]
-    public async Task AdminUser_ShouldSeeAllData()
+    public async Task AdminUser_ShouldSeeOnlyActiveBranchByDefault()
     {
         await SeedDataAsync();
 
@@ -91,11 +91,11 @@ public class BranchFilterExtensionsTests : IDisposable
             .ApplyBranchFilter(_userService)
             .ToListAsync();
 
-        Assert.Equal(3, invoices.Count);
+        Assert.Single(invoices);
     }
 
     [Fact]
-    public async Task HeadquartersUser_ShouldSeeAllData()
+    public async Task HeadquartersUser_ShouldSeeOnlyActiveBranchByDefault()
     {
         await SeedDataAsync();
 
@@ -106,7 +106,7 @@ public class BranchFilterExtensionsTests : IDisposable
             .ApplyBranchFilter(_userService)
             .ToListAsync();
 
-        Assert.Equal(3, invoices.Count);
+        Assert.Single(invoices);
     }
 
     [Fact]

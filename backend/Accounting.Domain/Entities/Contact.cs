@@ -3,7 +3,7 @@ using Accounting.Domain.Common;
 
 namespace Accounting.Domain.Entities;
 
-public class Contact : IHasTimestamps, ISoftDeletable, IHasRowVersion, IHasBranch
+public class Contact : IHasTimestamps, ISoftDeletable, IHasRowVersion
 {
     public int Id { get; set; }
     public string? SubscriptionNumber { get; set; }

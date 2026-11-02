@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Accounting.Application.Reports.Queries.GetDashboardStats;
 
-public record GetDashboardStatsQuery(int BranchId) : IRequest<DashboardStatsDto>;
+public record GetDashboardStatsQuery(int? BranchId) : IRequest<DashboardStatsDto>;

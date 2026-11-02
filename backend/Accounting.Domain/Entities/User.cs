@@ -26,6 +26,7 @@ public class User : IHasTimestamps, ISoftDeletable
     public int? BranchId { get; set; }
     public Branch? Branch { get; set; }
     public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+    public ICollection<UserBranch> AllowedBranches { get; set; } = new List<UserBranch>();
     public ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public string FullName => $"{FirstName} {LastName}".Trim();

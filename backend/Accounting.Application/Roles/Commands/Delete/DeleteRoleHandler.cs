@@ -24,10 +24,11 @@ public class DeleteRoleHandler : IRequestHandler<DeleteRoleCommand>
             throw new NotFoundException("Role", request.Id);
 
         // Prevent deletion if users assigned
-        if (role.UserRoles.Any())
+        if (await _db.UserRoles.AnyAsync(ur => ur.RoleId == role.Id && _db.Users.Any(u => u.Id == ur.UserId), ct))
             throw new FluentValidation.ValidationException("نقشی که به کاربران اختصاص یافته است قابل حذف نیست.");
 
-        _db.Roles.Remove(role);
+        role.IsDeleted = true;
+        role.DeletedAtUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync(ct);
     }
 }

@@ -61,12 +61,12 @@ public class OpeningBalanceService(IAppDbContext db, ICurrentUserService user)
             Version(entry,r.RowVersionBase64);
             await CheckContactUnused(r.ContactId,ct);
         }
-        else if (await db.ContactOpeningBalances.AnyAsync(x => x.ContactId == r.ContactId && !x.IsDeleted,ct))
+        else if (await db.ContactOpeningBalances.AnyAsync(x => x.ContactId == r.ContactId && x.BranchId == user.BranchId && !x.IsDeleted,ct))
             throw new BusinessRuleException("مانده اول دوره این طرف حساب قبلاً ثبت شده است.");
         if (await db.Invoices.AnyAsync(x => x.ContactId == r.ContactId && x.DateUtc < r.DateUtc && !x.IsDeleted,ct)
             || await db.Payments.AnyAsync(x => x.ContactId == r.ContactId && x.DateUtc < r.DateUtc && !x.IsDeleted,ct))
             throw new BusinessRuleException("تاریخ اول دوره نمی‌تواند بعد از گردش‌های قبلی طرف حساب باشد.");
-        entry.ContactId = r.ContactId; entry.BranchId = contact.BranchId; entry.DateUtc = DateTime.SpecifyKind(r.DateUtc,DateTimeKind.Utc);
+        entry.ContactId = r.ContactId; entry.BranchId = user.BranchId ?? throw new ForbiddenAccessException(); entry.DateUtc = DateTime.SpecifyKind(r.DateUtc,DateTimeKind.Utc);
         entry.Amount = r.Amount; entry.IsDebit = r.IsDebit.Value; entry.Note = r.Note?.Trim();
         if (!id.HasValue) db.ContactOpeningBalances.Add(entry);
         await Save(ct); await tx.CommitAsync(ct); return Map(entry);

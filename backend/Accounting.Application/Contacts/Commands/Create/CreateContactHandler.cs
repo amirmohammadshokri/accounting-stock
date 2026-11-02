@@ -10,10 +10,12 @@ namespace Accounting.Application.Contacts.Commands.Create;
 public class CreateContactHandler : IRequestHandler<CreateContactCommand, ContactDetailDto>
 {
     private readonly IAppDbContext _db;
-    public CreateContactHandler(IAppDbContext db) => _db = db;
+    private readonly Accounting.Application.Common.Interfaces.ICurrentUserService? _user;
+    public CreateContactHandler(IAppDbContext db, Accounting.Application.Common.Interfaces.ICurrentUserService? user = null) { _db = db; _user = user; }
 
     public async Task<ContactDetailDto> Handle(CreateContactCommand req, CancellationToken ct)
     {
+        req = req with { BranchId = _user?.BranchId ?? req.BranchId };
         var subscription = await SubscriptionNumbers.EnsureAvailable(_db, req.SubscriptionNumber, 0, ct);
         // Auto-generate Code: CRI-{BranchId}-{Sequence}
         var code = await GenerateCodeAsync(req.BranchId, ct);

@@ -1,3 +1,5 @@
+using Accounting.Domain.Common;
+using Accounting.Application.Common.Exceptions;
 using Accounting.Application.Common.Abstractions;
 using Accounting.Domain.Entities;
 using Accounting.Infrastructure.Persistence.Interceptors;
@@ -56,18 +58,38 @@ public class AppDbContext : DbContext, IAppDbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+        modelBuilder.Entity<AuditTrail>().HasIndex(e => e.BranchId);
+        modelBuilder.Entity<AuditTrail>().HasQueryFilter(e => !BranchScopeEnforced || ReadAllBranches || e.BranchId == ActiveBranchId);
 
-        // NOTE: Multi-Branch Visibility Filtering
-        // We do NOT use Global Query Filters for branch-based security because:
-        // 1. EF Core caches compiled queries with Expression.Constant, which captures service state at model-build time
-        // 2. ICurrentUserService is scoped per-request, but OnModelCreating runs once at app startup
-        // 3. This causes security issues where filter conditions become stale
-        //
-        // BEST PRACTICE: Apply branch filtering explicitly in each Handler/Query
-        // Example in handler:
-        //   var invoices = await context.Invoices
-        //       .Where(i => currentUserService.IsAdmin || currentUserService.IsHeadquarters || i.BranchId == currentUserService.BranchId)
-        //       .ToListAsync();
+        foreach (var type in modelBuilder.Model.GetEntityTypes().Select(e => e.ClrType).ToList())
+        {
+            if (typeof(IHasBranch).IsAssignableFrom(type) && typeof(ISoftDeletable).IsAssignableFrom(type))
+                typeof(AppDbContext).GetMethod(nameof(ConfigureBranchFilter), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+                    .MakeGenericMethod(type).Invoke(this, new object[] { modelBuilder });
+        }
+        modelBuilder.Entity<InvoiceLine>().HasQueryFilter(e => !e.IsDeleted && (!BranchScopeEnforced || ReadAllBranches || e.Invoice.BranchId == ActiveBranchId));
+        modelBuilder.Entity<OrderLine>().HasQueryFilter(e => !e.IsDeleted && (!BranchScopeEnforced || ReadAllBranches || e.Order.BranchId == ActiveBranchId));
+
+    }
+
+    // Context properties are parameterized by EF per DbContext, never captured service constants.
+    public bool BranchScopeEnforced => _currentUserService.EnforceBranchScope;
+    public bool ReadAllBranches => _currentUserService.AllBranches;
+    public int? ActiveBranchId => _currentUserService.BranchId;
+
+    private void ConfigureBranchFilter<T>(ModelBuilder builder) where T : class, IHasBranch, ISoftDeletable
+        => builder.Entity<T>().HasQueryFilter(e => !e.IsDeleted && (!BranchScopeEnforced || ReadAllBranches || e.BranchId == ActiveBranchId));
+
+    private void ValidateBranchWrites()
+    {
+        if (!BranchScopeEnforced) return;
+        foreach (var entry in ChangeTracker.Entries().Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted))
+        {
+            if (entry.Entity is not IHasBranch entity) continue;
+            if (!ActiveBranchId.HasValue || entity.BranchId != ActiveBranchId.Value
+                || (entry.State != EntityState.Added && (int)entry.Property("BranchId").OriginalValue! != ActiveBranchId.Value))
+                throw new ForbiddenAccessException();
+        }
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -85,12 +107,14 @@ public class AppDbContext : DbContext, IAppDbContext
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
+        ValidateBranchWrites();
         ValidateRialCurrency();
         return base.SaveChanges(acceptAllChangesOnSuccess);
     }
 
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
+        ValidateBranchWrites();
         ValidateRialCurrency();
         return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }

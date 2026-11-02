@@ -7,6 +7,7 @@ public class AuditTrail
 {
     public int Id { get; set; }
     public int? UserId { get; set; }
+    public int? BranchId { get; set; }
     public string? Action { get; set; }    // "Insert", "Update", "Delete", "SoftDelete"
     public string? EntityName { get; set; }
     public string? PrimaryKey { get; set; }

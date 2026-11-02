@@ -9,7 +9,7 @@ public class ContactOpeningBalanceConfiguration : IEntityTypeConfiguration<Conta
         b.ToTable("ContactOpeningBalances", t => t.HasCheckConstraint("CK_ContactOpening_Amount", "[Amount] > 0"));
         b.HasKey(x => x.Id); b.Property(x => x.Amount).HasPrecision(18,2);
         b.Property(x => x.Note).HasMaxLength(500); b.ApplyRowVersion(); b.ApplySoftDelete();
-        b.HasIndex(x => x.ContactId).IsUnique().HasFilter("[IsDeleted] = 0");
+        b.HasIndex(x => new { x.BranchId, x.ContactId }).IsUnique().HasFilter("[IsDeleted] = 0");
         b.HasOne<Contact>().WithMany().HasForeignKey(x => x.ContactId).OnDelete(DeleteBehavior.Restrict);
         b.HasOne<Branch>().WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.Restrict);
     }

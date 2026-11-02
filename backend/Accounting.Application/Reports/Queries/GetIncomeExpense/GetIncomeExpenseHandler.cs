@@ -25,11 +25,7 @@ public class GetIncomeExpenseHandler(IAppDbContext db, ICurrentUserService curre
         // IDOR koruması: HQ/Admin olmayan bir kullanıcı, branchId'yi hiç göndermeyerek
         // (şirket geneli) ya da başka bir şubenin ID'sini göndererek kendi şubesi dışındaki
         // gelir/gider verilerini göremesin — GetDashboardStatsHandler'daki aynı desen.
-        var branchId = request.BranchId;
-        if (!currentUserService.IsAdmin && !currentUserService.IsHeadquarters && currentUserService.BranchId.HasValue)
-        {
-            branchId = currentUserService.BranchId.Value;
-        }
+        int? branchId = currentUserService.AllBranches ? null : currentUserService.BranchId ?? request.BranchId;
 
         // =================================================================
         // 1. NET SATIŞLAR (Sales - Sales Returns)

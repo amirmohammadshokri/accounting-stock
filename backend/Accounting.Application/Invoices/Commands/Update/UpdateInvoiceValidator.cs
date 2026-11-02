@@ -66,26 +66,7 @@ public sealed class UpdateInvoiceValidator : AbstractValidator<UpdateInvoiceComm
 
     private async Task<bool> ContactBelongsToSameBranchAsync(UpdateInvoiceCommand cmd, CancellationToken ct)
     {
-        // Admin/HQ users can update any branch's invoice, same bypass ApplyBranchFilter
-        // applies everywhere else — without this, an admin could never update an invoice
-        // for a contact outside their own "home" branch (found via manual UI testing:
-        // editing invoice #2, whose contact belongs to a different branch than the admin
-        // account's own branch, failed validation every time).
-        if (_currentUserService.IsAdmin || _currentUserService.IsHeadquarters) return true;
-
-        if (!_currentUserService.BranchId.HasValue) return false;
-        var currentBranchId = _currentUserService.BranchId.Value;
-
-        var contact = await _db.Contacts
-            .AsNoTracking()
-            .Where(c => c.Id == cmd.ContactId && !c.IsDeleted)
-            .Select(c => new { c.BranchId })
-            .FirstOrDefaultAsync(ct);
-
-        if (contact == null)
-            return false;
-
-        return contact.BranchId == currentBranchId;
+        return await _db.Contacts.AnyAsync(c => c.Id == cmd.ContactId, ct);
     }
 
     private async Task<bool> AllItemsExistAsync(UpdateInvoiceCommand cmd, CancellationToken ct)

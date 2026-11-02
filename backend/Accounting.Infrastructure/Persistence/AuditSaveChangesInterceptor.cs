@@ -111,6 +111,7 @@ public sealed class AuditSaveChangesInterceptor : SaveChangesInterceptor
         var audit = new AuditTrail
         {
             UserId = userId,
+            BranchId = _currentUserService.BranchId,
             EntityName = entry.Entity.GetType().Name,
             TimestampUtc = now,
             PrimaryKey = GetPrimaryKey(entry)

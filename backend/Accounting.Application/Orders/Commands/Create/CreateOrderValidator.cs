@@ -64,18 +64,6 @@ public class CreateOrderValidator : AbstractValidator<CreateOrderCommand>
 
     private async Task<bool> ContactIsValidForBranchAsync(int contactId, CancellationToken ct)
     {
-        var contact = await _db.Contacts
-            .AsNoTracking()
-            .Where(c => c.Id == contactId && !c.IsDeleted)
-            .Select(c => new { c.BranchId })
-            .FirstOrDefaultAsync(ct);
-
-        if (contact == null) return false;
-
-        // Admin/HQ bypass — same rule ApplyBranchFilter applies everywhere else.
-        if (_currentUserService.IsAdmin || _currentUserService.IsHeadquarters) return true;
-
-        if (!_currentUserService.BranchId.HasValue) return false;
-        return contact.BranchId == _currentUserService.BranchId.Value;
+        return await _db.Contacts.AnyAsync(c => c.Id == contactId, ct);
     }
 }

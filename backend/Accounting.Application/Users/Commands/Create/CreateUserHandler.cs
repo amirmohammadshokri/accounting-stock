@@ -37,6 +37,11 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, int>
                 throw new NotFoundException("Branch", request.BranchId.Value);
         }
 
+        var branchIds = (request.AllowedBranchIds ?? new List<int>()).Distinct().ToList();
+        if (request.BranchId.HasValue && !branchIds.Contains(request.BranchId.Value)) branchIds.Add(request.BranchId.Value);
+        if (await _db.Branches.CountAsync(b => branchIds.Contains(b.Id), ct) != branchIds.Count)
+            throw new FluentValidation.ValidationException("یک یا چند شعبه مجاز معتبر نیست.");
+
         // Verify roles exist
         var roles = await _db.Roles
             .Where(r => request.RoleIds.Contains(r.Id))
@@ -55,6 +60,9 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, int>
             BranchId = request.BranchId,
             IsActive = request.IsActive
         };
+
+        user.AllowedBranches.Clear();
+        foreach (var branchId in branchIds) user.AllowedBranches.Add(new UserBranch { BranchId = branchId, UserId = user.Id });
 
         // Assign roles
         foreach (var roleId in request.RoleIds)

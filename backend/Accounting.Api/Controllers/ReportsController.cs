@@ -18,7 +18,7 @@ public class ReportsController(IMediator mediator, IExcelService excelService) :
 {
     [HttpGet("dashboard")]
     [Authorize(Policy = Permissions.Report.Dashboard)]
-    public async Task<ActionResult<DashboardStatsDto>> GetDashboard([FromQuery] int branchId = 1, CancellationToken ct = default)
+    public async Task<ActionResult<DashboardStatsDto>> GetDashboard([FromQuery] int? branchId = null, CancellationToken ct = default)
     {
         return Ok(await mediator.Send(new GetDashboardStatsQuery(branchId), ct));
     }

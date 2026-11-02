@@ -22,5 +22,6 @@ public record UserDetailDto(
     bool IsActive,
     List<string> Roles,
     DateTime CreatedAtUtc,
-    DateTime? UpdatedAtUtc
+    DateTime? UpdatedAtUtc,
+    List<int>? AllowedBranchIds = null
 );

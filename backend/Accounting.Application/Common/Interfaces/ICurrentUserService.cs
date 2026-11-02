@@ -6,4 +6,6 @@ public interface ICurrentUserService
     int? BranchId { get; }
     bool IsHeadquarters { get; }
     bool IsAdmin { get; }
+    bool EnforceBranchScope => false;
+    bool AllBranches => false;
 }

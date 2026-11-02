@@ -32,11 +32,7 @@ public class ListContactsHandler : IRequestHandler<ListContactsQuery, PagedResul
             .AsNoTracking()
             .ApplyBranchFilter(_currentUserService);
 
-        // BranchId filter
-        if (q.BranchId.HasValue)
-        {
-            qry = qry.Where(x => x.BranchId == q.BranchId.Value);
-        }
+
 
         if (!string.IsNullOrWhiteSpace(q.Search))
         {

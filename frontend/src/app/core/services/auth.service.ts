@@ -1,3 +1,4 @@
+import { BranchContextService } from './branch-context.service';
 import { HANDLE_ERROR_LOCALLY } from '../interceptors/http-problem-interceptor';
 /**
  * Auth Service
@@ -24,6 +25,7 @@ const SESSION_KEY = 'authSession';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private branches = inject(BranchContextService);
   private http = inject(HttpClient);
   private router = inject(Router);
   private baseUrl = `${environment.apiBaseUrl}/auth`;
@@ -36,7 +38,11 @@ export class AuthService {
   private authEpoch = 0;
   
   // Public readonly signals
-  readonly currentUser = this.currentUserSignal.asReadonly();
+  readonly currentUser = computed(() => {
+    const user = this.currentUserSignal();
+    const branch = this.branches.active();
+    return user && branch?.userId === user.id ? {...user, branchId: branch.id, isHeadquarters: branch.isHeadquarters} : user;
+  });
   readonly isAuthenticated = computed(() => this.currentUser() !== null);
   readonly isAdmin = computed(() => ['مدیر سامانه', 'Admin'].includes(this.currentUser()?.role ?? ''));
 
@@ -63,6 +69,7 @@ export class AuthService {
    * POST /api/auth/login
    */
   login(body: LoginBody): Observable<AuthResponse> {
+    this.branches.clear();
     const epoch = ++this.authEpoch;
     return this.http.post<AuthResponse>(`${this.baseUrl}/login`, body, {withCredentials: true, context:new HttpContext().set(HANDLE_ERROR_LOCALLY,true)}).pipe(
       tap(response => { if (epoch === this.authEpoch) this.handleAuthResponse(response); })
@@ -245,6 +252,7 @@ export class AuthService {
   }
 
   private clearAuth(): void {
+    this.branches.clear();
     this.authEpoch++;
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);

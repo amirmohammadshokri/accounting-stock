@@ -38,20 +38,6 @@ public class CreateChequeValidator : AbstractValidator<CreateChequeCommand>
 
     private async Task<bool> ContactBelongsToSameBranchAsync(CreateChequeCommand cmd, CancellationToken ct)
     {
-        if (!cmd.ContactId.HasValue) return true;
-
-        // Admin/HQ bypass — same rule ApplyBranchFilter applies everywhere else.
-        if (_currentUserService.IsAdmin || _currentUserService.IsHeadquarters) return true;
-
-        if (!_currentUserService.BranchId.HasValue) return false;
-        var currentBranchId = _currentUserService.BranchId.Value;
-
-        var contact = await _db.Contacts
-            .AsNoTracking()
-            .Select(c => new { c.Id, c.BranchId })
-            .FirstOrDefaultAsync(c => c.Id == cmd.ContactId.Value, ct);
-
-        if (contact == null) return false; // Cari bulunamadı
-        return contact.BranchId == currentBranchId;
+        return await _db.Contacts.AnyAsync(c => c.Id == cmd.ContactId, ct);
     }
 }

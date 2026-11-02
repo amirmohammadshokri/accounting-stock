@@ -208,6 +208,7 @@ app.UseCors("Frontend");
 
 app.UseAuthentication();
 app.UseMiddleware<SessionValidationMiddleware>();
+app.UseMiddleware<BranchContextMiddleware>();
 app.UseMiddleware<DataMaintenanceMiddleware>();
 app.UseRateLimiter();
 app.UseMiddleware<LicenseMiddleware>();

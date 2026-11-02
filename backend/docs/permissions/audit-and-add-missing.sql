@@ -59,6 +59,7 @@ INSERT @Catalog (Permission) VALUES
     (N'Category.Read'),
     (N'Category.Update'),
     (N'Category.Delete'),
+    (N'Branch.ViewAll'),
     (N'Branch.Create'),
     (N'Branch.Read'),
     (N'Branch.Update'),

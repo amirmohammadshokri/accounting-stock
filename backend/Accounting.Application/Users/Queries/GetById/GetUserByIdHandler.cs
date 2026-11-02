@@ -20,6 +20,7 @@ public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, UserDetailDt
         var user = await _db.Users
             .AsNoTracking()
             .Include(u => u.Branch)
+            .Include(u => u.AllowedBranches)
             .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
             .FirstOrDefaultAsync(u => u.Id == request.Id && !u.IsDeleted, ct);
@@ -41,7 +42,8 @@ public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, UserDetailDt
             user.IsActive,
             roles,
             user.CreatedAtUtc,
-            user.UpdatedAtUtc
+            user.UpdatedAtUtc,
+            user.AllowedBranches.Select(b => b.BranchId).ToList()
         );
     }
 }

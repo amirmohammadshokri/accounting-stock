@@ -9,5 +9,6 @@ public record CreateUserCommand(
     string Password,
     int? BranchId,
     bool IsActive,
-    List<int> RoleIds
+    List<int> RoleIds,
+    List<int>? AllowedBranchIds = null
 ) : IRequest<int>;

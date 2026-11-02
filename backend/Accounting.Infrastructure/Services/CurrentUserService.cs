@@ -8,7 +8,9 @@ public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICur
 {
     public int? UserId => GetClaimValue("id"); // or JwtRegisteredClaimNames.Sub
 
-    public int? BranchId => GetClaimValue("branchId");
+    public int? BranchId => httpContextAccessor.HttpContext?.Items["ActiveBranchId"] is int id ? id : GetClaimValue("branchId");
+    public bool EnforceBranchScope => httpContextAccessor.HttpContext?.Items["EnforceBranchScope"] is true;
+    public bool AllBranches => httpContextAccessor.HttpContext?.Items["AllBranches"] is true;
 
     public bool IsHeadquarters 
     {

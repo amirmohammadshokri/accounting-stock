@@ -9,5 +9,6 @@ public record UpdateUserCommand(
     string Email,
     int? BranchId,
     bool IsActive,
-    List<int> RoleIds
+    List<int> RoleIds,
+    List<int>? AllowedBranchIds = null
 ) : IRequest;

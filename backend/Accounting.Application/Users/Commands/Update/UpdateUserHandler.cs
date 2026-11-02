@@ -19,6 +19,7 @@ public class UpdateUserHandler : IRequestHandler<UpdateUserCommand>
     {
         var user = await _db.Users
             .Include(u => u.UserRoles)
+            .Include(u => u.AllowedBranches)
             .FirstOrDefaultAsync(u => u.Id == request.Id && !u.IsDeleted, ct);
 
         if (user is null)
@@ -41,6 +42,11 @@ public class UpdateUserHandler : IRequestHandler<UpdateUserCommand>
                 throw new NotFoundException("Branch", request.BranchId.Value);
         }
 
+        var branchIds = (request.AllowedBranchIds ?? user.AllowedBranches.Select(b => b.BranchId).ToList()).Distinct().ToList();
+        if (request.BranchId.HasValue && !branchIds.Contains(request.BranchId.Value)) branchIds.Add(request.BranchId.Value);
+        if (await _db.Branches.CountAsync(b => branchIds.Contains(b.Id), ct) != branchIds.Count)
+            throw new FluentValidation.ValidationException("یک یا چند شعبه مجاز معتبر نیست.");
+
         // Verify roles exist
         var roles = await _db.Roles
             .Where(r => request.RoleIds.Contains(r.Id))
@@ -55,6 +61,11 @@ public class UpdateUserHandler : IRequestHandler<UpdateUserCommand>
         user.Email = request.Email;
         user.BranchId = request.BranchId;
         user.IsActive = request.IsActive;
+
+        foreach (var old in user.AllowedBranches.Where(b => !branchIds.Contains(b.BranchId)).ToList())
+            user.AllowedBranches.Remove(old);
+        foreach (var branchId in branchIds.Where(id => !user.AllowedBranches.Any(b => b.BranchId == id)))
+            user.AllowedBranches.Add(new UserBranch { BranchId = branchId, UserId = user.Id });
 
         // Update roles - remove old and add new
         user.UserRoles.Clear();

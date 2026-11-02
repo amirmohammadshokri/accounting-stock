@@ -115,6 +115,7 @@ public static class Permissions
 
     public static class Branch
     {
+        public const string ViewAll = "Branch.ViewAll";
         public const string Create = "Branch.Create";
         public const string Read = "Branch.Read";
         public const string Update = "Branch.Update";
@@ -183,6 +184,7 @@ public static class Permissions
             Category.Create, Category.Read, Category.Update, Category.Delete,
             // Branch
             Branch.Create, Branch.Read, Branch.Update, Branch.Delete,
+            Branch.ViewAll,
             // User
             User.Create, User.Read, User.Update, User.Delete,
             // Role
